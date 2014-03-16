@@ -15,5 +15,12 @@
   "bugs": {
     "url": "https://github.com/jackrr/air-flick/issues"
   },
-  "homepage": "https://github.com/jackrr/air-flick"
+  "homepage": "https://github.com/jackrr/air-flick",
+  "dependencies": {
+    "backbone": "~1.1.2",
+    "dustjs-linkedin": "~2.3.4",
+    "socket.io": "~0.9.16",
+    "jquery": "~2.1.0",
+    "express": "~3.4.8"
+  }
 }
