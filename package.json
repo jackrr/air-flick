@@ -1,0 +1,19 @@
+{
+  "name": "air-flick",
+  "version": "0.0.0",
+  "description": "send data from a controlling device to a screen",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jackrr/air-flick.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jackrr/air-flick/issues"
+  },
+  "homepage": "https://github.com/jackrr/air-flick"
+}
