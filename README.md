@@ -4,6 +4,9 @@
 
 A web-based data transfer system in which mobile devices act as controllers between multi-computer, multi-screen systems.
 
+## Ideas ##
+* pinwheel screen assignment and data transfer
+
 ## Timeline ##
 #### March 21, 2014 ####
   1. Controller application detects events and transmits corresponding response to server
