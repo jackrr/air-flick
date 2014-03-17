@@ -17,6 +17,7 @@ TBD
 
 ## Ideas ##
 * pinwheel screen assignment and data transfer
+* re-orient to the screens using the camera
 
 ## Timeline ##
 #### March 21, 2014 ####
