@@ -4,6 +4,17 @@
 
 A web-based data transfer system in which mobile devices act as controllers between multi-computer, multi-screen systems.
 
+### Technologies ###
+* iOS and Android devices
+  * native code development
+* Nodejs
+* Backbonejs
+* Underscorejs
+* --templating language--
+
+### Goal ###
+TBD
+
 ## Ideas ##
 * pinwheel screen assignment and data transfer
 
