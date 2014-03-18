@@ -1,0 +1,9 @@
+#! /bin/sh
+
+browserify "public/scripts/main.js" -o "public/scripts/bundle.js"
+
+for f in $(find 'local/templates' -name '*.dust'); do
+  TPL="public/scripts/templates/`echo $f | sed -e 's,\.dust,\.js,' | sed -e 's,local/templates/,,'`"
+  echo "var dust = require('../dust-core.min.js');" > $TPL
+  dustc $f >> $TPL
+done
