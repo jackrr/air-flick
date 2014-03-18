@@ -1,7 +1,7 @@
 var rooms = {};
 
 function Room() {
-  this.id = 'room'+rooms.length;
+  this.id = 'room1';
 
   rooms[this.id] = this;
 

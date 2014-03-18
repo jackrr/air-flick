@@ -8,9 +8,6 @@ module.exports = Backbone.Model.extend({
 
   initialize: function() {
     var self = this;
-    this.socket.on("rooms:joinSuccess", function(response) {
-      self.set("message", response.message);
-    });
 
     this.view = new DisplayView({model: this});
   }

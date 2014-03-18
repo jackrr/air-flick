@@ -2,7 +2,7 @@
 var express = require('express');
 var http = require('http');
 var path = require('path');
-var io = require('socket.io');
+var socketio = require('socket.io');
 
 var app = express();
 
@@ -23,8 +23,10 @@ if ('development' == app.get('env')) {
 var routes = require('./routes/index.js')(app);
 
 var server = http.createServer(app);
-io.listen(server);
+
 
 server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
+  var io = socketio.listen(server);
+  var socketModule = require('./modules/sockets.js')(io);
 });
