@@ -1,5 +1,10 @@
+var RoutesIndex = require('./routes/index.js');
 
-var dust = require('dustjs-linkedin');
-var $ = require('jquery')(window);
+var $ = require('jquery');
 var Backbone = require('backbone');
 Backbone.$ = $;
+
+$(function(){
+  new RoutesIndex();
+  Backbone.history.start({pushState: true});
+});
