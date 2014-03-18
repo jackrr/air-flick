@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C8085B1918D8B2E600B08CF6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8085B1818D8B2E600B08CF6 /* Main.storyboard */; };
 		C89FD7F618D73AE600342046 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C89FD7F518D73AE600342046 /* Foundation.framework */; };
 		C89FD7F818D73AE600342046 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C89FD7F718D73AE600342046 /* CoreGraphics.framework */; };
 		C89FD7FA18D73AE600342046 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C89FD7F918D73AE600342046 /* UIKit.framework */; };
@@ -32,6 +33,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C8085B1818D8B2E600B08CF6 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		C89FD7F218D73AE600342046 /* AirFlick.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AirFlick.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C89FD7F518D73AE600342046 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		C89FD7F718D73AE600342046 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -107,6 +109,7 @@
 		C89FD7FB18D73AE600342046 /* AirFlick */ = {
 			isa = PBXGroup;
 			children = (
+				C8085B1818D8B2E600B08CF6 /* Main.storyboard */,
 				C89FD80418D73AE600342046 /* AppDelegate.h */,
 				C89FD80518D73AE600342046 /* AppDelegate.m */,
 				C89FD80718D73AE600342046 /* Images.xcassets */,
@@ -218,6 +221,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8085B1918D8B2E600B08CF6 /* Main.storyboard in Resources */,
 				C89FD80018D73AE600342046 /* InfoPlist.strings in Resources */,
 				C89FD80818D73AE600342046 /* Images.xcassets in Resources */,
 			);
@@ -440,6 +444,7 @@
 				C89FD82018D73AE600342046 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		C89FD82118D73AE600342046 /* Build configuration list for PBXNativeTarget "AirFlickTests" */ = {
 			isa = XCConfigurationList;
@@ -448,6 +453,7 @@
 				C89FD82318D73AE600342046 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
