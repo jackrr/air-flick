@@ -10,24 +10,39 @@ Backbone.$ = $;
 
 module.exports = Backbone.Model.extend({
   initialize: function() {
-    this.joinRoom();
+    this.connect();
     this.view = new RoomView({model: this});
     this.view.render();
   },
 
-  joinRoom: function() {
+  connect: function() {
     var self = this;
-    this.socket = io.connect("http://localhost:3000");
-    this.socket.on('connectSuccess', function(data) {
-      if (self.id) {
-        self.socket.emit("rooms:joinDisplay", { roomID: self.id });
-      } else {
-        self.socket.emit("rooms:newDisplay");
-      }
-
-      self.socket.on('rooms:joinSuccess', function (data) {
-        self.display = new Display({room: self, socket: self.socket, message: data.message});
+    var socket = io.connect("http://localhost:3000");
+    socket.on('connectSuccess', function(data) {
+      self.set({
+        status: 'connected',
+        socket: socket
       });
+    });
+  },
+
+  joinRoom: function(roomID) {
+    var self = this;
+    var socket = self.get('socket');
+    if (roomID) {
+      socket.emit("rooms:join", { roomID: roomID, type: 'display' });
+    } else {
+      socket.emit("rooms:new", { type: 'display' });
+    }
+
+    socket.on('rooms:joinSuccess', function (data) {
+      var room = data.room;
+      self.set(data.room);
+      self.display = new Display({room: self, socket: socket, message: data.message});
+    });
+
+    socket.on('rooms:notification', function (data) {
+      self.view.notify(data.message);
     });
   }
 });

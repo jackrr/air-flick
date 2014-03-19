@@ -2,26 +2,46 @@ var rooms = {};
 
 function Room() {
   this.id = 'room1';
+  this.displays = [];
+  this.controllers = [];
 
   rooms[this.id] = this;
 
-  this.forDevice = function() {
+  this.toJSON = function() {
     return {id: this.id};
   }
+
+  this.addDisplay = function(socket) {
+    this.displays.push(socket);
+    this.notifyAll('new display for room');
+  }
+
+  this.addController = function(socket) {
+    this.controllers.push(socket);
+    this.notifyAll('new controller for room');
+  }
+
+  this.notifyAll = function(msg) {
+    this.displays.forEach(function(socket) {
+      socket.emit('rooms:notification', { message: msg });
+    });
+
+    this.controllers.forEach(function(socket) {
+      socket.emit('rooms:notification', { message: msg });
+    });
+  };
+
+  this.close = function() {};
 }
 
 module.exports = {
-  addMonitor: function(room) {
-  },
-  addDevice: function(room) {
-  },
-  send: function(room, message) {
-    rooms[room].send(message);
+  getRoom: function(roomID) {
+    return rooms[roomID];
   },
   close: function(room) {
     rooms[room].close();
   },
-  create: function() {
+  create: function(io) {
     return new Room();
   }
 };

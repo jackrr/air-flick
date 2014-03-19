@@ -15986,24 +15986,39 @@ Backbone.$ = $;
 
 module.exports = Backbone.Model.extend({
   initialize: function() {
-    this.joinRoom();
+    this.connect();
     this.view = new RoomView({model: this});
     this.view.render();
   },
 
-  joinRoom: function() {
+  connect: function() {
     var self = this;
-    this.socket = io.connect("http://localhost:3000");
-    this.socket.on('connectSuccess', function(data) {
-      if (self.id) {
-        self.socket.emit("rooms:joinDisplay", { roomID: self.id });
-      } else {
-        self.socket.emit("rooms:newDisplay");
-      }
-
-      self.socket.on('rooms:joinSuccess', function (data) {
-        self.display = new Display({room: self, socket: self.socket, message: data.message});
+    var socket = io.connect("http://localhost:3000");
+    socket.on('connectSuccess', function(data) {
+      self.set({
+        status: 'connected',
+        socket: socket
       });
+    });
+  },
+
+  joinRoom: function(roomID) {
+    var self = this;
+    var socket = self.get('socket');
+    if (roomID) {
+      socket.emit("rooms:join", { roomID: roomID, type: 'display' });
+    } else {
+      socket.emit("rooms:new", { type: 'display' });
+    }
+
+    socket.on('rooms:joinSuccess', function (data) {
+      var room = data.room;
+      self.set(data.room);
+      self.display = new Display({room: self, socket: socket, message: data.message});
+    });
+
+    socket.on('rooms:notification', function (data) {
+      self.view.notify(data.message);
     });
   }
 });
@@ -16034,7 +16049,7 @@ var dust = require('../dust-core.min.js');
 (function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<h1>Message as follows:</h1><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p>").reference(ctx.get(["message"], false),ctx,"h").write("</p><p>new test</p><p>new test 2</p>");}return body_0;})();
 },{"../dust-core.min.js":5}],11:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("room",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1>");}return body_0;})();
+(function(){dust.register("room",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1><p>").reference(ctx.get(["status"], false),ctx,"h").write("</p><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p class=\"joinExisting\">Click to join an existing room</p><p class=\"joinNew\">Click to join a new room</p>");}return body_0;})();
 },{"../dust-core.min.js":5}],12:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
@@ -16069,15 +16084,33 @@ var dust = require('../dust-core.min.js');
 console.log(tpl);
 
 module.exports = Backbone.View.extend({
+  events: {
+    "click .joinExisting": "join",
+    "click .joinNew": "joinNew"
+  },
   el: 'body',
 
   initialize: function() {
     this.listenTo(this.model, 'change', this.render);
   },
 
+  join: function() {
+    var roomID = prompt("Enter the name of the room to join", "e.g. poopbutt");
+    this.model.joinRoom(roomID);
+  },
+
+  joinNew: function() {
+    this.model.joinRoom();
+  },
+
+  notify: function(msg) {
+    alert(msg);
+  },
+
   render: function() {
     var self = this;
-    dust.render('room', this.model.attributes, function(err, out) {
+    console.log('rendering room', this.model, this.model.attributes);
+    dust.render('room', self.model.attributes, function(err, out) {
       if (err) console.log(err);
       self.$el.html(out);
     });

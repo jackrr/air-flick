@@ -1,1 +1,5 @@
 <h1>ROOM VIEW</h1>
+<p>{status}</p>
+<p>{id}</p>
+<p class="joinExisting">Click to join an existing room</p>
+<p class="joinNew">Click to join a new room</p>
