@@ -1,2 +1,2 @@
 var dust = require('../dust-core.min.js');
-(function(){dust.register("local/templates/display.dust",body_0);function body_0(chk,ctx){return chk.write("<h1>Message as follows:</h1><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p>").reference(ctx.get(["message"], false),ctx,"h").write("</p><p>new test</p><p>new test 2</p>");}return body_0;})();
+(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<h1>Message as follows:</h1><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p>").reference(ctx.get(["message"], false),ctx,"h").write("</p><p>new test</p><p>new test 2</p>");}return body_0;})();

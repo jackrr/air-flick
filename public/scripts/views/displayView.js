@@ -7,8 +7,6 @@ var tpl = require('../templates/display.js');
 
 module.exports = Backbone.View.extend({
   el: 'body',
-  template: tpl,
-
 
   initialize: function() {
     this.listenTo(this.model, 'change', this.render);
@@ -16,7 +14,7 @@ module.exports = Backbone.View.extend({
 
   render: function() {
     var self = this;
-    dust.render(this.template, this.model.attributes, function(err, out) {
+    dust.render('display', this.model.attributes, function(err, out) {
       if (err) console.log(err);
       self.$el.html(out);
     });

@@ -16031,10 +16031,10 @@ module.exports = Backbone.Router.extend({
 
 },{"../models/roomModel.js":8,"backbone":1,"jquery":3}],10:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("local/templates/display.dust",body_0);function body_0(chk,ctx){return chk.write("<h1>Message as follows:</h1><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p>").reference(ctx.get(["message"], false),ctx,"h").write("</p><p>new test</p><p>new test 2</p>");}return body_0;})();
+(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<h1>Message as follows:</h1><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p>").reference(ctx.get(["message"], false),ctx,"h").write("</p><p>new test</p><p>new test 2</p>");}return body_0;})();
 },{"../dust-core.min.js":5}],11:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("local/templates/room.dust",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1>");}return body_0;})();
+(function(){dust.register("room",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1>");}return body_0;})();
 },{"../dust-core.min.js":5}],12:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
@@ -16045,8 +16045,6 @@ var tpl = require('../templates/display.js');
 
 module.exports = Backbone.View.extend({
   el: 'body',
-  template: tpl,
-
 
   initialize: function() {
     this.listenTo(this.model, 'change', this.render);
@@ -16054,7 +16052,7 @@ module.exports = Backbone.View.extend({
 
   render: function() {
     var self = this;
-    dust.render(this.template, this.model.attributes, function(err, out) {
+    dust.render('display', this.model.attributes, function(err, out) {
       if (err) console.log(err);
       self.$el.html(out);
     });
@@ -16072,8 +16070,6 @@ console.log(tpl);
 
 module.exports = Backbone.View.extend({
   el: 'body',
-  template: tpl,
-
 
   initialize: function() {
     this.listenTo(this.model, 'change', this.render);
@@ -16081,7 +16077,7 @@ module.exports = Backbone.View.extend({
 
   render: function() {
     var self = this;
-    dust.render(this.template, this.model.attributes, function(err, out) {
+    dust.render('room', this.model.attributes, function(err, out) {
       if (err) console.log(err);
       self.$el.html(out);
     });

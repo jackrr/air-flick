@@ -1,9 +1,14 @@
 #! /bin/sh
 
-for f in $(find 'local/templates' -name '*.dust'); do
-  TPL="public/scripts/templates/`echo $f | sed -e 's,\.dust,\.js,' | sed -e 's,local/templates/,,'`"
+cd local/templates
+
+for f in $(find . -name '*.dust'); do
+  NAME=`echo $f | sed -e 's,\.dust,,' | sed -e 's,\./,,'`
+  TPL="../../public/scripts/templates/`echo $f | sed -e 's,\.dust,\.js,'`"
   echo "var dust = require('../dust-core.min.js');" > $TPL
-  dustc $f >> $TPL
+  dustc --name=$NAME $f >> $TPL
 done
+
+cd ../..
 
 browserify "public/scripts/main.js" -o "public/scripts/bundle.js"
