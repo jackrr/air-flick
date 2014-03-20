@@ -39,6 +39,7 @@ module.exports = Backbone.Model.extend({
       var room = data.room;
       self.set(data.room);
       self.display = new Display({room: self, socket: socket, message: data.message});
+      self.view.hide();
     });
 
     socket.on('rooms:notification', function (data) {

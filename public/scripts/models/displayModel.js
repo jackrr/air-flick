@@ -10,5 +10,8 @@ module.exports = Backbone.Model.extend({
     var self = this;
 
     this.view = new DisplayView({model: this});
+    this.view.render();
+
+    this.socket.on('display:')
   }
 });

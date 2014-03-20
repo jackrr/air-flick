@@ -15970,6 +15970,8 @@ module.exports = Backbone.Model.extend({
     var self = this;
 
     this.view = new DisplayView({model: this});
+    console.log('in displayModel')
+    this.view.render();
   }
 });
 
@@ -16015,6 +16017,7 @@ module.exports = Backbone.Model.extend({
       var room = data.room;
       self.set(data.room);
       self.display = new Display({room: self, socket: socket, message: data.message});
+      self.view.hide();
     });
 
     socket.on('rooms:notification', function (data) {
@@ -16031,12 +16034,7 @@ Backbone.$ = $;
 
 module.exports = Backbone.Router.extend({
   routes: {
-    "new_room":        "newRoom", // # new_room
-    "join/:roomID":    "join" // # begin
-  },
-
-  join: function(roomID) {
-    var room = new Room({id: roomID});
+    "new_room":        "newRoom" // # new_room
   },
 
   newRoom: function() {
@@ -16059,7 +16057,7 @@ var dust = require('../dust-core.min.js');
 var tpl = require('../templates/display.js');
 
 module.exports = Backbone.View.extend({
-  el: 'body',
+  el: '#display',
 
   initialize: function() {
     this.listenTo(this.model, 'change', this.render);
@@ -16067,7 +16065,7 @@ module.exports = Backbone.View.extend({
 
   render: function() {
     var self = this;
-    dust.render('display', this.model.attributes, function(err, out) {
+    dust.render('display', self.model.attributes, function(err, out) {
       if (err) console.log(err);
       self.$el.html(out);
     });
@@ -16088,7 +16086,7 @@ module.exports = Backbone.View.extend({
     "click .joinExisting": "join",
     "click .joinNew": "joinNew"
   },
-  el: 'body',
+  el: '#room',
 
   initialize: function() {
     this.listenTo(this.model, 'change', this.render);
@@ -16107,9 +16105,12 @@ module.exports = Backbone.View.extend({
     alert(msg);
   },
 
+  hide: function() {
+    Backbone.$(this.$el).hide();
+  },
+
   render: function() {
     var self = this;
-    console.log('rendering room', this.model, this.model.attributes);
     dust.render('room', self.model.attributes, function(err, out) {
       if (err) console.log(err);
       self.$el.html(out);

@@ -1,9 +1,11 @@
 var rooms = {};
+var Display = require('./display.js');
+var Controller = require('./controller.js');
 
 function Room() {
   this.id = 'room1';
-  this.displays = [];
-  this.controllers = [];
+  this.displays = {};
+  this.controllers = {};
 
   rooms[this.id] = this;
 
@@ -12,13 +14,26 @@ function Room() {
   }
 
   this.addDisplay = function(socket) {
-    this.displays.push(socket);
+    var display = new Display(socket);
+    this.displays[display.id] = display;
     this.notifyAll('new display for room');
   }
 
   this.addController = function(socket) {
-    this.controllers.push(socket);
+    var controller = new Controller(socket);
+    this.controllers[controller.id] = controller;
     this.notifyAll('new controller for room');
+  }
+
+  this.nextUnmatchedDisplay = function() {
+    this.displays.forEach(function(display) {
+      if (!display.positioned) return display.toJSON();
+    });
+    return false;
+  }
+
+  this.positionDisplay = function(displayID) {
+    this.displays[displayID].position();
   }
 
   this.notifyAll = function(msg) {

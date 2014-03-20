@@ -5,12 +5,7 @@ Backbone.$ = $;
 
 module.exports = Backbone.Router.extend({
   routes: {
-    "new_room":        "newRoom", // # new_room
-    "join/:roomID":    "join" // # begin
-  },
-
-  join: function(roomID) {
-    var room = new Room({id: roomID});
+    "new_room":        "newRoom" // # new_room
   },
 
   newRoom: function() {

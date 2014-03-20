@@ -11,7 +11,7 @@ module.exports = Backbone.View.extend({
     "click .joinExisting": "join",
     "click .joinNew": "joinNew"
   },
-  el: 'body',
+  el: '#room',
 
   initialize: function() {
     this.listenTo(this.model, 'change', this.render);
@@ -30,9 +30,13 @@ module.exports = Backbone.View.extend({
     alert(msg);
   },
 
+  hide: function() {
+    // somehow, $ is being stepped on
+    Backbone.$(this.$el).hide();
+  },
+
   render: function() {
     var self = this;
-    console.log('rendering room', this.model, this.model.attributes);
     dust.render('room', self.model.attributes, function(err, out) {
       if (err) console.log(err);
       self.$el.html(out);
