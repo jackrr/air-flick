@@ -1,18 +1,18 @@
 //
-//  AirFlickTests.m
-//  AirFlickTests
+//  airflickTests.m
+//  airflickTests
 //
-//  Created by Nathan Teetor on 3/17/14.
-//
+//  Created by Nathan Teetor on 3/28/14.
+//  Copyright (c) 2014 Nonstop Akubara LLC. All rights reserved.
 //
 
 #import <XCTest/XCTest.h>
 
-@interface AirFlickTests : XCTestCase
+@interface airflickTests : XCTestCase
 
 @end
 
-@implementation AirFlickTests
+@implementation airflickTests
 
 - (void)setUp
 {

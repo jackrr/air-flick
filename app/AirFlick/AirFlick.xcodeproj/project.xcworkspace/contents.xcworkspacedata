@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:AirFlick.xcodeproj">
+      location = "self:airflick.xcodeproj">
    </FileRef>
 </Workspace>

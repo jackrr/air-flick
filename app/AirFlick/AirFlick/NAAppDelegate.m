@@ -1,18 +1,25 @@
 //
-//  AppDelegate.m
-//  AirFlick
+//  NAAppDelegate.m
+//  airflick
 //
-//  Created by Nathan Teetor on 3/17/14.
-//
+//  Created by Nathan Teetor on 3/28/14.
+//  Copyright (c) 2014 Nonstop Akubara LLC. All rights reserved.
 //
 
-#import "AppDelegate.h"
+#import "NAAppDelegate.h"
+#import "NAMainViewController.h"
 
-@implementation AppDelegate
+@implementation NAAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    
+    NAMainViewController *mainVC = [[NAMainViewController alloc] init];
+    
+    // set the root view controller
+    self.window.rootViewController = mainVC;
+    
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
