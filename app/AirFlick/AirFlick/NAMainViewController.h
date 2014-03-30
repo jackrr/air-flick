@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface NAMainViewController : UIViewController
+@interface NAMainViewController : UIViewController<NSURLConnectionDelegate>
 
 @end
