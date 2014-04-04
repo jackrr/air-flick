@@ -5,6 +5,13 @@ module.exports = function(app) {
     res.send("Hello, device");
   });
 
+    app.post('/device/hello', function(req, res){
+	var body = req.body;
+	var dir = body["direction"];
+	console.log("Swipe detected: "+dir);
+	res.send({message:"hello, device!"});
+    });
+
   app.get('/device/join_room/:roomID', function(req, res) {
   });
   

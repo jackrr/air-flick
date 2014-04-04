@@ -6,8 +6,9 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="NAMainViewController">
             <connections>
-                <outlet property="numRequestsLabel" destination="YDT-lT-51Z" id="jDe-nJ-yOz"/>
                 <outlet property="sendRequestLabel" destination="xgs-Ny-dP9" id="5ln-sZ-ITX"/>
+                <outlet property="swipeLeftRecognizer" destination="hFM-SV-XeH" id="4tD-Y3-K2X"/>
+                <outlet property="swipeRightRecognizer" destination="hc2-if-ExU" id="MFo-aE-hvG"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -16,34 +17,44 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Server Request" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xgs-Ny-dP9">
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Swipe to send request" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xgs-Ny-dP9">
                     <rect key="frame" x="20" y="191" width="280" height="21"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                    <nil key="highlightedColor"/>
-                </label>
-                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s88-HD-JnU">
-                    <rect key="frame" x="20" y="227" width="280" height="30"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <color key="backgroundColor" red="0.96862745100000003" green="0.96862745100000003" blue="0.96862745100000003" alpha="1" colorSpace="calibratedRGB"/>
-                    <state key="normal" title="Send">
-                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                    </state>
-                    <connections>
-                        <action selector="sendRequest:" destination="-1" eventType="touchUpInside" id="jqQ-OH-VPo"/>
-                    </connections>
-                </button>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YDT-lT-51Z">
-                    <rect key="frame" x="20" y="273" width="280" height="21"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <nil key="highlightedColor"/>
                 </label>
             </subviews>
-            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+            <gestureRecognizers/>
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+            <connections>
+                <outletCollection property="gestureRecognizers" destination="hc2-if-ExU" appends="YES" id="yTJ-EQ-U1A"/>
+                <outletCollection property="gestureRecognizers" destination="hFM-SV-XeH" appends="YES" id="lzk-py-6Mc"/>
+                <outletCollection property="gestureRecognizers" destination="izS-jP-fXA" appends="YES" id="W7o-2T-lDq"/>
+                <outletCollection property="gestureRecognizers" destination="GW5-yf-JzW" appends="YES" id="qS1-mg-cWU"/>
+            </connections>
         </view>
+        <swipeGestureRecognizer direction="right" id="hc2-if-ExU">
+            <connections>
+                <action selector="swipeRightResponder:" destination="-1" id="pCK-jk-i4d"/>
+            </connections>
+        </swipeGestureRecognizer>
+        <swipeGestureRecognizer direction="left" id="hFM-SV-XeH">
+            <connections>
+                <action selector="swipeLeftResponder:" destination="-1" id="Exa-bP-CBh"/>
+            </connections>
+        </swipeGestureRecognizer>
+        <swipeGestureRecognizer direction="up" id="izS-jP-fXA">
+            <connections>
+                <action selector="swipeUpResponder:" destination="-1" id="Bc7-FQ-7lt"/>
+            </connections>
+        </swipeGestureRecognizer>
+        <tapGestureRecognizer id="GW5-yf-JzW">
+            <connections>
+                <action selector="tapResponder:" destination="-1" id="aG8-Gi-KBR"/>
+            </connections>
+        </tapGestureRecognizer>
     </objects>
 </document>

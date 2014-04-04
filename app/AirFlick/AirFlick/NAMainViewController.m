@@ -7,17 +7,20 @@
 //
 
 #import "NAMainViewController.h"
+#import "NACard.h"
 
 @interface NAMainViewController ()
 
 @property (nonatomic) int numRequestsSent;
 
 @property (nonatomic) NSString *serverURL;
-@property (nonatomic) NSMutableData *_responseData;
+//@property (nonatomic) NSMutableData *_responseData;
 
 @property (nonatomic, weak) IBOutlet UILabel *sendRequestLabel;
-@property (nonatomic, weak) IBOutlet UILabel *numRequestsLabel;
-//@property (nonatomic, weak) IBOutlet UIButton *sendRequestButton;
+
+@property (nonatomic, strong) IBOutlet UISwipeGestureRecognizer *swipeRightRecognizer;
+@property (nonatomic, strong) IBOutlet UISwipeGestureRecognizer *swipeLeftRecognizer;
+@property (nonatomic, strong) IBOutlet UISwipeGestureRecognizer *swipeUpRecognizer;
 
 @end
 
@@ -30,7 +33,6 @@
     
     if (self) {
         self.serverURL = @"http://localhost:3000/device/hello";
-        self.numRequestsSent = 0;
     }
     
     // return the main view
@@ -44,12 +46,12 @@
     // so that we can append data to it in the didReceiveData method
     // Furthermore, this method is called each time there is a redirect so reinitializing it
     // also serves to clear it
-    __responseData = [[NSMutableData alloc] init];
+    _responseData = [[NSMutableData alloc] init];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
     // Append the new data to the instance variable you declared
-    [__responseData appendData:data];
+    [_responseData appendData:data];
 }
 
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse*)cachedResponse {
@@ -61,9 +63,9 @@
     // The request is complete and data has been received
     // You can parse the stuff in your instance variable now
     
-    NSString *msg = [NSString stringWithFormat:@"%@",__responseData];
-//    NSDictionary *jsonObj = [NSJSONSerialization JSONObjectWithData:__responseData options:0 error:nil];
-//    NSString *msg = [NSString stringWithFormat:@"%@",jsonObj];
+//    NSString *msg = [NSString stringWithFormat:@"%@",_responseData];
+    NSDictionary *jsonObj = [NSJSONSerialization JSONObjectWithData:_responseData options:0 error:nil];
+    NSString *msg = [jsonObj valueForKey:@"message"]; //[NSString stringWithFormat:@"%@",jsonObj];
     
     UIAlertView *receivedData = [[UIAlertView alloc] initWithTitle:@"Data Received" message:msg delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
     
@@ -76,29 +78,57 @@
     
     // throws error aka DOES NOT WORK
     
-    [[[UIAlertView alloc] initWithTitle:@"Connection Error" message:@"Could not connect to server" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
+    NSLog(@"%@",[NSString stringWithFormat:@"Connection failed: %@",error]);
+    
+    //[[[UIAlertView alloc] initWithTitle:@"Connection Error" message:@"Could not connect to server" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
 }
 
-- (IBAction)sendRequest:(id)sender {
-    self.numRequestsSent++;
-    
-    self.numRequestsLabel.text = [NSString stringWithFormat:@"%i",self.numRequestsSent];
-    
+- (void)sendJSONtoServer:(NSDictionary *)dict {
     // set URL
     NSURL *url = [NSURL URLWithString:self.serverURL];
     
-    // send request
-    NSURLRequest *req = [NSURLRequest requestWithURL:url];
+    // convert NSDictionary to NSData
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:kNilOptions error:nil];
     
-    // create url connection
-//    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:req delegate:self];
+    // construct request
+    NSMutableURLRequest *req = [[NSMutableURLRequest alloc] init];
+    [req setURL:url];
+    [req setHTTPMethod:@"POST"];
+    [req setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [req setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+    [req setHTTPBody:jsonData];
     
-    [NSURLConnection connectionWithRequest:req delegate:self];
-
+    // construct connection
+    NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:req delegate:self];
+    
 }
 
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-    [[[UIAlertView alloc] initWithTitle:@"Alert" message:@"Touch detected!" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
+- (IBAction)swipeRightResponder:(UISwipeGestureRecognizer *)sr {
+    NSLog(@"Swipe right detected");
+    
+    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"right", @"direction", nil];
+    [self sendJSONtoServer:dict];
+}
+
+- (IBAction)swipeLeftResponder:(UISwipeGestureRecognizer *)sr {
+    NSLog(@"Swipe left detected");
+    
+    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"left", @"direction", nil];
+    [self sendJSONtoServer:dict];
+}
+
+- (IBAction)swipeUpResponder:(UISwipeGestureRecognizer *)sr {
+    NSLog(@"Swipe up detected");
+    
+    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"up", @"direction", nil];
+    [self sendJSONtoServer:dict];
+}
+
+- (IBAction)tapResponder:(UITapGestureRecognizer *)tr {
+    NSLog(@"Tap detected");
+    
+    NACard *newCard = [[NACard alloc] initWithParentView:self.view];
+    [newCard display];
 }
 
 @end

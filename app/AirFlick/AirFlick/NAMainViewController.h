@@ -9,5 +9,8 @@
 #import <UIKit/UIKit.h>
 
 @interface NAMainViewController : UIViewController<NSURLConnectionDelegate>
+{
+    NSMutableData *_responseData;
+}
 
 @end
