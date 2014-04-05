@@ -7,6 +7,7 @@ module.exports = function(app) {
 
     app.post('/device/hello', function(req, res){
 	var body = req.body;
+	console.log(body);
 	var dir = body["direction"];
 	console.log("Swipe detected: "+dir);
 	res.send({message:"hello, device!"});

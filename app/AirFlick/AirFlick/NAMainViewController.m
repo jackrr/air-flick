@@ -13,6 +13,10 @@
 
 @property (nonatomic) int numRequestsSent;
 
+@property (nonatomic) IBOutlet UIView *subView;
+
+@property NACard *currentCard;
+
 @property (nonatomic) NSString *serverURL;
 //@property (nonatomic) NSMutableData *_responseData;
 
@@ -33,6 +37,8 @@
     
     if (self) {
         self.serverURL = @"http://localhost:3000/device/hello";
+        
+        [self addCard];
     }
     
     // return the main view
@@ -64,12 +70,14 @@
     // You can parse the stuff in your instance variable now
     
 //    NSString *msg = [NSString stringWithFormat:@"%@",_responseData];
-    NSDictionary *jsonObj = [NSJSONSerialization JSONObjectWithData:_responseData options:0 error:nil];
-    NSString *msg = [jsonObj valueForKey:@"message"]; //[NSString stringWithFormat:@"%@",jsonObj];
+    //NSDictionary *jsonObj = [NSJSONSerialization JSONObjectWithData:_responseData options:0 error:nil];
+    //NSString *msg = [jsonObj valueForKey:@"message"]; //[NSString stringWithFormat:@"%@",jsonObj];
     
-    UIAlertView *receivedData = [[UIAlertView alloc] initWithTitle:@"Data Received" message:msg delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    //UIAlertView *receivedData = [[UIAlertView alloc] initWithTitle:@"Data Received" message:msg delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
     
-    [receivedData show];
+    //[receivedData show];
+    [self addCard];
+    NSLog(@"Card sent succesfully");
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
@@ -103,32 +111,54 @@
     
 }
 
+- (void)sendCardtoServer:(NSString *)direction {
+    NSString *deviceID = [NSString stringWithFormat:@"%@",[[UIDevice currentDevice] identifierForVendor]];
+    NSString *cardColor = self.currentCard.typeColor;
+    
+    [self sendJSONtoServer:[NSDictionary dictionaryWithObjectsAndKeys:
+                            deviceID,@"id",
+                            cardColor,@"color",
+                            direction,@"direction",
+                            nil]];
+    
+}
+
 - (IBAction)swipeRightResponder:(UISwipeGestureRecognizer *)sr {
     NSLog(@"Swipe right detected");
     
-    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"right", @"direction", nil];
-    [self sendJSONtoServer:dict];
+//    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"right", @"direction", nil];
+//    [self sendJSONtoServer:dict];
+    [self sendCardtoServer:@"right"];
+    
+   // [self addCard];
 }
 
 - (IBAction)swipeLeftResponder:(UISwipeGestureRecognizer *)sr {
     NSLog(@"Swipe left detected");
+
+    [self sendCardtoServer:@"left"];
     
-    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"left", @"direction", nil];
-    [self sendJSONtoServer:dict];
+  //  [self addCard];
 }
 
 - (IBAction)swipeUpResponder:(UISwipeGestureRecognizer *)sr {
     NSLog(@"Swipe up detected");
     
-    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"up", @"direction", nil];
-    [self sendJSONtoServer:dict];
+//    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"up", @"direction", nil];
+//    [self sendJSONtoServer:dict];
+    [self sendCardtoServer:@"up"];
+    
+  //  [self addCard];
 }
 
-- (IBAction)tapResponder:(UITapGestureRecognizer *)tr {
+- (void)addCard {
     NSLog(@"Tap detected");
     
     NACard *newCard = [[NACard alloc] initWithParentView:self.view];
+    self.currentCard = newCard;
     [newCard display];
+    
+    //NSLog(@"%@",[self.view subviews]);
 }
 
 @end

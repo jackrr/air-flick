@@ -13,8 +13,15 @@
 @property UIView *parentView;
 @property UIColor *color;
 @property NSString *typeColor;
+@property UIView *view;
 
 - (instancetype)initWithParentView:(UIView *)parentView;
 - (void)display;
+- (NSDictionary *)convertToDict;
+
+// transition functions
+- (void)transitionLeft;
+- (void)transitionRight;
+- (void)transitionUp;
 
 @end
