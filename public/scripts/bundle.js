@@ -15970,8 +15970,9 @@ module.exports = Backbone.Model.extend({
     var self = this;
 
     this.view = new DisplayView({model: this});
-    console.log('in displayModel')
     this.view.render();
+
+    this.socket.on('display:')
   }
 });
 
@@ -15995,7 +15996,7 @@ module.exports = Backbone.Model.extend({
 
   connect: function() {
     var self = this;
-    var socket = io.connect("http://localhost:3000");
+    var socket = io.connect("http://photoplace.cs.oberlin.edu");
     socket.on('connectSuccess', function(data) {
       self.set({
         status: 'connected',
@@ -16106,6 +16107,7 @@ module.exports = Backbone.View.extend({
   },
 
   hide: function() {
+    // somehow, $ is being stepped on
     Backbone.$(this.$el).hide();
   },
 
