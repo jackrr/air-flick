@@ -1,5 +1,4 @@
 var rooms = {};
-console.log('************ at top of rooms.js');
 var Display = require('./display.js');
 var Controller = require('./controller.js');
 
@@ -8,6 +7,8 @@ function Room(id) {
   this.id = id || 'room1';
   this.displays = {};
   this.controllers = {};
+
+  console.log('new room with id: ', id);
 
   rooms[this.id] = this;
 
