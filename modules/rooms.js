@@ -62,6 +62,7 @@ module.exports = {
     console.log("in rooms.getRoom rooms is: ", rooms);
     var room = rooms[roomID];
     if (room) return room;
+    console.log('creating a new goddam room goddamit');
     return new Room(roomID);
   },
   close: function(room) {
