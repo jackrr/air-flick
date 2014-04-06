@@ -13,8 +13,10 @@ module.exports = function(app) {
   });
 
   app.post('/device/room/:roomID', function(req, res) {
+    console.log('device joined: ', req.body);
     var body = req.body;
     var room = rooms.getRoom(body.roomID);
+    console.log(body);
     room.sendTo(body.direction, body.block, body.deviceID);
     res.json({direction: body.direction});
   });
