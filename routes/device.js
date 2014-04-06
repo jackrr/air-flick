@@ -5,7 +5,8 @@ module.exports = function(app) {
     res.send("Hello, device");
   });
 
-  app.post('/device/rooms/join', function(req, res) {
+  app.post('/device/join', function(req, res) {
+    console.log('device joined: ', req.body);
     var body = req.body;
     var room = rooms.getRoom(body.roomID);
     room.addController(body.deviceID);
@@ -13,7 +14,6 @@ module.exports = function(app) {
   });
 
   app.post('/device/room/:roomID', function(req, res) {
-    console.log('device joined: ', req.body);
     var body = req.body;
     var room = rooms.getRoom(body.roomID);
     console.log(body);

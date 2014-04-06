@@ -21,6 +21,7 @@ function Room(id) {
   }
 
   this.sendTo = function(direction, block, controllerID) {
+    console.log("in rooms.js: ", direction, block, controllerID);
     var display = this.displays[direction].send('display:block', {device: this.controllers[controllerID], block: block});
   }
 
