@@ -1,4 +1,5 @@
 var rooms = {};
+console.log('************ at top of rooms.js');
 var Display = require('./display.js');
 var Controller = require('./controller.js');
 
