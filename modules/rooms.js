@@ -17,11 +17,13 @@ function Room(id) {
   this.addDisplay = function(socket, direction) {
     var display = new Display(socket, direction);
     this.displays[direction] = display;
+    console.log("in add display: ", this.displays);
     this.notifyAll('new display for room');
   }
 
   this.sendTo = function(direction, block, controllerID) {
-    console.log("in rooms.js: ", direction, block, controllerID);
+    console.log("in rooms sendTo: ", direction, block, controllerID);
+    console.log("in rooms sendTo: ", this.displays);
     var display = this.displays[direction].send('display:block', {device: this.controllers[controllerID], block: block});
   }
 
