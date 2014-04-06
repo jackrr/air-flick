@@ -2,8 +2,9 @@ var rooms = {};
 var Display = require('./display.js');
 var Controller = require('./controller.js');
 
-function Room() {
-  this.id = 'room1';
+function Room(id) {
+  var self = this;
+  this.id = id || 'room1';
   this.displays = {};
   this.controllers = {};
 
@@ -13,22 +14,27 @@ function Room() {
     return {id: this.id};
   }
 
-  this.addDisplay = function(socket) {
-    var display = new Display(socket);
-    this.displays[display.id] = display;
+  this.addDisplay = function(socket, direction) {
+    var display = new Display(socket, direction);
+    this.displays[direction] = display;
     this.notifyAll('new display for room');
   }
 
-  this.addController = function(socket) {
-    var controller = new Controller(socket);
+  this.sendTo = function(direction, block, controllerID) {
+    var display = this.displays[direction].send('display:block', {device: this.controllers[controllerID], block: block});
+  }
+
+  this.addController = function(id) {
+    var controller = new Controller(id);
     this.controllers[controller.id] = controller;
     this.notifyAll('new controller for room');
   }
 
   this.nextUnmatchedDisplay = function() {
-    this.displays.forEach(function(display) {
+    for (var key in this.displays) {
+      var display = self.displays[key];
       if (!display.positioned) return display.toJSON();
-    });
+    };
     return false;
   }
 
@@ -37,13 +43,10 @@ function Room() {
   }
 
   this.notifyAll = function(msg) {
-    this.displays.forEach(function(socket) {
-      socket.emit('rooms:notification', { message: msg });
-    });
-
-    this.controllers.forEach(function(socket) {
-      socket.emit('rooms:notification', { message: msg });
-    });
+    for (var key in this.displays) {
+      var display = this.displays[key];
+      display.send('rooms:notification', { message: msg });
+    };
   };
 
   this.close = function() {};
@@ -51,7 +54,9 @@ function Room() {
 
 module.exports = {
   getRoom: function(roomID) {
-    return rooms[roomID];
+    var room = rooms[roomID];
+    if (room) return room;
+    return new Room(roomID);
   },
   close: function(room) {
     rooms[room].close();

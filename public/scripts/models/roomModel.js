@@ -26,19 +26,19 @@ module.exports = Backbone.Model.extend({
     });
   },
 
-  joinRoom: function(roomID) {
+  joinRoom: function(direction, roomID) {
     var self = this;
     var socket = self.get('socket');
     if (roomID) {
-      socket.emit("rooms:join", { roomID: roomID, type: 'display' });
+      socket.emit("rooms:join", { roomID: roomID, type: 'display', direction: direction });
     } else {
-      socket.emit("rooms:new", { type: 'display' });
+      socket.emit("rooms:new", { type: 'display', direction: direction });
     }
 
     socket.on('rooms:joinSuccess', function (data) {
       var room = data.room;
       self.set(data.room);
-      self.display = new Display({room: self, socket: socket, message: data.message});
+      self.display = new Display({room: self, socket: socket, message: data.message, direction: direction});
       self.view.hide();
     });
 

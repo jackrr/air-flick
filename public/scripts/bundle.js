@@ -15957,10 +15957,26 @@ $(function(){
   Backbone.history.start();
 });
 
-},{"./routes/index.js":9,"backbone":1,"jquery":3}],7:[function(require,module,exports){
+},{"./routes/index.js":10,"backbone":1,"jquery":3}],7:[function(require,module,exports){
+var $ = require('jquery')(window);
+var Backbone = require('backbone');
+
+var BlockView = require('../views/blockView.js');
+
+Backbone.$ = $;
+
+module.exports = Backbone.Model.extend({
+  initialize: function() {
+    this.view = new BlockView({model: this});
+    this.view.render();
+  },
+});
+
+},{"../views/blockView.js":14,"backbone":1,"jquery":3}],8:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var DisplayView = require("../views/displayView.js");
+var Block = require("./blockModel.js");
 
 Backbone.$ = $;
 
@@ -15972,11 +15988,13 @@ module.exports = Backbone.Model.extend({
     this.view = new DisplayView({model: this});
     this.view.render();
 
-    this.socket.on('display:')
+    this.get('socket').on('display:block', function(data) {
+      var block = new Block({ display: self, color: data.block.color, device: data.device });
+    });
   }
 });
 
-},{"../views/displayView.js":12,"backbone":1,"jquery":3}],8:[function(require,module,exports){
+},{"../views/displayView.js":15,"./blockModel.js":7,"backbone":1,"jquery":3}],9:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var Display = require('./displayModel.js');
@@ -15996,7 +16014,8 @@ module.exports = Backbone.Model.extend({
 
   connect: function() {
     var self = this;
-    var socket = io.connect("http://photoplace.cs.oberlin.edu");
+    //var socket = io.connect("http://photoplace.cs.oberlin.edu");
+    var socket = io.connect("http://localhost:3000");
     socket.on('connectSuccess', function(data) {
       self.set({
         status: 'connected',
@@ -16005,19 +16024,19 @@ module.exports = Backbone.Model.extend({
     });
   },
 
-  joinRoom: function(roomID) {
+  joinRoom: function(direction, roomID) {
     var self = this;
     var socket = self.get('socket');
     if (roomID) {
-      socket.emit("rooms:join", { roomID: roomID, type: 'display' });
+      socket.emit("rooms:join", { roomID: roomID, type: 'display', direction: direction });
     } else {
-      socket.emit("rooms:new", { type: 'display' });
+      socket.emit("rooms:new", { type: 'display', direction: direction });
     }
 
     socket.on('rooms:joinSuccess', function (data) {
       var room = data.room;
       self.set(data.room);
-      self.display = new Display({room: self, socket: socket, message: data.message});
+      self.display = new Display({room: self, socket: socket, message: data.message, direction: direction});
       self.view.hide();
     });
 
@@ -16027,7 +16046,7 @@ module.exports = Backbone.Model.extend({
   }
 });
 
-},{"../views/roomView.js":13,"./displayModel.js":7,"backbone":1,"jquery":3,"socket.io-client":4}],9:[function(require,module,exports){
+},{"../views/roomView.js":16,"./displayModel.js":8,"backbone":1,"jquery":3,"socket.io-client":4}],10:[function(require,module,exports){
 var Room = require('../models/roomModel.js');
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
@@ -16043,13 +16062,43 @@ module.exports = Backbone.Router.extend({
   }
 });
 
-},{"../models/roomModel.js":8,"backbone":1,"jquery":3}],10:[function(require,module,exports){
+},{"../models/roomModel.js":9,"backbone":1,"jquery":3}],11:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<h1>Message as follows:</h1><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p>").reference(ctx.get(["message"], false),ctx,"h").write("</p><p>new test</p><p>new test 2</p>");}return body_0;})();
-},{"../dust-core.min.js":5}],11:[function(require,module,exports){
-var dust = require('../dust-core.min.js');
-(function(){dust.register("room",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1><p>").reference(ctx.get(["status"], false),ctx,"h").write("</p><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p class=\"joinExisting\">Click to join an existing room</p><p class=\"joinNew\">Click to join a new room</p>");}return body_0;})();
+(function(){dust.register("block",body_0);function body_0(chk,ctx){return chk.write("<div class=\"").reference(ctx.get(["color"], false),ctx,"h").write("block block\"></div>");}return body_0;})();
 },{"../dust-core.min.js":5}],12:[function(require,module,exports){
+var dust = require('../dust-core.min.js');
+(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<h1>").reference(ctx.get(["direction"], false),ctx,"h").write(" display</h1><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p>").reference(ctx.get(["message"], false),ctx,"h").write("</p><div id=\"blockHolder\"></div>");}return body_0;})();
+},{"../dust-core.min.js":5}],13:[function(require,module,exports){
+var dust = require('../dust-core.min.js');
+(function(){dust.register("room",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1><p>").reference(ctx.get(["status"], false),ctx,"h").write("</p><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p class=\"joinExisting\">Click to join an existing room</p><p class=\"left\">LEFT</p><p class=\"up\">UP</p><p class=\"right\">RIGHT</p>");}return body_0;})();
+},{"../dust-core.min.js":5}],14:[function(require,module,exports){
+var $ = require('jquery')(window);
+var Backbone = require('backbone');
+Backbone.$ = $;
+
+var tpl = require('../templates/block.js');
+var dust = require('../dust-core.min.js');
+
+module.exports = Backbone.View.extend({
+  events: {
+  },
+
+  el: '#blockHolder',
+
+  initialize: function() {
+    this.listenTo(this.model, 'change', this.render);
+  },
+
+  render: function() {
+    var self = this;
+    dust.render('block', self.model.attributes, function(err, out) {
+      if (err) console.log(err);
+      self.$el.html(out);
+    });
+  }
+});
+
+},{"../dust-core.min.js":5,"../templates/block.js":11,"backbone":1,"jquery":3}],15:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16073,7 +16122,7 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":5,"../templates/display.js":10,"backbone":1,"jquery":3}],13:[function(require,module,exports){
+},{"../dust-core.min.js":5,"../templates/display.js":12,"backbone":1,"jquery":3}],16:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16085,7 +16134,9 @@ console.log(tpl);
 module.exports = Backbone.View.extend({
   events: {
     "click .joinExisting": "join",
-    "click .joinNew": "joinNew"
+    "click .left": "joinLeft",
+    "click .up": "joinUp",
+    "click .right": "joinRight"
   },
   el: '#room',
 
@@ -16095,11 +16146,23 @@ module.exports = Backbone.View.extend({
 
   join: function() {
     var roomID = prompt("Enter the name of the room to join", "e.g. poopbutt");
-    this.model.joinRoom(roomID);
+    this.model.joinRoom("up", roomID);
   },
 
   joinNew: function() {
     this.model.joinRoom();
+  },
+  joinLeft: function() {
+    var roomID = prompt("Enter the name of the room to join", "e.g. poopbutt");
+    this.model.joinRoom("left", roomID);
+  },
+  joinRight: function() {
+    var roomID = prompt("Enter the name of the room to join", "e.g. poopbutt");
+    this.model.joinRoom("right", roomID);
+  },
+  joinUp: function() {
+    var roomID = prompt("Enter the name of the room to join", "e.g. poopbutt");
+    this.model.joinRoom("up", roomID);
   },
 
   notify: function(msg) {
@@ -16120,4 +16183,4 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":5,"../templates/room.js":11,"backbone":1,"jquery":3}]},{},[6])
+},{"../dust-core.min.js":5,"../templates/room.js":13,"backbone":1,"jquery":3}]},{},[6])

@@ -9,7 +9,9 @@ console.log(tpl);
 module.exports = Backbone.View.extend({
   events: {
     "click .joinExisting": "join",
-    "click .joinNew": "joinNew"
+    "click .left": "joinLeft",
+    "click .up": "joinUp",
+    "click .right": "joinRight"
   },
   el: '#room',
 
@@ -19,11 +21,23 @@ module.exports = Backbone.View.extend({
 
   join: function() {
     var roomID = prompt("Enter the name of the room to join", "e.g. poopbutt");
-    this.model.joinRoom(roomID);
+    this.model.joinRoom("up", roomID);
   },
 
   joinNew: function() {
     this.model.joinRoom();
+  },
+  joinLeft: function() {
+    var roomID = prompt("Enter the name of the room to join", "e.g. poopbutt");
+    this.model.joinRoom("left", roomID);
+  },
+  joinRight: function() {
+    var roomID = prompt("Enter the name of the room to join", "e.g. poopbutt");
+    this.model.joinRoom("right", roomID);
+  },
+  joinUp: function() {
+    var roomID = prompt("Enter the name of the room to join", "e.g. poopbutt");
+    this.model.joinRoom("up", roomID);
   },
 
   notify: function(msg) {

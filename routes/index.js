@@ -1,5 +1,5 @@
 var routeFiles = [
-  'monitor.js',
+  'display.js',
   'device.js'
 ];
 

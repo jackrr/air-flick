@@ -1,5 +1,9 @@
 var ids = [];
 
-module.exports = function Controller() {
-
+function Controller(id) {
+  if (ids.indexOf(id) > -1) return 'error';
+  ids.push(id);
+  this.id = id;
 }
+
+module.exports = Controller;

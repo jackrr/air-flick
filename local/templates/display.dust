@@ -1,5 +1,4 @@
-<h1>Message as follows:</h1>
+<h1>{direction} display</h1>
 <p>{id}</p>
 <p>{message}</p>
-<p>new test</p>
-<p>new test 2</p>
+<div id="blockHolder"></div>

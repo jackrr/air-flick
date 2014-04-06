@@ -1,0 +1,17 @@
+.yellowblock {
+  background-color: #ffff00;
+}
+.magentablock {
+  background-color: #ff00ff;
+}
+
+.cyanblock {
+  background-color: #00ffff;
+}
+
+.block {
+  height: 200px;
+  width: 300px;
+  margin: 0 auto;
+}
+

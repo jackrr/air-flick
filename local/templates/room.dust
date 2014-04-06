@@ -2,4 +2,6 @@
 <p>{status}</p>
 <p>{id}</p>
 <p class="joinExisting">Click to join an existing room</p>
-<p class="joinNew">Click to join a new room</p>
+<p class="left">LEFT</p>
+<p class="up">UP</p>
+<p class="right">RIGHT</p>

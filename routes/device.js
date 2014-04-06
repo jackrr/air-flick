@@ -5,7 +5,18 @@ module.exports = function(app) {
     res.send("Hello, device");
   });
 
-  app.get('/device/rooms/join/:roomID', function(req, res) {
+  app.post('/device/rooms/join', function(req, res) {
+    var body = req.body;
+    var room = rooms.getRoom(body.roomID);
+    room.addController(body.deviceID);
+    res.send("Hello, you fucker");
+  });
+
+  app.post('/device/room/:roomID', function(req, res) {
+    var body = req.body;
+    var room = rooms.getRoom(body.roomID);
+    room.sendTo(body.direction, body.block, body.deviceID);
+    res.json({direction: body.direction});
   });
 
   app.get('/device/rooms/:roomID/position_displays', function(req, res) {
