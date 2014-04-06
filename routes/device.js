@@ -15,7 +15,7 @@ module.exports = function(app) {
 
   app.post('/device/room/:roomID', function(req, res) {
     var body = req.body;
-    var room = rooms.getRoom(body.roomID);
+    var room = rooms.getRoom(req.params.roomID);
     console.log(body);
     room.sendTo(body.direction, body.block, body.deviceID);
     res.json({direction: body.direction});

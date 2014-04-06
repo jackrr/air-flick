@@ -4,7 +4,7 @@ var Controller = require('./controller.js');
 
 function Room(id) {
   var self = this;
-  this.id = id || 'room1';
+  this.id = id || 'fakeroom';
   this.displays = {};
   this.controllers = {};
 
