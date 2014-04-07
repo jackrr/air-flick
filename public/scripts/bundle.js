@@ -15970,6 +15970,10 @@ module.exports = Backbone.Model.extend({
     this.view = new BlockView({model: this});
     this.view.render();
   },
+
+  makeOld: function() {
+    this.view.makeOld();
+  }
 });
 
 },{"../views/blockView.js":14,"backbone":1,"jquery":3}],8:[function(require,module,exports){
@@ -15989,7 +15993,11 @@ module.exports = Backbone.Model.extend({
     this.view.render();
 
     this.get('socket').on('display:block', function(data) {
-      var block = new Block({ display: self, color: data.block.color, device: data.device });
+      if (self.block) {
+        self.oldBlock = self.block;
+        self.oldBlock.makeOld();
+      }
+      self.block = new Block({ display: self, color: data.block.color, device: data.device});
     });
   }
 });
@@ -16014,7 +16022,8 @@ module.exports = Backbone.Model.extend({
 
   connect: function() {
     var self = this;
-    var socket = io.connect("http://photoplace.cs.oberlin.edu");
+    // var socket = io.connect("http://photoplace.cs.oberlin.edu");
+    var socket = io.connect("http://localhost:3000");
     socket.on('connectSuccess', function(data) {
       self.set({
         status: 'connected',
@@ -16066,7 +16075,7 @@ var dust = require('../dust-core.min.js');
 (function(){dust.register("block",body_0);function body_0(chk,ctx){return chk.write("<div class=\"").reference(ctx.get(["color"], false),ctx,"h").write("block block\"></div>");}return body_0;})();
 },{"../dust-core.min.js":5}],12:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<h1>").reference(ctx.get(["direction"], false),ctx,"h").write(" display</h1><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p>").reference(ctx.get(["message"], false),ctx,"h").write("</p><div id=\"blockHolder\"></div>");}return body_0;})();
+(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<h1>").reference(ctx.get(["direction"], false),ctx,"h").write(" display</h1><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p>").reference(ctx.get(["message"], false),ctx,"h").write("</p><div id=\"currentBlock\"></div><div id=\"oldBlock\"></div>");}return body_0;})();
 },{"../dust-core.min.js":5}],13:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
 (function(){dust.register("room",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1><p>").reference(ctx.get(["status"], false),ctx,"h").write("</p><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p class=\"joinExisting\">Click to join an existing room</p><p class=\"left\">LEFT</p><p class=\"up\">UP</p><p class=\"right\">RIGHT</p>");}return body_0;})();
@@ -16082,7 +16091,7 @@ module.exports = Backbone.View.extend({
   events: {
   },
 
-  el: '#blockHolder',
+  el: '#currentBlock',
 
   initialize: function() {
     this.listenTo(this.model, 'change', this.render);
@@ -16090,10 +16099,16 @@ module.exports = Backbone.View.extend({
 
   render: function() {
     var self = this;
+    console.log('rendering to: ', self.$el);
     dust.render('block', self.model.attributes, function(err, out) {
       if (err) console.log(err);
       self.$el.html(out);
     });
+  },
+
+  makeOld: function() {
+    this.setElement(Backbone.$('#oldBlock'));
+    this.render();
   }
 });
 

@@ -10,4 +10,8 @@ module.exports = Backbone.Model.extend({
     this.view = new BlockView({model: this});
     this.view.render();
   },
+
+  makeOld: function() {
+    this.view.makeOld();
+  }
 });

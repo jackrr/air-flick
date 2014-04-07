@@ -14,7 +14,11 @@ module.exports = Backbone.Model.extend({
     this.view.render();
 
     this.get('socket').on('display:block', function(data) {
-      var block = new Block({ display: self, color: data.block.color, device: data.device });
+      if (self.block) {
+        self.oldBlock = self.block;
+        self.oldBlock.makeOld();
+      }
+      self.block = new Block({ display: self, color: data.block.color, device: data.device});
     });
   }
 });

@@ -9,9 +9,22 @@
   background-color: #00ffff;
 }
 
+#currentBlock {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+}
+
 .block {
-  height: 200px;
-  width: 300px;
-  margin: 0 auto;
+  height: 100%;
+  width: 100%;
+}
+
+#oldBlock {
+  position: fixed;
+  height: 100px;
+  width: 70px;
+  top: 20px;
+  right: 20px;
 }
 

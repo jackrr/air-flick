@@ -9,7 +9,7 @@ module.exports = Backbone.View.extend({
   events: {
   },
 
-  el: '#blockHolder',
+  el: '#currentBlock',
 
   initialize: function() {
     this.listenTo(this.model, 'change', this.render);
@@ -17,9 +17,15 @@ module.exports = Backbone.View.extend({
 
   render: function() {
     var self = this;
+    console.log('rendering to: ', self.$el);
     dust.render('block', self.model.attributes, function(err, out) {
       if (err) console.log(err);
       self.$el.html(out);
     });
+  },
+
+  makeOld: function() {
+    this.setElement(Backbone.$('#oldBlock'));
+    this.render();
   }
 });
