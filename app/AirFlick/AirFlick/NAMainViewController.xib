@@ -27,11 +27,23 @@
                 <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GZW-Jb-Tjr">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5NF-Y6-0Gd">
+                            <rect key="frame" x="15" y="518" width="285" height="30"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <state key="normal" title="Connect to room1">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="reconnectDevice:" destination="-1" eventType="touchUpInside" id="tLt-JT-9Pl"/>
+                            </connections>
+                        </button>
+                    </subviews>
                     <connections>
                         <outletCollection property="gestureRecognizers" destination="hc2-if-ExU" appends="YES" id="KmZ-M3-U7d"/>
                         <outletCollection property="gestureRecognizers" destination="hFM-SV-XeH" appends="YES" id="dUE-H1-I6Y"/>
                         <outletCollection property="gestureRecognizers" destination="izS-jP-fXA" appends="YES" id="uvw-Ca-Sml"/>
-                        <outletCollection property="gestureRecognizers" destination="GW5-yf-JzW" appends="YES" id="cUq-Ug-6v5"/>
                     </connections>
                 </view>
             </subviews>
@@ -55,10 +67,5 @@
                 <action selector="swipeUpResponder:" destination="-1" id="Bc7-FQ-7lt"/>
             </connections>
         </swipeGestureRecognizer>
-        <tapGestureRecognizer id="GW5-yf-JzW">
-            <connections>
-                <action selector="tapResponder:" destination="-1" id="aG8-Gi-KBR"/>
-            </connections>
-        </tapGestureRecognizer>
     </objects>
 </document>

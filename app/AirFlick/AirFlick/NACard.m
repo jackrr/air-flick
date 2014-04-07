@@ -21,7 +21,6 @@
         UIColor *COLORS[] = { magenta, cyan, yellow };
         NSString *TYPES[] = { @"magenta", @"cyan", @"yellow" };
         NSUInteger i = arc4random_uniform(3);
-        NSLog(@"i = %d",i);
         
         _color = COLORS[i];
         _typeColor = TYPES[i];
@@ -60,6 +59,8 @@
     [animation setTimingFunction:
      [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
     [_view.layer addAnimation:animation forKey:kCATransition];
+    
+    NSLog(@"I sure hope some animation happened");
 }
 
 - (void)transitionRight {

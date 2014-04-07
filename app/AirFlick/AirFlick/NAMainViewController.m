@@ -11,15 +11,14 @@
 
 @interface NAMainViewController ()
 
-@property (nonatomic) int numRequestsSent;
-
 @property (nonatomic) IBOutlet UIView *subView;
 
 @property NACard *currentCard;
 
+@property (nonatomic) NSString *deviceID;
 @property (nonatomic) NSString *serverURL;
-//@property (nonatomic) NSMutableData *_responseData;
-
+@property (nonatomic) NSString *roomID;
+           
 @property (nonatomic, weak) IBOutlet UILabel *sendRequestLabel;
 
 @property (nonatomic, strong) IBOutlet UISwipeGestureRecognizer *swipeRightRecognizer;
@@ -36,13 +35,64 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     
     if (self) {
-        self.serverURL = @"http://localhost:3000/device/hello";
         
+        //self.serverURL = @"http://localhost:3000/device/hello";
+
+        // get device id
+        self.deviceID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+
+        [self establishDeviceToRoomConnection];
+    
+        NSLog(@"Connected to %@",self.serverURL);
         [self addCard];
     }
     
     // return the main view
     return self;
+}
+
+- (void)establishDeviceToRoomConnection {
+    // request room ID
+    NSURL *joinRoomURL = [NSURL URLWithString:@"http://photoplace.cs.oberlin.edu/device/join"];
+    NSMutableURLRequest *reqForRoomID = [[NSMutableURLRequest alloc] init];
+    [reqForRoomID setURL:joinRoomURL];
+    [reqForRoomID setHTTPMethod:@"POST"];
+    [reqForRoomID setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [reqForRoomID setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+    
+    NSDictionary *temp = [NSDictionary dictionaryWithObjectsAndKeys:
+                         @"room1",@"roomID",
+                         self.deviceID,@"deviceID",
+                          nil];
+    NSLog(@"connection dictionary: %@",temp);
+    
+    [reqForRoomID setHTTPBody: [NSJSONSerialization
+                                dataWithJSONObject:temp
+                                options:kNilOptions error:nil]];
+    
+    NSURLResponse *joinReqResponse = nil;
+    NSError *joinReqError = nil;
+    NSData *joinReqData = [NSURLConnection sendSynchronousRequest:reqForRoomID
+                                                returningResponse:&joinReqResponse
+                                                            error:&joinReqError];
+    if (joinReqError == nil){
+        //            NSDictionary *joinResJSON = [NSJSONSerialization JSONObjectWithData:joinReqData
+        //                                                                        options:0
+        //                                                                          error:nil];
+        self.serverURL = @"http://photoplace.cs.oberlin.edu/device/room/room1";
+    } else {
+        [[[UIAlertView alloc] initWithTitle:@"Whoops!"
+                                    message:@"Could not connect to room1. Connecting to localhost instead."
+                                   delegate:nil
+                          cancelButtonTitle:@"OK"
+                          otherButtonTitles:nil] show];
+        
+        self.serverURL = @"http://localhost:3000/device/hello";
+    }
+}
+
+- (IBAction)reconnectDevice:(id)sender {
+    [self establishDeviceToRoomConnection];
 }
 
 // request methods (you tell me)
@@ -76,9 +126,11 @@
     //UIAlertView *receivedData = [[UIAlertView alloc] initWithTitle:@"Data Received" message:msg delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
     
     //[receivedData show];
-    [self addCard];
     NSLog(@"Card sent succesfully");
-}
+
+    //[self.currentCard transitionLeft];
+    [self addCard];
+   }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
     // The request has failed for some reason!
@@ -87,13 +139,14 @@
     // throws error aka DOES NOT WORK
     
     NSLog(@"%@",[NSString stringWithFormat:@"Connection failed: %@",error]);
-    
-    //[[[UIAlertView alloc] initWithTitle:@"Connection Error" message:@"Could not connect to server" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
 }
 
 - (void)sendJSONtoServer:(NSDictionary *)dict {
     // set URL
+    NSLog(@"Sending card to %@",self.serverURL);
     NSURL *url = [NSURL URLWithString:self.serverURL];
+    
+    NSLog(@"Dictionary to be sent: %@",dict);
     
     // convert NSDictionary to NSData
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict options:kNilOptions error:nil];
@@ -108,16 +161,16 @@
     
     // construct connection
     NSURLConnection *conn = [[NSURLConnection alloc] initWithRequest:req delegate:self];
-    
 }
 
 - (void)sendCardtoServer:(NSString *)direction {
-    NSString *deviceID = [NSString stringWithFormat:@"%@",[[UIDevice currentDevice] identifierForVendor]];
     NSString *cardColor = self.currentCard.typeColor;
     
     [self sendJSONtoServer:[NSDictionary dictionaryWithObjectsAndKeys:
-                            deviceID,@"id",
-                            cardColor,@"color",
+                            self.deviceID,@"deviceID",
+                            [NSDictionary dictionaryWithObjectsAndKeys:
+                             cardColor,@"color",
+                             nil],@"block",
                             direction,@"direction",
                             nil]];
     
@@ -130,33 +183,25 @@
 //    [self sendJSONtoServer:dict];
     [self sendCardtoServer:@"right"];
     
-   // [self addCard];
 }
 
 - (IBAction)swipeLeftResponder:(UISwipeGestureRecognizer *)sr {
     NSLog(@"Swipe left detected");
 
     [self sendCardtoServer:@"left"];
-    
-  //  [self addCard];
+
 }
 
 - (IBAction)swipeUpResponder:(UISwipeGestureRecognizer *)sr {
     NSLog(@"Swipe up detected");
-    
-//    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"up", @"direction", nil];
-//    [self sendJSONtoServer:dict];
+
     [self sendCardtoServer:@"up"];
     
-  //  [self addCard];
 }
 
 - (void)addCard {
-    NSLog(@"Tap detected");
-    
-    NACard *newCard = [[NACard alloc] initWithParentView:self.view];
-    self.currentCard = newCard;
-    [newCard display];
+    self.currentCard = [[NACard alloc] initWithParentView:self.view];
+    [self.currentCard display];
     
     //NSLog(@"%@",[self.view subviews]);
 }
