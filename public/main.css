@@ -1,3 +1,7 @@
+body {
+  margin: 0;
+}
+
 .yellowblock {
   background-color: #ffff00;
 }
@@ -9,15 +13,16 @@
   background-color: #00ffff;
 }
 
-#currentBlock {
-  position: fixed;
+.block {
   height: 100%;
   width: 100%;
 }
 
-.block {
+#currentBlock {
+  position: fixed;
   height: 100%;
   width: 100%;
+  z-index: -1;
 }
 
 #oldBlock {
@@ -28,3 +33,7 @@
   right: 20px;
 }
 
+.infoBar {
+  float: left;
+  margin-left: 8px;
+}

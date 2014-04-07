@@ -1,5 +1,7 @@
-<h1>{direction} display</h1>
-<p>{id}</p>
-<p>{message}</p>
+<div class="infoBar">
+  <h1>{direction} display</h1>
+  <p>{id}</p>
+  <p>{message}</p>
+</div>
 <div id="currentBlock"></div>
 <div id="oldBlock"></div>

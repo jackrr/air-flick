@@ -15953,8 +15953,9 @@ var Backbone = require('backbone');
 Backbone.$ = $;
 
 $(function(){
-  new RoutesIndex();
+  var router = new RoutesIndex();
   Backbone.history.start();
+  router.newRoom();
 });
 
 },{"./routes/index.js":10,"backbone":1,"jquery":3}],7:[function(require,module,exports){
@@ -16075,7 +16076,7 @@ var dust = require('../dust-core.min.js');
 (function(){dust.register("block",body_0);function body_0(chk,ctx){return chk.write("<div class=\"").reference(ctx.get(["color"], false),ctx,"h").write("block block\"></div>");}return body_0;})();
 },{"../dust-core.min.js":5}],12:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<h1>").reference(ctx.get(["direction"], false),ctx,"h").write(" display</h1><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p>").reference(ctx.get(["message"], false),ctx,"h").write("</p><div id=\"currentBlock\"></div><div id=\"oldBlock\"></div>");}return body_0;})();
+(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<div class=\"infoBar\"><h1>").reference(ctx.get(["direction"], false),ctx,"h").write(" display</h1><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p>").reference(ctx.get(["message"], false),ctx,"h").write("</p></div><div id=\"currentBlock\"></div><div id=\"oldBlock\"></div>");}return body_0;})();
 },{"../dust-core.min.js":5}],13:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
 (function(){dust.register("room",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1><p>").reference(ctx.get(["status"], false),ctx,"h").write("</p><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p class=\"joinExisting\">Click to join an existing room</p><p class=\"left\">LEFT</p><p class=\"up\">UP</p><p class=\"right\">RIGHT</p>");}return body_0;})();
@@ -16143,7 +16144,6 @@ Backbone.$ = $;
 
 var tpl = require('../templates/room.js');
 var dust = require('../dust-core.min.js');
-console.log(tpl);
 
 module.exports = Backbone.View.extend({
   events: {
@@ -16159,7 +16159,7 @@ module.exports = Backbone.View.extend({
   },
 
   join: function() {
-    var roomID = prompt("Enter the name of the room to join", "e.g. poopbutt");
+    var roomID = prompt("Enter the name of the room to join", "room1");
     this.model.joinRoom("up", roomID);
   },
 
@@ -16167,15 +16167,15 @@ module.exports = Backbone.View.extend({
     this.model.joinRoom();
   },
   joinLeft: function() {
-    var roomID = prompt("Enter the name of the room to join", "e.g. poopbutt");
+    var roomID = prompt("Enter the name of the room to join", "room1");
     this.model.joinRoom("left", roomID);
   },
   joinRight: function() {
-    var roomID = prompt("Enter the name of the room to join", "e.g. poopbutt");
+    var roomID = prompt("Enter the name of the room to join", "room1");
     this.model.joinRoom("right", roomID);
   },
   joinUp: function() {
-    var roomID = prompt("Enter the name of the room to join", "e.g. poopbutt");
+    var roomID = prompt("Enter the name of the room to join", "room1");
     this.model.joinRoom("up", roomID);
   },
 

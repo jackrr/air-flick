@@ -4,7 +4,6 @@ Backbone.$ = $;
 
 var tpl = require('../templates/room.js');
 var dust = require('../dust-core.min.js');
-console.log(tpl);
 
 module.exports = Backbone.View.extend({
   events: {
@@ -20,7 +19,7 @@ module.exports = Backbone.View.extend({
   },
 
   join: function() {
-    var roomID = prompt("Enter the name of the room to join", "e.g. poopbutt");
+    var roomID = prompt("Enter the name of the room to join", "room1");
     this.model.joinRoom("up", roomID);
   },
 
@@ -28,15 +27,15 @@ module.exports = Backbone.View.extend({
     this.model.joinRoom();
   },
   joinLeft: function() {
-    var roomID = prompt("Enter the name of the room to join", "e.g. poopbutt");
+    var roomID = prompt("Enter the name of the room to join", "room1");
     this.model.joinRoom("left", roomID);
   },
   joinRight: function() {
-    var roomID = prompt("Enter the name of the room to join", "e.g. poopbutt");
+    var roomID = prompt("Enter the name of the room to join", "room1");
     this.model.joinRoom("right", roomID);
   },
   joinUp: function() {
-    var roomID = prompt("Enter the name of the room to join", "e.g. poopbutt");
+    var roomID = prompt("Enter the name of the room to join", "room1");
     this.model.joinRoom("up", roomID);
   },
 

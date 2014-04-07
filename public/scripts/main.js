@@ -5,6 +5,7 @@ var Backbone = require('backbone');
 Backbone.$ = $;
 
 $(function(){
-  new RoutesIndex();
+  var router = new RoutesIndex();
   Backbone.history.start();
+  router.newRoom();
 });
