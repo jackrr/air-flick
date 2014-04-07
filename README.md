@@ -35,5 +35,10 @@ TBD
   4. 
   
 #### April 11, 2014 ####
-  1. Multiple controllers
+  1. App connects to any specified room
+  2. App menu screen
+  3. Screen displays number of cards received
+  4. Chord sounds when all screens are same color/all are different color (test out audio components)
+  5. Server will connect faster
+  6. Screen app cleaned up a bit
   
