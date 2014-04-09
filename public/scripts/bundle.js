@@ -16100,7 +16100,7 @@ module.exports = Backbone.Router.extend({
 
 },{"../models/roomModel.js":10,"backbone":1,"jquery":3}],12:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("block",body_0);function body_0(chk,ctx){return chk.write("<div class=\"").reference(ctx.get(["color"], false),ctx,"h").write("block block\"></div>");}return body_0;})();
+(function(){dust.register("block",body_0);function body_0(chk,ctx){return chk.write("<div class=\"block\"></div>");}return body_0;})();
 },{"../dust-core.min.js":5}],13:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
 (function(){dust.register("cardCount",body_0);function body_0(chk,ctx){return chk.write("<div class=\"count\">").reference(ctx.get(["count"], false),ctx,"h").write("</div>");}return body_0;})();
@@ -16134,7 +16134,13 @@ module.exports = Backbone.View.extend({
     dust.render('block', self.model.attributes, function(err, out) {
       if (err) console.log(err);
       self.$el.html(out);
+      self.setColor();
     });
+  },
+
+  setColor: function(color) {
+    if (!color) color = this.model.get('color');
+    this.$el.css('background-color', color);
   },
 
   makeOld: function() {
