@@ -1,0 +1,2 @@
+var dust = require('../dust-core.min.js');
+(function(){dust.register("cardCount",body_0);function body_0(chk,ctx){return chk.write("<div class=\"count\">").reference(ctx.get(["count"], false),ctx,"h").write("</div>");}return body_0;})();

@@ -31,6 +31,16 @@ body {
   width: 70px;
   top: 20px;
   right: 20px;
+  z-index: 0;
+}
+
+#cardCount .count {
+  font-size: 26px;
+  font-weight: 700;
+  position:fixed;
+  top: 40px;
+  right: 40px;
+  z-index: 1;
 }
 
 .infoBar {

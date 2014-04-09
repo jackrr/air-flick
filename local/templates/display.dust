@@ -5,3 +5,4 @@
 </div>
 <div id="currentBlock"></div>
 <div id="oldBlock"></div>
+<div id="cardCount"></div>
