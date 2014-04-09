@@ -31,6 +31,7 @@ body {
   width: 70px;
   top: 20px;
   right: 20px;
+  border: solid 3px #ffffff;
   z-index: 0;
 }
 
@@ -38,14 +39,23 @@ body {
   font-size: 26px;
   font-weight: 700;
   position:fixed;
-  top: 40px;
-  right: 40px;
+  top: 20px;
+  right: 20px;
+  height: 100px;
+  width: 70px;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 100px;
   z-index: 1;
 }
 
 .infoBar {
-  float: left;
-  margin-left: 8px;
+  position: absolute;
+  width: 20%;
+  left: 40%;
+  top: 20px;
+  padding: 4px;
+  background-color: #ffffff;
 }
 
 .arrow {
