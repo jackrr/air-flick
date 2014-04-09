@@ -21,7 +21,13 @@ module.exports = Backbone.View.extend({
     dust.render('block', self.model.attributes, function(err, out) {
       if (err) console.log(err);
       self.$el.html(out);
+      self.setColor();
     });
+  },
+
+  setColor: function(color) {
+    if (!color) color = this.model.get('color');
+    this.$el.css('background-color', color);
   },
 
   makeOld: function() {
