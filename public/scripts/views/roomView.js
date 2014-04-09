@@ -8,9 +8,9 @@ var dust = require('../dust-core.min.js');
 module.exports = Backbone.View.extend({
   events: {
     "click .joinExisting": "join",
-    "click .left": "joinLeft",
-    "click .up": "joinUp",
-    "click .right": "joinRight"
+    "click .leftArrow": "joinLeft",
+    "click .upArrow": "joinUp",
+    "click .rightArrow": "joinRight"
   },
   el: '#room',
 

@@ -37,3 +37,34 @@ body {
   float: left;
   margin-left: 8px;
 }
+
+.arrow {
+  margin-left: 20px;
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  background-size: contain;
+}
+
+.arrow:hover {
+  cursor: pointer;
+}
+
+.leftArrow {
+  background-image:url('images/left-red.png');
+}
+.leftArrow:hover {
+  background-image:url('images/left-blue.png');
+}
+.rightArrow {
+  background-image:url('images/right-red.png');
+}
+.rightArrow:hover {
+  background-image:url('images/right-blue.png');
+}
+.upArrow {
+  background-image:url('images/up-red.png');
+}
+.upArrow:hover {
+  background-image:url('images/up-blue.png');
+}

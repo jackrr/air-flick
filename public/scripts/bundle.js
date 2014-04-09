@@ -16023,7 +16023,8 @@ module.exports = Backbone.Model.extend({
 
   connect: function() {
     var self = this;
-    var socket = io.connect("http://photoplace.cs.oberlin.edu");
+    // var socket = io.connect("http://photoplace.cs.oberlin.edu");
+    var socket = io.connect("http://localhost:3000");
     socket.on('connectSuccess', function(data) {
       self.set({
         status: 'connected',
@@ -16078,7 +16079,7 @@ var dust = require('../dust-core.min.js');
 (function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<div class=\"infoBar\"><h1>").reference(ctx.get(["direction"], false),ctx,"h").write(" display</h1><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p>").reference(ctx.get(["message"], false),ctx,"h").write("</p></div><div id=\"currentBlock\"></div><div id=\"oldBlock\"></div>");}return body_0;})();
 },{"../dust-core.min.js":5}],13:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("room",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1><p>").reference(ctx.get(["status"], false),ctx,"h").write("</p><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p class=\"joinExisting\">Click to join an existing room</p><p class=\"left\">LEFT</p><p class=\"up\">UP</p><p class=\"right\">RIGHT</p>");}return body_0;})();
+(function(){dust.register("room",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1><p>").reference(ctx.get(["status"], false),ctx,"h").write("</p><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><div class=\"arrow leftArrow\"></div><div class=\"arrow upArrow\"></div><div class=\"arrow rightArrow\"></div>");}return body_0;})();
 },{"../dust-core.min.js":5}],14:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
@@ -16147,9 +16148,9 @@ var dust = require('../dust-core.min.js');
 module.exports = Backbone.View.extend({
   events: {
     "click .joinExisting": "join",
-    "click .left": "joinLeft",
-    "click .up": "joinUp",
-    "click .right": "joinRight"
+    "click .leftArrow": "joinLeft",
+    "click .upArrow": "joinUp",
+    "click .rightArrow": "joinRight"
   },
   el: '#room',
 
