@@ -21,6 +21,12 @@
 		C8080C5418E60A01002E9447 /* airflickTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C8080C5318E60A01002E9447 /* airflickTests.m */; };
 		C8080C6318E60EB6002E9447 /* NAMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8080C6118E60EB6002E9447 /* NAMainViewController.m */; };
 		C8080C6418E60EB6002E9447 /* NAMainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8080C6218E60EB6002E9447 /* NAMainViewController.xib */; };
+		C817BE9318FB0ABE0088750F /* NAColorsClass.m in Sources */ = {isa = PBXBuildFile; fileRef = C817BE9218FB0ABE0088750F /* NAColorsClass.m */; };
+		C817BE9718FB17940088750F /* NAColorSelectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C817BE9518FB17940088750F /* NAColorSelectorViewController.m */; };
+		C817BE9818FB17940088750F /* NAColorSelectorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C817BE9618FB17940088750F /* NAColorSelectorViewController.xib */; };
+		C817BE9B18FB8BC50088750F /* UIColor+Expanded.m in Sources */ = {isa = PBXBuildFile; fileRef = C817BE9A18FB8BC50088750F /* UIColor+Expanded.m */; };
+		C87EFB0818F33DB100913968 /* NARoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C87EFB0618F33DB100913968 /* NARoomViewController.m */; };
+		C87EFB0918F33DB100913968 /* NARoomViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C87EFB0718F33DB100913968 /* NARoomViewController.xib */; };
 		C8A0B6C818ECBD7300639917 /* NACard.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A0B6C718ECBD7300639917 /* NACard.m */; };
 /* End PBXBuildFile section */
 
@@ -54,6 +60,16 @@
 		C8080C6018E60EB6002E9447 /* NAMainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NAMainViewController.h; sourceTree = "<group>"; };
 		C8080C6118E60EB6002E9447 /* NAMainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NAMainViewController.m; sourceTree = "<group>"; };
 		C8080C6218E60EB6002E9447 /* NAMainViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NAMainViewController.xib; sourceTree = "<group>"; };
+		C817BE9118FB0ABE0088750F /* NAColorsClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NAColorsClass.h; sourceTree = "<group>"; };
+		C817BE9218FB0ABE0088750F /* NAColorsClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NAColorsClass.m; sourceTree = "<group>"; };
+		C817BE9418FB17940088750F /* NAColorSelectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NAColorSelectorViewController.h; sourceTree = "<group>"; };
+		C817BE9518FB17940088750F /* NAColorSelectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NAColorSelectorViewController.m; sourceTree = "<group>"; };
+		C817BE9618FB17940088750F /* NAColorSelectorViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NAColorSelectorViewController.xib; sourceTree = "<group>"; };
+		C817BE9918FB8BC50088750F /* UIColor+Expanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Expanded.h"; sourceTree = "<group>"; };
+		C817BE9A18FB8BC50088750F /* UIColor+Expanded.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Expanded.m"; sourceTree = "<group>"; };
+		C87EFB0518F33DB100913968 /* NARoomViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NARoomViewController.h; sourceTree = "<group>"; };
+		C87EFB0618F33DB100913968 /* NARoomViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NARoomViewController.m; sourceTree = "<group>"; };
+		C87EFB0718F33DB100913968 /* NARoomViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NARoomViewController.xib; sourceTree = "<group>"; };
 		C8A0B6C618ECBD7300639917 /* NACard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NACard.h; sourceTree = "<group>"; };
 		C8A0B6C718ECBD7300639917 /* NACard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NACard.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -121,9 +137,19 @@
 				C8080C3518E60A00002E9447 /* Supporting Files */,
 				C8080C6018E60EB6002E9447 /* NAMainViewController.h */,
 				C8080C6118E60EB6002E9447 /* NAMainViewController.m */,
+				C8080C6218E60EB6002E9447 /* NAMainViewController.xib */,
+				C817BE9418FB17940088750F /* NAColorSelectorViewController.h */,
+				C817BE9518FB17940088750F /* NAColorSelectorViewController.m */,
+				C817BE9618FB17940088750F /* NAColorSelectorViewController.xib */,
 				C8A0B6C618ECBD7300639917 /* NACard.h */,
 				C8A0B6C718ECBD7300639917 /* NACard.m */,
-				C8080C6218E60EB6002E9447 /* NAMainViewController.xib */,
+				C817BE9118FB0ABE0088750F /* NAColorsClass.h */,
+				C817BE9218FB0ABE0088750F /* NAColorsClass.m */,
+				C87EFB0518F33DB100913968 /* NARoomViewController.h */,
+				C87EFB0618F33DB100913968 /* NARoomViewController.m */,
+				C87EFB0718F33DB100913968 /* NARoomViewController.xib */,
+				C817BE9918FB8BC50088750F /* UIColor+Expanded.h */,
+				C817BE9A18FB8BC50088750F /* UIColor+Expanded.m */,
 			);
 			path = airflick;
 			sourceTree = "<group>";
@@ -233,6 +259,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C87EFB0918F33DB100913968 /* NARoomViewController.xib in Resources */,
+				C817BE9818FB17940088750F /* NAColorSelectorViewController.xib in Resources */,
 				C8080C3918E60A00002E9447 /* InfoPlist.strings in Resources */,
 				C8080C6418E60EB6002E9447 /* NAMainViewController.xib in Resources */,
 				C8080C4118E60A01002E9447 /* Images.xcassets in Resources */,
@@ -254,9 +282,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C817BE9318FB0ABE0088750F /* NAColorsClass.m in Sources */,
 				C8A0B6C818ECBD7300639917 /* NACard.m in Sources */,
 				C8080C3B18E60A00002E9447 /* main.m in Sources */,
+				C87EFB0818F33DB100913968 /* NARoomViewController.m in Sources */,
 				C8080C3F18E60A01002E9447 /* NAAppDelegate.m in Sources */,
+				C817BE9718FB17940088750F /* NAColorSelectorViewController.m in Sources */,
+				C817BE9B18FB8BC50088750F /* UIColor+Expanded.m in Sources */,
 				C8080C6318E60EB6002E9447 /* NAMainViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
