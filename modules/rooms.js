@@ -8,8 +8,6 @@ function Room(id) {
   this.displays = {};
   this.controllers = {};
 
-  console.log('new room with id: ', id);
-
   rooms[this.id] = this;
 
   this.toJSON = function() {
@@ -19,14 +17,31 @@ function Room(id) {
   this.addDisplay = function(socket, direction) {
     var display = new Display(socket, direction);
     this.displays[direction] = display;
-    console.log("in add display: ", this.displays);
     this.notifyAll('new display for room');
   }
 
   this.sendTo = function(direction, block, controllerID) {
-    console.log("in rooms sendTo: ", direction, block, controllerID);
-    console.log("in rooms sendTo: ", this.displays);
-    var display = this.displays[direction].send('display:block', {device: this.controllers[controllerID], block: block});
+    this.displays[direction].sendBlock({device: this.controllers[controllerID], block: block});
+  }
+
+  this.displaysMatching = function() {
+    var colors = {};
+    for (var key in this.displays) {
+      var display = self.displays[key];
+      var color = display.currentColor();
+      if (colors[color]) {
+        colors[color] += 1;
+      } else {
+        colors[color] = 1;
+      }
+    }
+
+    var max = 0;
+    for (var key in colors) {
+      if (colors[key] > max) max = colors[key];
+    }
+      
+    return colors[key];
   }
 
   this.addController = function(id) {

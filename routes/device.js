@@ -16,9 +16,9 @@ module.exports = function(app) {
   app.post('/device/room/:roomID', function(req, res) {
     var body = req.body;
     var room = rooms.getRoom(req.params.roomID);
-    console.log(body);
     room.sendTo(body.direction, body.block, body.deviceID);
-    res.json({direction: body.direction});
+    var matches = room.displaysMatching();
+    res.json({direction: body.direction, matches: matches});
   });
 
   app.get('/device/rooms/:roomID/position_displays', function(req, res) {

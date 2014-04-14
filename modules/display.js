@@ -18,4 +18,13 @@ Display.prototype.send = function(event, data) {
   this.socket.emit(event, data);
 }
 
+Display.prototype.sendBlock = function(data) {
+  this.lastBlock = data.block;
+  this.socket.emit('display:block', data);
+};
+
+Display.prototype.currentColor = function() {
+  return this.lastBlock.color;
+};
+
 module.exports = Display;
