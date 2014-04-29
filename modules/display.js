@@ -1,9 +1,16 @@
+var uuid = require('node-uuid');
 var id = 0;
 
-function Display(socket, direction) {
+function Display(socket) {
   this.socket = socket;
-  this.direction = direction;
-  this.id = ++id; // fix to avoid num rollover weirdness (or is it going to be NaN?)
+  this.id = uuid.v1(); // fix to avoid num rollover weirdness (or is it going to be NaN?)
+  
+  this.toJSON = function() {
+    return {
+      id: this.id
+    }
+  }
+
 }
 
 Display.prototype.position = function() {
@@ -19,8 +26,23 @@ Display.prototype.send = function(event, data) {
 }
 
 Display.prototype.sendBlock = function(data) {
-  this.lastBlock = data.block;
-  this.socket.emit('display:block', data);
+  this.currentBlock = data.block;
+  this.socket.emit('display:sendBlock', data);
+};
+
+Display.prototype.removeBlock = function(callback) {
+  var self = this;
+  this.socket.emit('display:removeBlock');
+  this.socket.on('rooms:blockRemoved', function(data) {
+    self.socket.removeAllListeners('rooms:blockRemoved');
+    self.currentBlock = data.currentBlock;
+    callback(data.removedBlock);
+  });
+};
+
+Display.prototype.blockRemoved = function(data) {
+  this.currentBlock = data.currentBlock;
+  
 };
 
 Display.prototype.currentColor = function() {
