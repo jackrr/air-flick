@@ -16044,6 +16044,10 @@ module.exports = Backbone.Model.extend({
   initialize: function() {
     this.view = new LogInsView({model: this});
     this.view.render();
+  },
+
+  remove: function() {
+    this.get('logger').removeLog(this.cid);
   }
 });
 
@@ -16066,9 +16070,19 @@ module.exports = Backbone.Model.extend({
     var self = this;
 
     socket.on('rooms:notification', function (data) {
-      self.logs.push(new LogInstance({ parent: self, message: data.message }));
+      self.logs.push(new LogInstance({ logger: self, message: data.message }));
     });
   },
+
+  removeLog: function(logID) {
+    newlogs = [];
+    this.logs.map(function(log) {
+      if (log.cid != logID) {
+        newlogs.push(log);
+      }
+    });
+    this.logs = newlogs;
+  }
 
 });
 
@@ -16094,8 +16108,8 @@ module.exports = Backbone.Model.extend({
 
   connect: function() {
     var self = this;
-    // var socket = io.connect("http://photoplace.cs.oberlin.edu");
-    var socket = io.connect("http://localhost:3000");
+    var socket = io.connect("http://photoplace.cs.oberlin.edu");
+    // var socket = io.connect("http://localhost:3000");
     socket.on('connectSuccess', function(data) {
       self.set({
         status: 'connected',
@@ -16270,11 +16284,8 @@ module.exports = Backbone.View.extend({
   },
 
   remove: function() {
-    console.log('in remove');
-    console.log(this.domID());
-    console.log(this.$el.children(this.domID()));
-
     this.$el.children(this.domID()).remove();
+    this.model.remove();
   },
 
   hide: function() {
