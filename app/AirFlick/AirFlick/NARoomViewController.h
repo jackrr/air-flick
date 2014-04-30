@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface NARoomViewController : UIViewController
+@interface NARoomViewController : UIViewController<NSURLConnectionDelegate>
+{
+    NSMutableData *_responseData;
+}
 
 @end

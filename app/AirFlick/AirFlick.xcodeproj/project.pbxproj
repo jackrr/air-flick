@@ -25,6 +25,8 @@
 		C817BE9718FB17940088750F /* NAColorSelectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C817BE9518FB17940088750F /* NAColorSelectorViewController.m */; };
 		C817BE9818FB17940088750F /* NAColorSelectorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C817BE9618FB17940088750F /* NAColorSelectorViewController.xib */; };
 		C817BE9B18FB8BC50088750F /* UIColor+Expanded.m in Sources */ = {isa = PBXBuildFile; fileRef = C817BE9A18FB8BC50088750F /* UIColor+Expanded.m */; };
+		C82BE44518FC609F009FB7AC /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C82BE44418FC609F009FB7AC /* AudioToolbox.framework */; };
+		C82BE44718FC6129009FB7AC /* C.wav in Resources */ = {isa = PBXBuildFile; fileRef = C82BE44618FC6129009FB7AC /* C.wav */; };
 		C87EFB0818F33DB100913968 /* NARoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C87EFB0618F33DB100913968 /* NARoomViewController.m */; };
 		C87EFB0918F33DB100913968 /* NARoomViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C87EFB0718F33DB100913968 /* NARoomViewController.xib */; };
 		C8A0B6C818ECBD7300639917 /* NACard.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A0B6C718ECBD7300639917 /* NACard.m */; };
@@ -67,6 +69,8 @@
 		C817BE9618FB17940088750F /* NAColorSelectorViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NAColorSelectorViewController.xib; sourceTree = "<group>"; };
 		C817BE9918FB8BC50088750F /* UIColor+Expanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Expanded.h"; sourceTree = "<group>"; };
 		C817BE9A18FB8BC50088750F /* UIColor+Expanded.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Expanded.m"; sourceTree = "<group>"; };
+		C82BE44418FC609F009FB7AC /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		C82BE44618FC6129009FB7AC /* C.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = C.wav; path = "../../../../../Downloads/Pitx_-_Chords_1/C.wav"; sourceTree = "<group>"; };
 		C87EFB0518F33DB100913968 /* NARoomViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NARoomViewController.h; sourceTree = "<group>"; };
 		C87EFB0618F33DB100913968 /* NARoomViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NARoomViewController.m; sourceTree = "<group>"; };
 		C87EFB0718F33DB100913968 /* NARoomViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NARoomViewController.xib; sourceTree = "<group>"; };
@@ -79,6 +83,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C82BE44518FC609F009FB7AC /* AudioToolbox.framework in Frameworks */,
 				C8080C3118E60A00002E9447 /* CoreGraphics.framework in Frameworks */,
 				C8080C3318E60A00002E9447 /* UIKit.framework in Frameworks */,
 				C8080C2F18E60A00002E9447 /* Foundation.framework in Frameworks */,
@@ -120,6 +125,7 @@
 		C8080C2D18E60A00002E9447 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C82BE44418FC609F009FB7AC /* AudioToolbox.framework */,
 				C8080C2E18E60A00002E9447 /* Foundation.framework */,
 				C8080C3018E60A00002E9447 /* CoreGraphics.framework */,
 				C8080C3218E60A00002E9447 /* UIKit.framework */,
@@ -131,6 +137,7 @@
 		C8080C3418E60A00002E9447 /* airflick */ = {
 			isa = PBXGroup;
 			children = (
+				C82BE44618FC6129009FB7AC /* C.wav */,
 				C8080C3D18E60A00002E9447 /* NAAppDelegate.h */,
 				C8080C3E18E60A01002E9447 /* NAAppDelegate.m */,
 				C8080C4018E60A01002E9447 /* Images.xcassets */,
@@ -259,6 +266,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C82BE44718FC6129009FB7AC /* C.wav in Resources */,
 				C87EFB0918F33DB100913968 /* NARoomViewController.xib in Resources */,
 				C817BE9818FB17940088750F /* NAColorSelectorViewController.xib in Resources */,
 				C8080C3918E60A00002E9447 /* InfoPlist.strings in Resources */,

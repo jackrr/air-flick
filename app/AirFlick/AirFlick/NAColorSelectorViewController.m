@@ -8,6 +8,7 @@
 
 #import "NAColorSelectorViewController.h"
 #import "NAColorsClass.h"
+#import "UIColor+Expanded.h"
 
 @interface NAColorSelectorViewController () <UITextFieldDelegate>
 
@@ -42,6 +43,7 @@
         textField.autocorrectionType = UITextAutocorrectionTypeNo;
         textField.tag = 1;
         textField.text = obj.color1;
+        textField.backgroundColor = [UIColor colorWithHexString:obj.color1];
         
         // color 2
         CGRect textField2Rect = CGRectMake(40, 130, 240, 30);
@@ -54,6 +56,7 @@
         textField2.autocorrectionType = UITextAutocorrectionTypeNo;
         textField2.tag = 2;
         textField2.text = obj.color2;
+        textField2.backgroundColor = [UIColor colorWithHexString:obj.color2];
         
         // color 3
         CGRect textField3Rect = CGRectMake(40, 170, 240, 30);
@@ -66,6 +69,7 @@
         textField3.autocorrectionType = UITextAutocorrectionTypeNo;
         textField3.tag = 3;
         textField3.text = obj.color3;
+        textField3.backgroundColor = [UIColor colorWithHexString:obj.color3];
         
         // add text field sub views
         [self.view addSubview:textField];
@@ -88,28 +92,42 @@
                                   delegate:self
                          cancelButtonTitle:@"OK"
                           otherButtonTitles:nil] show];
+        textField.backgroundColor = [UIColor whiteColor];
         return YES;
     } else {
         NAColorsClass *obj = [NAColorsClass getInstance];
         [textField resignFirstResponder];
         textField.text = [textField.text uppercaseString];
         
+        
         switch (textField.tag) {
             case 1:
                 NSLog(@"updated color1");
                 obj.color1 = textField.text;
+                textField.backgroundColor = [UIColor colorWithHexString:textField.text];
                 break;
             case 2:
                 NSLog(@"updated color2");
                 obj.color2 = textField.text;
+                textField.backgroundColor = [UIColor colorWithHexString:textField.text];
                 break;
             case 3:
                 NSLog(@"updated color3");
                 obj.color3 = textField.text;
+                textField.backgroundColor = [UIColor colorWithHexString:textField.text];
                 break;
             default:
                 break;
         }
+
+        // used for changing font color depending on the darkness of the background color
+        CGFloat red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0;
+        CGFloat threshold = 0.25;
+        [textField.backgroundColor getRed:&red green:&green blue:&blue alpha:&alpha];
+        NSLog(@"red %f green %f blue %f",red,green,blue);
+        CGFloat bgDelta = ((red * 299) + (green * 587) + (blue * 114)) / 1000;
+        NSLog(@"bgDelta = %f",bgDelta);
+        textField.textColor = (bgDelta > threshold) ? [UIColor blackColor] : [UIColor whiteColor];
         
         return YES;
     }
