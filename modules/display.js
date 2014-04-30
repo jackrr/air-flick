@@ -14,11 +14,20 @@ function Display(socket) {
 }
 
 Display.prototype.position = function() {
-  this.position = true;
+  this.hasPosition = true;
+  this.socket.emit('display:positioningDone');
 }
 
-Display.prototype.positioned = function() {
-  return this.position || false;
+Display.prototype.startPositioning = function() {
+  this.socket.emit('display:positioningStart');
+}
+
+Display.prototype.setPosition = function() {
+  this.socket.emit('display:position');
+}
+
+Display.prototype.isPositioned = function() {
+  return this.hasPosition || false;
 }
 
 Display.prototype.send = function(event, data) {

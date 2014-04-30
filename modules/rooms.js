@@ -55,15 +55,23 @@ function Room(id) {
   }
 
   this.nextUnmatchedDisplay = function() {
+    if (this.lastPositioned) {
+      this.lastPositioned.position();
+    } else {
+      for (var key in this.displays) {
+        this.displays[key].startPositioning();
+      }
+    }
+
     for (var key in this.displays) {
-      var display = self.displays[key];
-      if (!display.positioned) return display.toJSON();
+      var display = this.displays[key];
+      if (!display.isPositioned()) {
+        display.setPosition();
+        this.lastPositioned = display;
+        return display.toJSON();
+      }
     };
     return false;
-  }
-
-  this.positionDisplay = function(displayID) {
-    this.displays[displayID].position();
   }
 
   this.notifyAll = function(msg) {

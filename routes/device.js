@@ -36,13 +36,6 @@ module.exports = function(app) {
     }
   });
 
-  // this is used to tell the server that the specific display is associated with a direction on the device
-  app.get('/device/room/:roomID/position_display/:displayID', function(req, res) {
-    var room = rooms.getRoom(req.params.roomID);
-    room.positionDisplay(req.params.roomID);
-    res.json(room.toJSON());
-  });
-
   app.get('/device/room/:roomID/display_content/:displayID', function(req, res) {
     var room = rooms.getRoom(req.params.roomID);
     room.displays[req.params.displayID].removeBlock(function(block) {

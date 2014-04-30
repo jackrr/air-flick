@@ -18,5 +18,17 @@ module.exports = Backbone.View.extend({
       if (err) console.log(err);
       self.$el.html(out);
     });
+  },
+
+  silence: function() {
+    this.render();
+    this.$el.css('background-color', '#000000');
+  },
+
+  ident: function() {
+    this.render();
+    this.$el.css('background-color', '#ffffff');
+    this.$el.append('<div>LOOK AT ME</div>');
   }
+
 });

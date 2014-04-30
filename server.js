@@ -24,19 +24,18 @@ var routes = require('./routes/index.js')(app);
 
 var server = http.createServer(app);
 
-
 server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
   var io = socketio.listen(server);
 
-io.configure('production', function(){
-  io.set('transports', [
-  'xhr-polling'
-  ]);
-});
+  io.configure('production', function(){
+    io.set('transports', [
+    'xhr-polling'
+    ]);
+  });
 
-io.configure('development', function(){
-  io.set('transports', ['websocket']);
-});
+  io.configure('development', function(){
+    io.set('transports', ['websocket']);
+  });
   var socketModule = require('./modules/sockets.js')(io);
 });

@@ -34,6 +34,18 @@ module.exports = Backbone.Model.extend({
         currentBlock: data.currentBlock.forServer()
       });
     });
+
+    socket.on('display:positioningStart', function() {
+      self.view.silence();
+    });
+
+    socket.on('display:position', function() {
+      self.view.ident();
+    });
+
+    socket.on('display:positioningDone', function() {
+      self.view.silence();
+    });
   },
 
   addBlock: function(block, sender) {
