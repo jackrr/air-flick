@@ -1,0 +1,4 @@
+<div id="logInstance{cid}" class="logInstance">
+  <span class="message">{message}</span>
+  <span class="close">[x]</span>
+</div>

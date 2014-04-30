@@ -15941,11 +15941,13 @@ if (typeof define === "function" && define.amd) {
 }
 })();
 },{}],5:[function(require,module,exports){
+module.exports=require(2)
+},{}],6:[function(require,module,exports){
 /*! Dust - Asynchronous Templating - v2.3.4
 * http://linkedin.github.io/dustjs/
 * Copyright (c) 2014 Aleksander Williams; Released under the MIT License */
 !function(root){function Context(a,b,c,d){this.stack=a,this.global=b,this.blocks=c,this.templateName=d}function Stack(a,b,c,d){this.tail=b,this.isObject=a&&"object"==typeof a,this.head=a,this.index=c,this.of=d}function Stub(a){this.head=new Chunk(this),this.callback=a,this.out=""}function Stream(){this.head=new Chunk(this)}function Chunk(a,b,c){this.root=a,this.next=b,this.data=[],this.flushable=!1,this.taps=c}function Tap(a,b){this.head=a,this.tail=b}var dust={},NONE="NONE",ERROR="ERROR",WARN="WARN",INFO="INFO",DEBUG="DEBUG",loggingLevels=[DEBUG,INFO,WARN,ERROR,NONE],EMPTY_FUNC=function(){},logger={},originalLog,loggerContext;dust.debugLevel=NONE,dust.silenceErrors=!1,root&&root.console&&root.console.log&&(loggerContext=root.console,originalLog=root.console.log),logger.log=loggerContext?function(){logger.log="function"==typeof originalLog?function(){originalLog.apply(loggerContext,arguments)}:function(){var a=Array.prototype.slice.apply(arguments).join(" ");originalLog(a)},logger.log.apply(this,arguments)}:function(){},dust.log=function(a,b){if(dust.isDebug&&dust.debugLevel===NONE&&(logger.log('[!!!DEPRECATION WARNING!!!]: dust.isDebug is deprecated.  Set dust.debugLevel instead to the level of logging you want ["debug","info","warn","error","none"]'),dust.debugLevel=INFO),b=b||INFO,dust.indexInArray(loggingLevels,b)>=dust.indexInArray(loggingLevels,dust.debugLevel)&&(dust.logQueue||(dust.logQueue=[]),dust.logQueue.push({message:a,type:b}),logger.log("[DUST "+b+"]: "+a)),!dust.silenceErrors&&b===ERROR)throw"string"==typeof a?new Error(a):a},dust.onError=function(a,b){if(logger.log("[!!!DEPRECATION WARNING!!!]: dust.onError will no longer return a chunk object."),dust.log(a.message||a,ERROR),dust.silenceErrors)return b;throw a},dust.helpers={},dust.cache={},dust.register=function(a,b){a&&(dust.cache[a]=b)},dust.render=function(a,b,c){var d=new Stub(c).head;try{dust.load(a,d,Context.wrap(b,a)).end()}catch(e){dust.log(e,ERROR)}},dust.stream=function(a,b){var c=new Stream;return dust.nextTick(function(){try{dust.load(a,c.head,Context.wrap(b,a)).end()}catch(d){dust.log(d,ERROR)}}),c},dust.renderSource=function(a,b,c){return dust.compileFn(a)(b,c)},dust.compileFn=function(a,b){b=b||null;var c=dust.loadSource(dust.compile(a,b));return function(a,d){var e=d?new Stub(d):new Stream;return dust.nextTick(function(){"function"==typeof c?c(e.head,Context.wrap(a,b)).end():dust.log(new Error("Template ["+b+"] cannot be resolved to a Dust function"),ERROR)}),e}},dust.load=function(a,b,c){var d=dust.cache[a];return d?d(b,c):dust.onLoad?b.map(function(b){dust.onLoad(a,function(d,e){return d?b.setError(d):(dust.cache[a]||dust.loadSource(dust.compile(e,a)),void dust.cache[a](b,c).end())})}):b.setError(new Error("Template Not Found: "+a))},dust.loadSource=function(source,path){return eval(source)},dust.isArray=Array.isArray?Array.isArray:function(a){return"[object Array]"===Object.prototype.toString.call(a)},dust.indexInArray=function(a,b,c){if(c=+c||0,Array.prototype.indexOf)return a.indexOf(b,c);if(void 0===a||null===a)throw new TypeError('cannot call method "indexOf" of null');var d=a.length;for(1/0===Math.abs(c)&&(c=0),0>c&&(c+=d,0>c&&(c=0));d>c;c++)if(a[c]===b)return c;return-1},dust.nextTick=function(){return function(a){setTimeout(a,0)}}(),dust.isEmpty=function(a){return dust.isArray(a)&&!a.length?!0:0===a?!1:!a},dust.filter=function(a,b,c){if(c)for(var d=0,e=c.length;e>d;d++){var f=c[d];"s"===f?(b=null,dust.log("Using unescape filter on ["+a+"]",DEBUG)):"function"==typeof dust.filters[f]?a=dust.filters[f](a):dust.log("Invalid filter ["+f+"]",WARN)}return b&&(a=dust.filters[b](a)),a},dust.filters={h:function(a){return dust.escapeHtml(a)},j:function(a){return dust.escapeJs(a)},u:encodeURI,uc:encodeURIComponent,js:function(a){return JSON?JSON.stringify(a):(dust.log("JSON is undefined.  JSON stringify has not been used on ["+a+"]",WARN),a)},jp:function(a){return JSON?JSON.parse(a):(dust.log("JSON is undefined.  JSON parse has not been used on ["+a+"]",WARN),a)}},dust.makeBase=function(a){return new Context(new Stack,a)},Context.wrap=function(a,b){return a instanceof Context?a:new Context(new Stack(a),{},null,b)},Context.prototype.get=function(a,b){return"string"==typeof a&&("."===a[0]&&(b=!0,a=a.substr(1)),a=a.split(".")),this._get(b,a)},Context.prototype._get=function(a,b){var c,d,e,f,g=this.stack,h=1;if(dust.log("Searching for reference [{"+b.join(".")+"}] in template ["+this.getTemplateName()+"]",DEBUG),d=b[0],e=b.length,a&&0===e)f=g,g=g.head;else{if(a)g&&(g=g.head?g.head[d]:void 0);else{for(;g&&(!g.isObject||(f=g.head,c=g.head[d],void 0===c));)g=g.tail;g=void 0!==c?c:this.global?this.global[d]:void 0}for(;g&&e>h;)f=g,g=g[b[h]],h++}if("function"==typeof g){var i=function(){try{return g.apply(f,arguments)}catch(a){return dust.log(a,ERROR)}};return i.isFunction=!0,i}return void 0===g&&dust.log("Cannot find the value for reference [{"+b.join(".")+"}] in template ["+this.getTemplateName()+"]"),g},Context.prototype.getPath=function(a,b){return this._get(a,b)},Context.prototype.push=function(a,b,c){return new Context(new Stack(a,this.stack,b,c),this.global,this.blocks,this.getTemplateName())},Context.prototype.rebase=function(a){return new Context(new Stack(a),this.global,this.blocks,this.getTemplateName())},Context.prototype.current=function(){return this.stack.head},Context.prototype.getBlock=function(a){if("function"==typeof a){var b=new Chunk;a=a(b,this).data.join("")}var c=this.blocks;if(!c)return void dust.log("No blocks for context[{"+a+"}] in template ["+this.getTemplateName()+"]",DEBUG);for(var d,e=c.length;e--;)if(d=c[e][a])return d},Context.prototype.shiftBlocks=function(a){var b,c=this.blocks;return a?(b=c?c.concat([a]):[a],new Context(this.stack,this.global,b,this.getTemplateName())):this},Context.prototype.getTemplateName=function(){return this.templateName},Stub.prototype.flush=function(){for(var a=this.head;a;){if(!a.flushable)return a.error?(this.callback(a.error),dust.log("Chunk error ["+a.error+"] thrown. Ceasing to render this template.",WARN),void(this.flush=EMPTY_FUNC)):void 0;this.out+=a.data.join(""),a=a.next,this.head=a}this.callback(null,this.out)},Stream.prototype.flush=function(){for(var a=this.head;a;){if(!a.flushable)return a.error?(this.emit("error",a.error),dust.log("Chunk error ["+a.error+"] thrown. Ceasing to render this template.",WARN),void(this.flush=EMPTY_FUNC)):void 0;this.emit("data",a.data.join("")),a=a.next,this.head=a}this.emit("end")},Stream.prototype.emit=function(a,b){if(!this.events)return dust.log("No events to emit",INFO),!1;var c=this.events[a];if(!c)return dust.log("Event type ["+a+"] does not exist",WARN),!1;if("function"==typeof c)c(b);else if(dust.isArray(c))for(var d=c.slice(0),e=0,f=d.length;f>e;e++)d[e](b);else dust.log("Event Handler ["+c+"] is not of a type that is handled by emit",WARN)},Stream.prototype.on=function(a,b){return this.events||(this.events={}),this.events[a]?"function"==typeof this.events[a]?this.events[a]=[this.events[a],b]:this.events[a].push(b):(dust.log("Event type ["+a+"] does not exist. Using just the specified callback.",WARN),b?this.events[a]=b:dust.log("Callback for type ["+a+"] does not exist. Listener not registered.",WARN)),this},Stream.prototype.pipe=function(a){return this.on("data",function(b){try{a.write(b,"utf8")}catch(c){dust.log(c,ERROR)}}).on("end",function(){try{return a.end()}catch(b){dust.log(b,ERROR)}}).on("error",function(b){a.error(b)}),this},Chunk.prototype.write=function(a){var b=this.taps;return b&&(a=b.go(a)),this.data.push(a),this},Chunk.prototype.end=function(a){return a&&this.write(a),this.flushable=!0,this.root.flush(),this},Chunk.prototype.map=function(a){var b=new Chunk(this.root,this.next,this.taps),c=new Chunk(this.root,b,this.taps);return this.next=c,this.flushable=!0,a(c),b},Chunk.prototype.tap=function(a){var b=this.taps;return this.taps=b?b.push(a):new Tap(a),this},Chunk.prototype.untap=function(){return this.taps=this.taps.tail,this},Chunk.prototype.render=function(a,b){return a(this,b)},Chunk.prototype.reference=function(a,b,c,d){return"function"==typeof a&&(a.isFunction=!0,a=a.apply(b.current(),[this,b,null,{auto:c,filters:d}]),a instanceof Chunk)?a:dust.isEmpty(a)?this:this.write(dust.filter(a,c,d))},Chunk.prototype.section=function(a,b,c,d){if("function"==typeof a&&(a=a.apply(b.current(),[this,b,c,d]),a instanceof Chunk))return a;var e=c.block,f=c["else"];if(d&&(b=b.push(d)),dust.isArray(a)){if(e){var g=a.length,h=this;if(g>0){b.stack.head&&(b.stack.head.$len=g);for(var i=0;g>i;i++)b.stack.head&&(b.stack.head.$idx=i),h=e(h,b.push(a[i],i,g));return b.stack.head&&(b.stack.head.$idx=void 0,b.stack.head.$len=void 0),h}if(f)return f(this,b)}}else if(a===!0){if(e)return e(this,b)}else if(a||0===a){if(e)return e(this,b.push(a))}else if(f)return f(this,b);return dust.log("Not rendering section (#) block in template ["+b.getTemplateName()+"], because above key was not found",DEBUG),this},Chunk.prototype.exists=function(a,b,c){var d=c.block,e=c["else"];if(dust.isEmpty(a)){if(e)return e(this,b)}else if(d)return d(this,b);return dust.log("Not rendering exists (?) block in template ["+b.getTemplateName()+"], because above key was not found",DEBUG),this},Chunk.prototype.notexists=function(a,b,c){var d=c.block,e=c["else"];if(dust.isEmpty(a)){if(d)return d(this,b)}else if(e)return e(this,b);return dust.log("Not rendering not exists (^) block check in template ["+b.getTemplateName()+"], because above key was found",DEBUG),this},Chunk.prototype.block=function(a,b,c){var d=c.block;return a&&(d=a),d?d(this,b):this},Chunk.prototype.partial=function(a,b,c){var d;d=dust.makeBase(b.global),d.blocks=b.blocks,b.stack&&b.stack.tail&&(d.stack=b.stack.tail),c&&(d=d.push(c)),"string"==typeof a&&(d.templateName=a),d=d.push(b.stack.head);var e;return e="function"==typeof a?this.capture(a,d,function(a,b){d.templateName=d.templateName||a,dust.load(a,b,d).end()}):dust.load(a,this,d)},Chunk.prototype.helper=function(a,b,c,d){var e=this;try{return dust.helpers[a]?dust.helpers[a](e,b,c,d):(dust.log("Invalid helper ["+a+"]",WARN),e)}catch(f){return dust.log(f,ERROR),e}},Chunk.prototype.capture=function(a,b,c){return this.map(function(d){var e=new Stub(function(a,b){a?d.setError(a):c(b,d)});a(e.head,b).end()})},Chunk.prototype.setError=function(a){return this.error=a,this.root.flush(),this},Tap.prototype.push=function(a){return new Tap(a,this)},Tap.prototype.go=function(a){for(var b=this;b;)a=b.head(a),b=b.tail;return a};var HCHARS=new RegExp(/[&<>\"\']/),AMP=/&/g,LT=/</g,GT=/>/g,QUOT=/\"/g,SQUOT=/\'/g;dust.escapeHtml=function(a){return"string"==typeof a?HCHARS.test(a)?a.replace(AMP,"&amp;").replace(LT,"&lt;").replace(GT,"&gt;").replace(QUOT,"&quot;").replace(SQUOT,"&#39;"):a:a};var BS=/\\/g,FS=/\//g,CR=/\r/g,LS=/\u2028/g,PS=/\u2029/g,NL=/\n/g,LF=/\f/g,SQ=/'/g,DQ=/"/g,TB=/\t/g;dust.escapeJs=function(a){return"string"==typeof a?a.replace(BS,"\\\\").replace(FS,"\\/").replace(DQ,'\\"').replace(SQ,"\\'").replace(CR,"\\r").replace(LS,"\\u2028").replace(PS,"\\u2029").replace(NL,"\\n").replace(LF,"\\f").replace(TB,"\\t"):a},"object"==typeof exports?module.exports=dust:root.dust=dust}(this);
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var RoutesIndex = require('./routes/index.js');
 
 var $ = require('jquery');
@@ -15958,7 +15960,7 @@ $(function(){
   router.newRoom();
 });
 
-},{"./routes/index.js":11,"backbone":1,"jquery":3}],7:[function(require,module,exports){
+},{"./routes/index.js":14,"backbone":1,"jquery":3}],8:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 
@@ -15977,7 +15979,7 @@ module.exports = Backbone.Model.extend({
   }
 });
 
-},{"../views/blockView.js":16,"backbone":1,"jquery":3}],8:[function(require,module,exports){
+},{"../views/blockView.js":21,"backbone":1,"jquery":3}],9:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var CardCountView = require("../views/cardCountView.js");
@@ -15999,7 +16001,7 @@ module.exports = Backbone.Model.extend({
   }
 });
 
-},{"../views/cardCountView.js":17,"./blockModel.js":7,"backbone":1,"jquery":3}],9:[function(require,module,exports){
+},{"../views/cardCountView.js":22,"./blockModel.js":8,"backbone":1,"jquery":3}],10:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var DisplayView = require("../views/displayView.js");
@@ -16030,7 +16032,47 @@ module.exports = Backbone.Model.extend({
   }
 });
 
-},{"../models/cardCounterModel.js":8,"../views/displayView.js":18,"./blockModel.js":7,"backbone":1,"jquery":3}],10:[function(require,module,exports){
+},{"../models/cardCounterModel.js":9,"../views/displayView.js":23,"./blockModel.js":8,"backbone":1,"jquery":3}],11:[function(require,module,exports){
+var $ = require('jquery')(window);
+var Backbone = require('backbone');
+
+var LogInsView = require('../views/logInstanceView.js');
+
+Backbone.$ = $;
+
+module.exports = Backbone.Model.extend({
+  initialize: function() {
+    this.view = new LogInsView({model: this});
+    this.view.render();
+  }
+});
+
+},{"../views/logInstanceView.js":24,"backbone":1,"jquery":3}],12:[function(require,module,exports){
+var $ = require('jquery')(window);
+var Backbone = require('backbone');
+
+var LoggerView = require('../views/loggerView.js');
+var LogInstance = require('./logInstance.js');
+
+Backbone.$ = $;
+
+module.exports = Backbone.Model.extend({
+  initialize: function() {
+    this.view = new LoggerView({model: this});
+    this.view.render();
+    this.logs = [];
+
+    var socket = this.get('socket');
+    var self = this;
+
+    socket.on('rooms:notification', function (data) {
+      self.logs.push(new LogInstance({ parent: self, message: data.message }));
+    });
+  },
+
+});
+
+},{"../views/loggerView.js":25,"./logInstance.js":11,"backbone":1,"jquery":3}],13:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var Display = require('./displayModel.js');
@@ -16038,6 +16080,7 @@ var io = require('socket.io-client');
 
 
 var RoomView = require('../views/roomView.js');
+var Logger = require('./logger.js');
 
 Backbone.$ = $;
 
@@ -16046,43 +16089,42 @@ module.exports = Backbone.Model.extend({
     this.connect();
     this.view = new RoomView({model: this});
     this.view.render();
+
   },
 
   connect: function() {
     var self = this;
-    var socket = io.connect("http://photoplace.cs.oberlin.edu");
-    // var socket = io.connect("http://localhost:3000");
+    // var socket = io.connect("http://photoplace.cs.oberlin.edu");
+    var socket = io.connect("http://localhost:3000");
     socket.on('connectSuccess', function(data) {
       self.set({
         status: 'connected',
         socket: socket
       });
+
+      self.logger = new Logger({socket: socket});
     });
   },
 
-  joinRoom: function(direction, roomID) {
+  joinRoom: function(roomID) {
     var self = this;
     var socket = self.get('socket');
     if (roomID) {
-      socket.emit("rooms:join", { roomID: roomID, type: 'display', direction: direction });
+      socket.emit("rooms:join", { roomID: roomID, type: 'display' });
     } else {
-      socket.emit("rooms:new", { type: 'display', direction: direction });
+      socket.emit("rooms:new", { type: 'display' });
     }
 
     socket.on('rooms:joinSuccess', function (data) {
       var room = data.room;
       self.set(data.room);
-      self.display = new Display({room: self, socket: socket, message: data.message, direction: direction});
+      self.display = new Display({room: self, socket: socket, message: data.message, id: data.id});
       self.view.hide();
-    });
-
-    socket.on('rooms:notification', function (data) {
-      self.view.notify(data.message);
     });
   }
 });
 
-},{"../views/roomView.js":19,"./displayModel.js":9,"backbone":1,"jquery":3,"socket.io-client":4}],11:[function(require,module,exports){
+},{"../views/roomView.js":26,"./displayModel.js":10,"./logger.js":12,"backbone":1,"jquery":3,"socket.io-client":4}],14:[function(require,module,exports){
 var Room = require('../models/roomModel.js');
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
@@ -16098,19 +16140,25 @@ module.exports = Backbone.Router.extend({
   }
 });
 
-},{"../models/roomModel.js":10,"backbone":1,"jquery":3}],12:[function(require,module,exports){
+},{"../models/roomModel.js":13,"backbone":1,"jquery":3}],15:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
 (function(){dust.register("block",body_0);function body_0(chk,ctx){return chk.write("<div class=\"block\"></div>");}return body_0;})();
-},{"../dust-core.min.js":5}],13:[function(require,module,exports){
+},{"../dust-core.min.js":6}],16:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
 (function(){dust.register("cardCount",body_0);function body_0(chk,ctx){return chk.write("<div class=\"count\">").reference(ctx.get(["count"], false),ctx,"h").write("</div>");}return body_0;})();
-},{"../dust-core.min.js":5}],14:[function(require,module,exports){
+},{"../dust-core.min.js":6}],17:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
 (function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<div class=\"infoBar\"><h1>").reference(ctx.get(["direction"], false),ctx,"h").write(" display</h1><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p>").reference(ctx.get(["message"], false),ctx,"h").write("</p></div><div id=\"currentBlock\"></div><div id=\"oldBlock\"></div><div id=\"cardCount\"></div>");}return body_0;})();
-},{"../dust-core.min.js":5}],15:[function(require,module,exports){
+},{"../dust-core.min.js":6}],18:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("room",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1><p>").reference(ctx.get(["status"], false),ctx,"h").write("</p><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><div class=\"arrow leftArrow\"></div><div class=\"arrow upArrow\"></div><div class=\"arrow rightArrow\"></div>");}return body_0;})();
-},{"../dust-core.min.js":5}],16:[function(require,module,exports){
+(function(){dust.register("logInstance",body_0);function body_0(chk,ctx){return chk.write("<div id=\"logInstance").reference(ctx.get(["cid"], false),ctx,"h").write("\" class=\"logInstance\"><span class=\"message\">").reference(ctx.get(["message"], false),ctx,"h").write("</span><span class=\"close\">[x]</span></div>");}return body_0;})();
+},{"../dust-core.min.js":6}],19:[function(require,module,exports){
+var dust = require('../dust-core.min.js');
+(function(){dust.register("logger",body_0);function body_0(chk,ctx){return chk.write("<div class=\"logArea\"><div>Log</div><div id=\"logInstances\"></div></div>");}return body_0;})();
+},{"../dust-core.min.js":6}],20:[function(require,module,exports){
+var dust = require('../dust-core.min.js');
+(function(){dust.register("room",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1><p>").reference(ctx.get(["status"], false),ctx,"h").write("</p><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><div class=\"joinNew\">Create a new room</div><div class=\"joinExisting\">Join a room</div>");}return body_0;})();
+},{"../dust-core.min.js":6}],21:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16149,7 +16197,7 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":5,"../templates/block.js":12,"backbone":1,"jquery":3}],17:[function(require,module,exports){
+},{"../dust-core.min.js":6,"../templates/block.js":15,"backbone":1,"jquery":3}],22:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16173,7 +16221,7 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":5,"../templates/cardCount.js":13,"backbone":1,"jquery":3}],18:[function(require,module,exports){
+},{"../dust-core.min.js":6,"../templates/cardCount.js":16,"backbone":1,"jquery":3}],23:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16197,7 +16245,82 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":5,"../templates/display.js":14,"backbone":1,"jquery":3}],19:[function(require,module,exports){
+},{"../dust-core.min.js":6,"../templates/display.js":17,"backbone":1,"jquery":3}],24:[function(require,module,exports){
+var $ = require('jquery')(window);
+var Backbone = require('backbone');
+var _ = require('underscore');
+Backbone.$ = $;
+
+var tpl = require('../templates/logInstance.js');
+var dust = require('../dust-core.min.js');
+
+module.exports = Backbone.View.extend({
+  events: {
+    "click .close": "remove"
+  },
+
+  el: '#logInstances',
+
+  domID: function() {
+    return '#logInstance'+this.model.cid;
+  },
+
+  initialize: function() {
+    this.listenTo(this.model, 'change', this.render);
+  },
+
+  remove: function() {
+    console.log('in remove');
+    console.log(this.domID());
+    console.log(this.$el.children(this.domID()));
+
+    this.$el.children(this.domID()).remove();
+  },
+
+  hide: function() {
+    this.$el.children(this.domID()).hide();
+  },
+
+  render: function() {
+    var self = this;
+    dust.render('logInstance', _.extend({cid: self.model.cid}, self.model.attributes), function(err, out) {
+      if (err) console.log(err);
+      self.$el.append(out);
+    });
+  }
+});
+
+},{"../dust-core.min.js":6,"../templates/logInstance.js":18,"backbone":1,"jquery":3,"underscore":5}],25:[function(require,module,exports){
+var $ = require('jquery')(window);
+var Backbone = require('backbone');
+Backbone.$ = $;
+
+var tpl = require('../templates/logger.js');
+var dust = require('../dust-core.min.js');
+
+module.exports = Backbone.View.extend({
+  events: {
+  },
+  el: '#log',
+
+  initialize: function() {
+    this.listenTo(this.model, 'change', this.render);
+  },
+
+  hide: function() {
+    Backbone.$(this.$el).hide();
+  },
+
+  render: function() {
+    var self = this;
+    dust.render('logger', self.model.attributes, function(err, out) {
+      if (err) console.log(err);
+      self.$el.html(out);
+    });
+  }
+});
+
+},{"../dust-core.min.js":6,"../templates/logger.js":19,"backbone":1,"jquery":3}],26:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16208,9 +16331,7 @@ var dust = require('../dust-core.min.js');
 module.exports = Backbone.View.extend({
   events: {
     "click .joinExisting": "join",
-    "click .leftArrow": "joinLeft",
-    "click .upArrow": "joinUp",
-    "click .rightArrow": "joinRight"
+    "click .joinNew": "joinNew"
   },
   el: '#room',
 
@@ -16220,27 +16341,11 @@ module.exports = Backbone.View.extend({
 
   join: function() {
     var roomID = prompt("Enter the name of the room to join", "room1");
-    this.model.joinRoom("up", roomID);
+    this.model.joinRoom(roomID);
   },
 
   joinNew: function() {
     this.model.joinRoom();
-  },
-  joinLeft: function() {
-    var roomID = prompt("Enter the name of the room to join", "room1");
-    this.model.joinRoom("left", roomID);
-  },
-  joinRight: function() {
-    var roomID = prompt("Enter the name of the room to join", "room1");
-    this.model.joinRoom("right", roomID);
-  },
-  joinUp: function() {
-    var roomID = prompt("Enter the name of the room to join", "room1");
-    this.model.joinRoom("up", roomID);
-  },
-
-  notify: function(msg) {
-    alert(msg);
   },
 
   hide: function() {
@@ -16257,4 +16362,4 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":5,"../templates/room.js":15,"backbone":1,"jquery":3}]},{},[6])
+},{"../dust-core.min.js":6,"../templates/room.js":20,"backbone":1,"jquery":3}]},{},[7])
