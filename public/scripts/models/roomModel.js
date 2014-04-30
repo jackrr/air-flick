@@ -5,6 +5,7 @@ var io = require('socket.io-client');
 
 
 var RoomView = require('../views/roomView.js');
+var Logger = require('./logger.js');
 
 Backbone.$ = $;
 
@@ -13,6 +14,7 @@ module.exports = Backbone.Model.extend({
     this.connect();
     this.view = new RoomView({model: this});
     this.view.render();
+
   },
 
   connect: function() {
@@ -24,27 +26,25 @@ module.exports = Backbone.Model.extend({
         status: 'connected',
         socket: socket
       });
+
+      self.logger = new Logger({socket: socket});
     });
   },
 
-  joinRoom: function(direction, roomID) {
+  joinRoom: function(roomID) {
     var self = this;
     var socket = self.get('socket');
     if (roomID) {
-      socket.emit("rooms:join", { roomID: roomID, type: 'display', direction: direction });
+      socket.emit("rooms:join", { roomID: roomID, type: 'display' });
     } else {
-      socket.emit("rooms:new", { type: 'display', direction: direction });
+      socket.emit("rooms:new", { type: 'display' });
     }
 
     socket.on('rooms:joinSuccess', function (data) {
       var room = data.room;
       self.set(data.room);
-      self.display = new Display({room: self, socket: socket, message: data.message, direction: direction});
+      self.display = new Display({room: self, socket: socket, message: data.message, id: data.id});
       self.view.hide();
-    });
-
-    socket.on('rooms:notification', function (data) {
-      self.view.notify(data.message);
     });
   }
 });

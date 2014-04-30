@@ -1,6 +1,5 @@
 <h1>ROOM VIEW</h1>
 <p>{status}</p>
 <p>{id}</p>
-<div class="arrow leftArrow"></div>
-<div class="arrow upArrow"></div>
-<div class="arrow rightArrow"></div>
+<div class="joinNew">Create a new room</div>
+<div class="joinExisting">Join a room</div>

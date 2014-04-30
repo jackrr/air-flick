@@ -10,31 +10,44 @@ module.exports = function(app) {
     var body = req.body;
     var room = rooms.getRoom(body.roomID);
     room.addController(body.deviceID);
-    res.send("Hello, you fucker");
+    res.send("Hello, you device.");
   });
 
   app.post('/device/room/:roomID', function(req, res) {
     var body = req.body;
     var room = rooms.getRoom(req.params.roomID);
-    room.sendTo(body.direction, body.block, body.deviceID);
+    room.sendTo(body.displayID, body.block, body.deviceID);
     var matches = room.displaysMatching();
-    res.json({direction: body.direction, matches: matches});
+    res.json({display: room.displays[body.displayID].toJSON(), matches: matches});
   });
 
-  app.get('/device/rooms/:roomID/position_displays', function(req, res) {
+  // this is used to ask the server for an unpositioned display
+  // if there is a display that needs to be positioned, the response contains:
+  //    next -- the display (next.id is the unique identifier for the display)
+  //    count -- the number of displays in the room
+  // otherwise, the response contains basic info about the room (no next key will be present)
+  app.get('/device/room/:roomID/position_displays', function(req, res) {
     var room = rooms.getRoom(req.params.roomID);
     display = room.nextUnmatchedDisplay();
     if (display){
-      res.json({"next": display.toJSON()});
+      res.json({next: display.toJSON(), count: room.displayCount});
     } else {
-      res.json({"room": room.toJSON()});
+      res.json({room: room.toJSON()});
     }
   });
 
-  app.get('/device/rooms/:roomID/position_display/:displayID', function(req, res) {
+  // this is used to tell the server that the specific display is associated with a direction on the device
+  app.get('/device/room/:roomID/position_display/:displayID', function(req, res) {
     var room = rooms.getRoom(req.params.roomID);
     room.positionDisplay(req.params.roomID);
     res.json(room.toJSON());
+  });
+
+  app.get('/device/room/:roomID/display_content/:displayID', function(req, res) {
+    var room = rooms.getRoom(req.params.roomID);
+    room.displays[req.params.displayID].removeBlock(function(block) {
+      res.json({block: block});
+    });
   });
 
   app.get('/device/new_room/', function(req, res) {

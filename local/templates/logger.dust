@@ -1,0 +1,4 @@
+<div class="logArea">
+  <div>Log</div>
+  <div id="logInstances"></div>
+</div>

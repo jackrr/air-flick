@@ -1,12 +1,14 @@
 var rooms = {};
 var Display = require('./display.js');
 var Controller = require('./controller.js');
+var uuid = require('node-uuid');
 
 function Room(id) {
   var self = this;
-  this.id = id || 'fakeroom';
+  this.id = id || uuid.v1();
   this.displays = {};
   this.controllers = {};
+  this.displayCount = 0;
 
   rooms[this.id] = this;
 
@@ -14,14 +16,16 @@ function Room(id) {
     return {id: this.id};
   }
 
-  this.addDisplay = function(socket, direction) {
-    var display = new Display(socket, direction);
-    this.displays[direction] = display;
+  this.addDisplay = function(socket) {
+    var display = new Display(socket);
+    this.displays[display.id] = display;
+    this.displayCount++;
     this.notifyAll('new display for room');
+    return display;
   }
 
-  this.sendTo = function(direction, block, controllerID) {
-    this.displays[direction].sendBlock({device: this.controllers[controllerID], block: block});
+  this.sendTo = function(displayID, block, controllerID) {
+    this.displays[displayID].sendBlock({device: this.controllers[controllerID], block: block});
   }
 
   this.displaysMatching = function() {
@@ -74,10 +78,8 @@ function Room(id) {
 
 module.exports = {
   getRoom: function(roomID) {
-    console.log("in rooms.getRoom rooms is: ", rooms);
     var room = rooms[roomID];
     if (room) return room;
-    console.log('creating a new goddam room goddamit');
     return new Room(roomID);
   },
   close: function(room) {
