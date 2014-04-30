@@ -27,7 +27,7 @@
     "socket.io-client": "0.9.16",
     "duster": "~0.3.2",
     "watch": "~0.9.0",
-    "forever": "~0.11.0"
-    "underscore": "^1.6.0",
+    "forever": "~0.11.0",
+    "underscore": "^1.6.0"
   }
 }
