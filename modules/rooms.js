@@ -68,7 +68,7 @@ function Room(id) {
       if (!display.isPositioned()) {
         display.setPosition();
         this.lastPositioned = display;
-        return display.toJSON();
+        return display;
       }
     };
     return false;
