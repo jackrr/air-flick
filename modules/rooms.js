@@ -21,6 +21,7 @@ function Room(id) {
     this.displays[display.id] = display;
     this.displayCount++;
     this.notifyAll('new display for room');
+    return display;
   }
 
   this.sendTo = function(displayID, block, controllerID) {

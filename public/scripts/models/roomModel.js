@@ -17,8 +17,8 @@ module.exports = Backbone.Model.extend({
 
   connect: function() {
     var self = this;
-    var socket = io.connect("http://photoplace.cs.oberlin.edu");
-    // var socket = io.connect("http://localhost:3000");
+    // var socket = io.connect("http://photoplace.cs.oberlin.edu");
+    var socket = io.connect("http://localhost:3000");
     socket.on('connectSuccess', function(data) {
       self.set({
         status: 'connected',
@@ -27,19 +27,19 @@ module.exports = Backbone.Model.extend({
     });
   },
 
-  joinRoom: function(direction, roomID) {
+  joinRoom: function(roomID) {
     var self = this;
     var socket = self.get('socket');
     if (roomID) {
-      socket.emit("rooms:join", { roomID: roomID, type: 'display', direction: direction });
+      socket.emit("rooms:join", { roomID: roomID, type: 'display' });
     } else {
-      socket.emit("rooms:new", { type: 'display', direction: direction });
+      socket.emit("rooms:new", { type: 'display' });
     }
 
     socket.on('rooms:joinSuccess', function (data) {
       var room = data.room;
       self.set(data.room);
-      self.display = new Display({room: self, socket: socket, message: data.message, direction: direction});
+      self.display = new Display({room: self, socket: socket, message: data.message, id: data.id});
       self.view.hide();
     });
 

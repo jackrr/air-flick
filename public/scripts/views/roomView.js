@@ -8,9 +8,7 @@ var dust = require('../dust-core.min.js');
 module.exports = Backbone.View.extend({
   events: {
     "click .joinExisting": "join",
-    "click .leftArrow": "joinLeft",
-    "click .upArrow": "joinUp",
-    "click .rightArrow": "joinRight"
+    "click .joinNew": "joinNew"
   },
   el: '#room',
 
@@ -20,23 +18,11 @@ module.exports = Backbone.View.extend({
 
   join: function() {
     var roomID = prompt("Enter the name of the room to join", "room1");
-    this.model.joinRoom("up", roomID);
+    this.model.joinRoom(roomID);
   },
 
   joinNew: function() {
     this.model.joinRoom();
-  },
-  joinLeft: function() {
-    var roomID = prompt("Enter the name of the room to join", "room1");
-    this.model.joinRoom("left", roomID);
-  },
-  joinRight: function() {
-    var roomID = prompt("Enter the name of the room to join", "room1");
-    this.model.joinRoom("right", roomID);
-  },
-  joinUp: function() {
-    var roomID = prompt("Enter the name of the room to join", "room1");
-    this.model.joinRoom("up", roomID);
   },
 
   notify: function(msg) {
