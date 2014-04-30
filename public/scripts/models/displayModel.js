@@ -17,13 +17,41 @@ module.exports = Backbone.Model.extend({
 
     this.cardCounter = new CardCounter();
 
-    this.get('socket').on('display:block', function(data) {
-      if (self.block) {
-        self.oldBlock = self.block;
-        self.oldBlock.makeOld();
-      }
+    this.blockStack = [];
+
+    var socket = this.get('socket');
+
+    socket.on('display:block', function(data) {
+      self.addBlock(data.block, data.device);
       self.block = new Block({ display: self, color: data.block.color, device: data.device});
-      self.cardCounter.inc();
     });
+
+    socket.on('display:removeBlock', function() {
+      var data = self.removeBlock();
+
+      socket.emit('rooms:blockRemoved', {
+        removedBlock: data.removedBlock.forServer(),
+        currentBlock: data.currentBlock.forServer()
+      });
+    });
+  },
+
+  addBlock: function(block, sender) {
+    var blocks = this.blockStack;
+    if (blocks.length > 0) blocks[blocks.length - 1].makeOld();
+
+    blocks.push(new Block({display: self, color: block.color, device: sender}));
+    this.cardCounter.inc();
+  },
+
+  removeBlock: function() {
+    var blocks = this.blockStack;
+    if (blocks.length == 0) return {};
+
+    this.cardCounter.dec();
+    return {
+      removedBlock: blocks.pop(),
+      currentBlock: blocks[blocks.length - 1]
+    };
   }
 });

@@ -13,5 +13,9 @@ module.exports = Backbone.Model.extend({
 
   makeOld: function() {
     this.view.makeOld();
+  },
+
+  forServer: function() {
+    return this.attributes;
   }
 });

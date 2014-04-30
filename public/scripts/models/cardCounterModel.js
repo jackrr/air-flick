@@ -16,5 +16,9 @@ module.exports = Backbone.Model.extend({
 
   inc: function() {
     this.set('count', this.get('count') + 1);
+  },
+
+  dec: function() {
+    this.set('count', this.get('count') - 1);
   }
 });
