@@ -16046,6 +16046,18 @@ module.exports = Backbone.Model.extend({
         currentBlock: data.currentBlock.forServer()
       });
     });
+
+    socket.on('display:positioningStart', function() {
+      self.view.silence();
+    });
+
+    socket.on('display:position', function() {
+      self.view.ident();
+    });
+
+    socket.on('display:positioningDone', function() {
+      self.view.silence();
+    });
   },
 
   addBlock: function(block, sender) {
@@ -16144,8 +16156,8 @@ module.exports = Backbone.Model.extend({
 
   connect: function() {
     var self = this;
-    // var socket = io.connect("http://photoplace.cs.oberlin.edu");
-    var socket = io.connect("http://localhost:3000");
+    var socket = io.connect("http://photoplace.cs.oberlin.edu");
+    // var socket = io.connect("http://localhost:3000");
     socket.on('connectSuccess', function(data) {
       self.set({
         status: 'connected',
@@ -16292,7 +16304,19 @@ module.exports = Backbone.View.extend({
       if (err) console.log(err);
       self.$el.html(out);
     });
+  },
+
+  silence: function() {
+    this.render();
+    this.$el.css('background-color', '#000000');
+  },
+
+  ident: function() {
+    this.render();
+    this.$el.css('background-color', '#ffffff');
+    this.$el.append('<div>LOOK AT ME</div>');
   }
+
 });
 
 },{"../dust-core.min.js":6,"../templates/display.js":17,"backbone":1,"jquery":3}],24:[function(require,module,exports){
