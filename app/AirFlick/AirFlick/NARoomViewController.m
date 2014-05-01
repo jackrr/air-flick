@@ -130,20 +130,6 @@
     }
 }
 
-- (void)sendTestRequest {
-    
-    NSString *hex = [NSString stringWithFormat:@"#%@",[self.view.backgroundColor hexStringValue]];
-    NSLog(@"%@",hex);
-    
-//    NSDictionary *jsonDict = @{@"deviceID":self.deviceID,
-//                               @"block":@{@"color":hex}};
-
-    //[self sendJSONtoPath:self.currentRoomID :jsonDict];
-    
-    self.view.backgroundColor = [_obj getColor];
-}
-
-
 /* 
  * URLCONNECTION FUNCTIONS
  */
@@ -167,37 +153,9 @@
     
     NSLog(@"received: %@",resJSON);
     
-    
-    if (self.mode == -1){
-        // add first screen
-//        [self.screens addObject:[[NSMutableDictionary alloc]
-//                                 initWithDictionary:
-//                                 @{@"displayID":[resJSON valueForKey:@"displayID"],
-//                                   @"point":@"NA"
-//                                   }]];
-        
-        
-        // switch to adding screens mode
-        //self.mode = 0;
-    }
-    else if (self.mode == 0){
+    if (self.mode == 0){
         // adding screens mode
         
-        if ([resJSON valueForKey:@"next"] == nil){
-            // no more screens to setup
-            
-            self.mode = 1;
-        }
-        else {
-            // add a screen
-            [self.screens addObject:[[NSMutableDictionary alloc]
-                                     initWithDictionary:
-                                     @{@"displayID":[resJSON valueForKey:@"displayID"],
-                                       @"point":@"NA"
-                                       }]];
-
-            //[self sendDisplayRequest];
-        }
     }
     
 }
@@ -206,6 +164,7 @@
     NSURL *url = [self.serverURL URLByAppendingPathComponent:urlPath];
     
     NSLog(@"Sending POST request to %@",url);
+    NSLog(@"JSON object: %@",dictWithJSONObject);
     
     NSData *jsonData = [NSJSONSerialization
                         dataWithJSONObject:dictWithJSONObject
@@ -247,9 +206,6 @@
                        returningResponse:&res
                        error:&err];
     
-    NSLog(@"positionDisplay received: %@",reqData);
-    NSLog(@"positionDisplay res received: %@",res);
-    
     if (err == nil){
         // no error, parse data
         NSDictionary *resJSON = [NSJSONSerialization JSONObjectWithData:reqData
@@ -259,6 +215,7 @@
         if (resJSON[@"next"] == nil){
             NSLog(@"no \"next\" key detected");
             self.mode = 1;
+            self.view.backgroundColor = [_obj getColor];
             
         } else {
             NSLog(@"%@",err);
@@ -329,13 +286,13 @@
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
     NSLog(@"Touch end detected");
     NSLog(@"mode %i",self.mode);
+
+    CGPoint endPoint = [[touches anyObject] locationInView:self.view];
     
     if (self.mode == 0){
         // add screens mode
 
-        // updated point for latest screen
-        CGPoint endPoint = [[touches anyObject] locationInView:self.view];
-        
+        // update point for latest screen
         [[self.screens lastObject] setObject:[NSValue valueWithCGPoint:endPoint]
                                       forKey:@"point"];
         
@@ -345,15 +302,22 @@
     } else if (self.mode == 1){
         // sending and getting data mode
         
-
+        NSMutableDictionary *closestScreen = [self closestScreenForPoint:endPoint];
+                                   
+        [self sendJSONtoPath:[NSString stringWithFormat:@"/device/room/%@",self.roomID]
+                            :@{@"block":@{@"color":[self.view.backgroundColor hexStringValue]},
+                               @"displayID":closestScreen[@"displayID"],
+                               @"deviceID":self.deviceID}];
+        
+        self.view.backgroundColor = [_obj getColor];
     }
 }
 
-- (NSDictionary *)closestScreenForPoint:(CGPoint)point {
-    NSDictionary *closestScreen = nil;
+- (NSMutableDictionary *)closestScreenForPoint:(CGPoint)point {
+    NSMutableDictionary *closestScreen = nil;
     float closestDist = MAXFLOAT;
     
-    for (NSDictionary *screen in self.screens){
+    for (NSMutableDictionary *screen in self.screens){
         CGPoint scg = [[screen valueForKey:@"point"] CGPointValue];
         
         CGFloat dx = (scg.x-point.x);
