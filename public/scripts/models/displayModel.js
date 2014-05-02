@@ -21,7 +21,7 @@ module.exports = Backbone.Model.extend({
 
     var socket = this.get('socket');
 
-    socket.on('display:block', function(data) {
+    socket.on('display:sendBlock', function(data) {
       self.addBlock(data.block, data.device);
       self.block = new Block({ display: self, color: data.block.color, device: data.device});
     });
@@ -45,6 +45,10 @@ module.exports = Backbone.Model.extend({
 
     socket.on('display:positioningDone', function() {
       self.view.silence();
+    });
+
+    socket.on('display:allPositioningDone', function() {
+      self.view.allPositioned();
     });
   },
 

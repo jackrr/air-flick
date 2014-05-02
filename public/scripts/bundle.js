@@ -16033,7 +16033,7 @@ module.exports = Backbone.Model.extend({
 
     var socket = this.get('socket');
 
-    socket.on('display:block', function(data) {
+    socket.on('display:sendBlock', function(data) {
       self.addBlock(data.block, data.device);
       self.block = new Block({ display: self, color: data.block.color, device: data.device});
     });
@@ -16057,6 +16057,10 @@ module.exports = Backbone.Model.extend({
 
     socket.on('display:positioningDone', function() {
       self.view.silence();
+    });
+
+    socket.on('display:allPositioningDone', function() {
+      self.view.allPositioned();
     });
   },
 
@@ -16210,7 +16214,7 @@ var dust = require('../dust-core.min.js');
 (function(){dust.register("cardCount",body_0);function body_0(chk,ctx){return chk.write("<div class=\"count\">").reference(ctx.get(["count"], false),ctx,"h").write("</div>");}return body_0;})();
 },{"../dust-core.min.js":6}],17:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<div class=\"infoBar\"><h1>").reference(ctx.get(["direction"], false),ctx,"h").write(" display</h1><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><p>").reference(ctx.get(["message"], false),ctx,"h").write("</p></div><div id=\"currentBlock\"></div><div id=\"oldBlock\"></div><div id=\"cardCount\"></div>");}return body_0;})();
+(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<div class=\"infoBar\"></div><div id=\"currentBlock\"></div><div id=\"oldBlock\"></div><div id=\"cardCount\"></div>");}return body_0;})();
 },{"../dust-core.min.js":6}],18:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
 (function(){dust.register("logInstance",body_0);function body_0(chk,ctx){return chk.write("<div id=\"logInstance").reference(ctx.get(["cid"], false),ctx,"h").write("\" class=\"logInstance\"><span class=\"message\">").reference(ctx.get(["message"], false),ctx,"h").write("</span><span class=\"close\">[x]</span></div>");}return body_0;})();
@@ -16240,7 +16244,6 @@ module.exports = Backbone.View.extend({
 
   render: function() {
     var self = this;
-    console.log('rendering to: ', self.$el);
     dust.render('block', self.model.attributes, function(err, out) {
       if (err) console.log(err);
       self.$el.html(out);
@@ -16250,7 +16253,7 @@ module.exports = Backbone.View.extend({
 
   setColor: function(color) {
     if (!color) color = this.model.get('color');
-    this.$el.css('background-color', color);
+    this.$el.css('background-color', '#'+color);
   },
 
   makeOld: function() {
@@ -16314,7 +16317,12 @@ module.exports = Backbone.View.extend({
   ident: function() {
     this.render();
     this.$el.css('background-color', '#ffffff');
-    this.$el.append('<div>LOOK AT ME</div>');
+    this.$el.append('<div class="attn">LOOK AT ME</div>');
+  },
+
+  allPositioned: function() {
+    this.render();
+    this.$el.css('background-color', '');
   }
 
 });

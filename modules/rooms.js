@@ -70,7 +70,12 @@ function Room(id) {
         this.lastPositioned = display;
         return display;
       }
-    };
+    }
+
+    // all displays have been positioned
+    for (var key in this.displays) {
+      this.displays[key].allPostioningDone();
+    }
     return false;
   }
 

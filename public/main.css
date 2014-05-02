@@ -20,7 +20,7 @@ body {
   position: fixed;
   height: 100%;
   width: 100%;
-  z-index: -1;
+  z-index: 1;
 }
 
 #oldBlock {
@@ -30,7 +30,7 @@ body {
   top: 20px;
   right: 20px;
   border: solid 3px #ffffff;
-  z-index: 0;
+  z-index: 2;
 }
 
 #cardCount .count {
@@ -47,6 +47,7 @@ body {
   z-index: 1;
 }
 
+/*
 .infoBar {
   position: absolute;
   width: 20%;
@@ -55,34 +56,29 @@ body {
   padding: 4px;
   background-color: #ffffff;
 }
+*/
 
-.arrow {
-  margin-left: 20px;
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  background-size: contain;
-}
-
-.arrow:hover {
-  cursor: pointer;
+#display {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+  background-color: #ffffff;
 }
 
-.leftArrow {
-  background-image:url('images/left-red.png');
+#attn {
+  font-size: 30px;
+  margin-top: 30px;
+  text-align: center;
 }
-.leftArrow:hover {
-  background-image:url('images/left-blue.png');
-}
-.rightArrow {
-  background-image:url('images/right-red.png');
-}
-.rightArrow:hover {
-  background-image:url('images/right-blue.png');
-}
-.upArrow {
-  background-image:url('images/up-red.png');
-}
-.upArrow:hover {
-  background-image:url('images/up-blue.png');
+
+#log {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 170px;
+  background-color: #000000;
+  height: 100px;
+  padding: 2px;
+  color: #ffffff;
 }

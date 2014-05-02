@@ -28,7 +28,12 @@ module.exports = Backbone.View.extend({
   ident: function() {
     this.render();
     this.$el.css('background-color', '#ffffff');
-    this.$el.append('<div>LOOK AT ME</div>');
+    this.$el.append('<div class="attn">LOOK AT ME</div>');
+  },
+
+  allPositioned: function() {
+    this.render();
+    this.$el.css('background-color', '');
   }
 
 });

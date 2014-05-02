@@ -18,6 +18,10 @@ Display.prototype.position = function() {
   this.socket.emit('display:positioningDone');
 }
 
+Display.prototype.allPostioningDone = function() {
+  this.socket.emit('display:allPositioningDone');
+}
+
 Display.prototype.startPositioning = function() {
   this.socket.emit('display:positioningStart');
 }
@@ -55,7 +59,9 @@ Display.prototype.blockRemoved = function(data) {
 };
 
 Display.prototype.currentColor = function() {
-  return this.lastBlock.color;
+  var color;
+  if (this.currentBlock && this.currentBlock.color) return this.currentBlock.color;
+  return 'none';
 };
 
 module.exports = Display;
