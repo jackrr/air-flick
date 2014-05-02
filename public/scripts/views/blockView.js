@@ -26,11 +26,16 @@ module.exports = Backbone.View.extend({
 
   setColor: function(color) {
     if (!color) color = this.model.get('color');
-    this.$el.css('background-color', '#'+color);
+    this.$el.find('.block').css('background-color', '#'+color);
   },
 
   makeOld: function() {
     this.setElement(Backbone.$('#oldBlock'));
+    this.render();
+  },
+
+  makePrimary: function() {
+    this.setElement(Backbone.$('#currentBlock'));
     this.render();
   }
 });

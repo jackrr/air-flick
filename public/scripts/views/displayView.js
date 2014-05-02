@@ -35,5 +35,4 @@ module.exports = Backbone.View.extend({
     this.render();
     this.$el.css('background-color', '');
   }
-
 });

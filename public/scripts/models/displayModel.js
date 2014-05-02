@@ -3,6 +3,7 @@ var Backbone = require('backbone');
 var DisplayView = require("../views/displayView.js");
 var CardCounter = require("../models/cardCounterModel.js");
 var Block = require("./blockModel.js");
+var Manager = require("../modules/blockManager.js");
 
 Backbone.$ = $;
 
@@ -17,13 +18,12 @@ module.exports = Backbone.Model.extend({
 
     this.cardCounter = new CardCounter();
 
-    this.blockStack = [];
+    this.blocks = new Manager();
 
     var socket = this.get('socket');
 
     socket.on('display:sendBlock', function(data) {
       self.addBlock(data.block, data.device);
-      self.block = new Block({ display: self, color: data.block.color, device: data.device});
     });
 
     socket.on('display:removeBlock', function() {
@@ -53,21 +53,12 @@ module.exports = Backbone.Model.extend({
   },
 
   addBlock: function(block, sender) {
-    var blocks = this.blockStack;
-    if (blocks.length > 0) blocks[blocks.length - 1].makeOld();
-
-    blocks.push(new Block({display: self, color: block.color, device: sender}));
-    this.cardCounter.inc();
+    var block = new Block({display: self, color: block.color, device: sender});
+    this.blocks.addBlock(block)
   },
 
   removeBlock: function() {
-    var blocks = this.blockStack;
-    if (blocks.length == 0) return {};
-
-    this.cardCounter.dec();
-    return {
-      removedBlock: blocks.pop(),
-      currentBlock: blocks[blocks.length - 1]
-    };
+    if (this.blocks.blockCount == 0) return {};
+    return this.blocks.removeBlock();
   }
 });
