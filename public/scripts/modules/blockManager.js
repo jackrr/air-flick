@@ -1,21 +1,27 @@
+var Sound = require('../models/soundModel.js');
+var Block = require('../models/blockModel.js');
+
 var Manager = function() {
   this.blockCount = 0;
   this.blocks = {};
   this.largest = '';
+  this.smallSound = new Sound({type: 'short'});
+  this.longSound = new Sound({type: 'long'});
 };
 
 Manager.prototype.addBlock = function(block) {
-  var color = block.get('color');
+  var color = block.color;
   if (!this.blocks[color]) this.blocks[color] = [];
   this.blocks[color].push(block);
   this.updateLargest();
   
-  block.playSound(1);
+  this.smallSound.set('color', color);
 
   if (this.largest == color) {
-    if (this.current) this.current.sendBack();
+    if (this.current) this.current.remove();
+    var block = new Block({color: color});
+    this.longSound.set('color', color);
     this.current = block;
-    this.current.makePrimary();
   }
 
   this.blockCount++;

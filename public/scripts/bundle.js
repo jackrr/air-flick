@@ -15980,7 +15980,7 @@ Backbone.$ = $;
 
 module.exports = Backbone.Model.extend({
   initialize: function() {
-    this.sound = new Sound({color: this.get('color')});
+    //this.sound = new Sound({color: this.get('color')});
     this.view = new BlockView({model: this});
     this.view.render();
   },
@@ -16005,6 +16005,10 @@ module.exports = Backbone.Model.extend({
   makePrimary: function() {
     this.playSound();
     this.view.makePrimary();
+  },
+
+  remove: function() {
+    this.view.makeOld();
   },
 
   forServer: function() {
@@ -16094,7 +16098,6 @@ module.exports = Backbone.Model.extend({
   },
 
   addBlock: function(block, sender) {
-    var block = new Block({display: self, color: block.color, device: sender});
     this.blocks.addBlock(block)
   },
 
@@ -16222,14 +16225,17 @@ module.exports = Backbone.Model.extend({
 
 
   initialize: function() {
+    this.on('change:color', this.setNote);
+    this.view = new SoundView({model: this});
+  },
+
+  setNote: function() {
     var cnotes = {
       'FF00FF': 'C4',
       '00FFFF': 'E4',
       'FFFF00': 'G4'
     };
     this.set('note', cnotes[this.get('color')]);
-    this.view = new SoundView({model: this});
-    this.view.render();
   },
 
   playOnce: function(duration) {
@@ -16246,24 +16252,30 @@ module.exports = Backbone.Model.extend({
 });
 
 },{"../views/soundView.js":30,"backbone":1,"jquery":3}],16:[function(require,module,exports){
+var Sound = require('../models/soundModel.js');
+var Block = require('../models/blockModel.js');
+
 var Manager = function() {
   this.blockCount = 0;
   this.blocks = {};
   this.largest = '';
+  this.smallSound = new Sound({type: 'short'});
+  this.longSound = new Sound({type: 'long'});
 };
 
 Manager.prototype.addBlock = function(block) {
-  var color = block.get('color');
+  var color = block.color;
   if (!this.blocks[color]) this.blocks[color] = [];
   this.blocks[color].push(block);
   this.updateLargest();
   
-  block.playSound(1);
+  this.smallSound.set('color', color);
 
   if (this.largest == color) {
-    if (this.current) this.current.sendBack();
+    if (this.current) this.current.remove();
+    var block = new Block({color: color});
+    this.longSound.set('color', color);
     this.current = block;
-    this.current.makePrimary();
   }
 
   this.blockCount++;
@@ -16300,7 +16312,7 @@ Manager.prototype.removeBlock = function() {
 
 module.exports = Manager;
 
-},{}],17:[function(require,module,exports){
+},{"../models/blockModel.js":9,"../models/soundModel.js":15}],17:[function(require,module,exports){
 var Room = require('../models/roomModel.js');
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
@@ -16566,7 +16578,11 @@ module.exports = Backbone.View.extend({
   el: '#sounds',
 
   initialize: function() {
-    this.listenTo(this.model, 'change', this.render);
+    if (this.model.get('type') == 'short') {
+      this.listenTo(this.model, 'change', this.renderShort);
+    } else {
+      this.listenTo(this.model, 'change', this.renderLong);
+    }
   },
 
   notes: {
@@ -16576,12 +16592,19 @@ module.exports = Backbone.View.extend({
     'Bb4': 466
   },
 
-  render: function() {
-
+  renderShort: function() {
     var audio = timbre("sin", {freq: this.notes[this.model.get('note')], mul: 0.8});
+    audio.play();
     setTimeout(function() {
       audio.pause();
     }, 1000);
+  },
+
+  renderLong: function() {
+    if (this.audio) this.audio.pause();
+    this.audio = timbre("sin", {freq: this.notes[this.model.get('note')], mul: 0.3});
+    this.audio.set('freq', this.notes[this.model.get('note')]);
+    this.audio.play();
   },
 
   playFor: function(duration) {

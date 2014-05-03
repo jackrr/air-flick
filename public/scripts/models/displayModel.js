@@ -53,7 +53,6 @@ module.exports = Backbone.Model.extend({
   },
 
   addBlock: function(block, sender) {
-    var block = new Block({display: self, color: block.color, device: sender});
     this.blocks.addBlock(block)
   },
 

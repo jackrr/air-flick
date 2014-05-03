@@ -8,7 +8,7 @@ Backbone.$ = $;
 
 module.exports = Backbone.Model.extend({
   initialize: function() {
-    this.sound = new Sound({color: this.get('color')});
+    //this.sound = new Sound({color: this.get('color')});
     this.view = new BlockView({model: this});
     this.view.render();
   },
@@ -33,6 +33,10 @@ module.exports = Backbone.Model.extend({
   makePrimary: function() {
     this.playSound();
     this.view.makePrimary();
+  },
+
+  remove: function() {
+    this.view.makeOld();
   },
 
   forServer: function() {
