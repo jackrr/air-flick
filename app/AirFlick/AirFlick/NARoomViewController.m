@@ -26,9 +26,13 @@
 
 @property int mode;
 
+@property (nonatomic) CGPoint lastPoint;
+
 @end
 
 @implementation NARoomViewController
+
+@synthesize lastPoint = _lastPoint;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -36,6 +40,11 @@
     if (self) {
         // Custom initialization
         _obj = [NAColorsClass getInstance];
+        
+        [self.view setNeedsDisplay];
+        
+        //CGContextRef context = UIGraphicsGetCurrentContext();
+        //CGContextSetLineDash(<#CGContextRef c#>, <#CGFloat phase#>, <#const CGFloat *lengths#>, <#size_t count#>)
         
         self.numScreens = 0;
         
@@ -295,6 +304,8 @@
         [[self.screens lastObject] setObject:[NSValue valueWithCGPoint:endPoint]
                                       forKey:@"point"];
         
+        [self drawRect:endPoint];
+        
         // send synchronous get request
         [self positionDisplay];
         
@@ -313,6 +324,8 @@
 }
 
 - (NSMutableDictionary *)closestScreenForPoint:(CGPoint)point {
+    NSLog(@"screens: %@",self.screens);
+    
     NSMutableDictionary *closestScreen = nil;
     float closestDist = MAXFLOAT;
     
@@ -320,7 +333,7 @@
         CGPoint scg = [[screen valueForKey:@"point"] CGPointValue];
         
         CGFloat dx = (scg.x-point.x);
-        CGFloat dy = (scg.x-point.y);
+        CGFloat dy = (scg.y-point.y);
         CGFloat dist = sqrt((dx*dx)+(dy*dy));
 
         if (dist < closestDist){
@@ -329,7 +342,20 @@
         }
     }
     
+    NSLog(@"closest screen: %@",closestScreen);
     return closestScreen;
+}
+
+- (void)drawRect:(CGPoint)point
+{
+    NSLog(@"I don't believe this is getting called.");
+    
+    float size = 20;
+    UIView *circleView = [[UIView alloc] initWithFrame:CGRectMake(point.x-(size/2),point.y-(size/2),size,size)];
+    circleView.alpha = 1.0;
+//    circleView.layer.cornerRadius = 10;
+    circleView.backgroundColor = [UIColor blackColor];
+    [self.view addSubview:circleView];
 }
 
 
