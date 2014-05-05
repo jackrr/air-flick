@@ -19,8 +19,8 @@ module.exports = Backbone.Model.extend({
 
   connect: function() {
     var self = this;
-    // var socket = io.connect("http://photoplace.cs.oberlin.edu");
-    var socket = io.connect("http://localhost:3000");
+    var socket = io.connect("http://photoplace.cs.oberlin.edu");
+    // var socket = io.connect("http://localhost:3000");
     socket.on('connectSuccess', function(data) {
       self.set({
         status: 'connected',
