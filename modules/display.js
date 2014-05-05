@@ -13,6 +13,10 @@ function Display(socket) {
 
 }
 
+Display.prototype.close = function() {
+  this.socket.emit('display');
+}
+
 Display.prototype.position = function() {
   this.hasPosition = true;
   this.socket.emit('display:positioningDone');

@@ -86,7 +86,14 @@ function Room(id) {
     };
   };
 
-  this.close = function() {};
+  this.close = function() {
+    for (var key in this.displays) {
+      this.displays[key].close();
+    }
+    for (var key in this.controllers) {
+      this.controllers[key].close();
+    }
+  };
 }
 
 module.exports = {
@@ -100,5 +107,11 @@ module.exports = {
   },
   create: function(io) {
     return new Room();
+  },
+  reset: function() {
+    for (var key in rooms) {
+      rooms[key].close();
+      delete rooms[key];
+    }
   }
 };

@@ -16068,6 +16068,8 @@ module.exports = Backbone.Model.extend({
     var socket = this.get('socket');
 
     socket.on('display:sendBlock', function(data) {
+      console.log("************ Block received");
+      console.log(data);
       self.addBlock(data.block, data.device);
     });
 
@@ -16183,8 +16185,8 @@ module.exports = Backbone.Model.extend({
 
   connect: function() {
     var self = this;
-    var socket = io.connect("http://photoplace.cs.oberlin.edu");
-    // var socket = io.connect("http://localhost:3000");
+    // var socket = io.connect("http://photoplace.cs.oberlin.edu");
+    var socket = io.connect("http://localhost:3000");
     socket.on('connectSuccess', function(data) {
       self.set({
         status: 'connected',
@@ -16320,11 +16322,22 @@ Backbone.$ = $;
 
 module.exports = Backbone.Router.extend({
   routes: {
-    "new_room":        "newRoom" // # new_room
+    "new_room":        "newRoom", // # new_room
+    "clear_rooms":      "clearRooms"
   },
 
   newRoom: function() {
     var room = new Room();
+  },
+
+  clearRooms: function() {
+    Backbone.$.get("rooms/clear_all", function(data) {
+      if (data.success) {
+        alert('rooms emptied');
+      } else {
+        alert('room clear failed');
+      }
+    });
   }
 });
 
