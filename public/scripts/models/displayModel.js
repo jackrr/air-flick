@@ -23,8 +23,6 @@ module.exports = Backbone.Model.extend({
     var socket = this.get('socket');
 
     socket.on('display:sendBlock', function(data) {
-      console.log("************ Block received");
-      console.log(data);
       self.addBlock(data.block, data.device);
     });
 

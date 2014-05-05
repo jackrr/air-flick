@@ -16068,8 +16068,6 @@ module.exports = Backbone.Model.extend({
     var socket = this.get('socket');
 
     socket.on('display:sendBlock', function(data) {
-      console.log("************ Block received");
-      console.log(data);
       self.addBlock(data.block, data.device);
     });
 
@@ -16237,6 +16235,8 @@ module.exports = Backbone.Model.extend({
       '00FFFF': 'E4',
       'FFFF00': 'G4'
     };
+    var note = cnotes[this.get('color')];
+    if (!note) console.log("ERROR: No musical note for color");
     this.set('note', cnotes[this.get('color')]);
   },
 
