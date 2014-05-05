@@ -6,4 +6,8 @@ function Controller(id) {
   this.id = id;
 }
 
+Controller.prototype.close = function() {
+  
+}
+
 module.exports = Controller;

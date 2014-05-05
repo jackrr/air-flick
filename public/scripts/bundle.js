@@ -16322,8 +16322,7 @@ Backbone.$ = $;
 
 module.exports = Backbone.Router.extend({
   routes: {
-    "new_room":        "newRoom", // # new_room
-    "clear_rooms":      "clearRooms"
+    "new_room":        "newRoom" // # new_room
   },
 
   newRoom: function() {
