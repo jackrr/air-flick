@@ -1,0 +1,2 @@
+var dust = require('../dust-core.min.js');
+(function(){dust.register("bar",body_0);function body_0(chk,ctx){return chk.write("<div id=\"bar").reference(ctx.get(["cid"], false),ctx,"h").write("\" class=\"bar\"><div class=\"scale\"></div></div>");}return body_0;})();

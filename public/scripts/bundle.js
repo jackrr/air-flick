@@ -15969,7 +15969,39 @@ $(function(){
   router.newRoom();
 });
 
-},{"./routes/index.js":17,"backbone":1,"jquery":3}],9:[function(require,module,exports){
+},{"./routes/index.js":18,"backbone":1,"jquery":3}],9:[function(require,module,exports){
+var $ = require('jquery')(window);
+var Backbone = require('backbone');
+var BarView = require('../views/barView.js');
+
+Backbone.$ = $;
+
+module.exports = Backbone.Model.extend({
+
+  initialize: function() {
+    this.blocks = [];
+    this.view = new BarView({model: this});
+    this.view.render();
+  },
+
+  addBlock: function(block) {
+    this.blocks.push(block);
+    this.set('count', this.blocks.length);
+  },
+
+  barCount: function(count) {
+    this.view.barCount(count);
+  },
+
+  popBlock: function() {
+    if (this.blocks.length == 0) return {};
+    var block = this.blocks.pop();
+    this.view.render();
+    return block;
+  }
+});
+
+},{"../views/barView.js":26,"backbone":1,"jquery":3}],10:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 
@@ -16016,7 +16048,7 @@ module.exports = Backbone.Model.extend({
   }
 });
 
-},{"../views/blockView.js":24,"./soundModel.js":15,"backbone":1,"jquery":3}],10:[function(require,module,exports){
+},{"../views/blockView.js":27,"./soundModel.js":16,"backbone":1,"jquery":3}],11:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var CardCountView = require("../views/cardCountView.js");
@@ -16042,7 +16074,7 @@ module.exports = Backbone.Model.extend({
   }
 });
 
-},{"../views/cardCountView.js":25,"./blockModel.js":9,"backbone":1,"jquery":3}],11:[function(require,module,exports){
+},{"../views/cardCountView.js":28,"./blockModel.js":10,"backbone":1,"jquery":3}],12:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var DisplayView = require("../views/displayView.js");
@@ -16107,7 +16139,7 @@ module.exports = Backbone.Model.extend({
   }
 });
 
-},{"../models/cardCounterModel.js":10,"../modules/blockManager.js":16,"../views/displayView.js":26,"./blockModel.js":9,"backbone":1,"jquery":3}],12:[function(require,module,exports){
+},{"../models/cardCounterModel.js":11,"../modules/blockManager.js":17,"../views/displayView.js":29,"./blockModel.js":10,"backbone":1,"jquery":3}],13:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 
@@ -16126,7 +16158,7 @@ module.exports = Backbone.Model.extend({
   }
 });
 
-},{"../views/logInstanceView.js":27,"backbone":1,"jquery":3}],13:[function(require,module,exports){
+},{"../views/logInstanceView.js":30,"backbone":1,"jquery":3}],14:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 
@@ -16161,7 +16193,7 @@ module.exports = Backbone.Model.extend({
 
 });
 
-},{"../views/loggerView.js":28,"./logInstance.js":12,"backbone":1,"jquery":3}],14:[function(require,module,exports){
+},{"../views/loggerView.js":31,"./logInstance.js":13,"backbone":1,"jquery":3}],15:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var Display = require('./displayModel.js');
@@ -16213,7 +16245,7 @@ module.exports = Backbone.Model.extend({
   }
 });
 
-},{"../views/roomView.js":29,"./displayModel.js":11,"./logger.js":13,"backbone":1,"jquery":3,"socket.io-client":4}],15:[function(require,module,exports){
+},{"../views/roomView.js":32,"./displayModel.js":12,"./logger.js":14,"backbone":1,"jquery":3,"socket.io-client":4}],16:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var SoundView = require('../views/soundView.js');
@@ -16253,13 +16285,16 @@ module.exports = Backbone.Model.extend({
   }
 });
 
-},{"../views/soundView.js":30,"backbone":1,"jquery":3}],16:[function(require,module,exports){
+},{"../views/soundView.js":33,"backbone":1,"jquery":3}],17:[function(require,module,exports){
 var Sound = require('../models/soundModel.js');
 var Block = require('../models/blockModel.js');
+var Bar = require('../models/barModel.js');
 
 var Manager = function() {
   this.blockCount = 0;
   this.blocks = {};
+  this.bars = {};
+  this.barCount = 0;
   this.largest = '';
   this.smallSound = new Sound({type: 'short'});
   this.longSound = new Sound({type: 'long'});
@@ -16267,8 +16302,15 @@ var Manager = function() {
 
 Manager.prototype.addBlock = function(block) {
   var color = block.color;
-  if (!this.blocks[color]) this.blocks[color] = [];
+  if (!this.blocks[color]) {
+    this.blocks[color] = [];
+    this.bars[color] = new Bar({color: color, count: 0});
+    this.barCount++;
+
+    for (var key in this.bars) this.bars[key].barCount(this.barCount);
+  }
   this.blocks[color].push(block);
+  this.bars[color].addBlock(block);
   this.updateLargest();
   
   this.smallSound.set('color', color);
@@ -16296,7 +16338,10 @@ Manager.prototype.updateLargest = function() {
 Manager.prototype.removeBlock = function() {
   if (!this.current) return {};
 
-  var block = this.blocks[this.current.get('color')].pop();
+  var color = this.current.get('color');
+  var block = this.blocks[color].pop();
+  this.bars[color].popBlock();
+
   this.updateLargest();
 
   var large = this.blocks[this.largest];
@@ -16314,7 +16359,7 @@ Manager.prototype.removeBlock = function() {
 
 module.exports = Manager;
 
-},{"../models/blockModel.js":9,"../models/soundModel.js":15}],17:[function(require,module,exports){
+},{"../models/barModel.js":9,"../models/blockModel.js":10,"../models/soundModel.js":16}],18:[function(require,module,exports){
 var Room = require('../models/roomModel.js');
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
@@ -16340,25 +16385,75 @@ module.exports = Backbone.Router.extend({
   }
 });
 
-},{"../models/roomModel.js":14,"backbone":1,"jquery":3}],18:[function(require,module,exports){
+},{"../models/roomModel.js":15,"backbone":1,"jquery":3}],19:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("block",body_0);function body_0(chk,ctx){return chk.write("<div class=\"block\"></div>");}return body_0;})();
-},{"../dust-core.min.js":7}],19:[function(require,module,exports){
-var dust = require('../dust-core.min.js');
-(function(){dust.register("cardCount",body_0);function body_0(chk,ctx){return chk.write("<div class=\"count\">").reference(ctx.get(["count"], false),ctx,"h").write("</div>");}return body_0;})();
+(function(){dust.register("bar",body_0);function body_0(chk,ctx){return chk.write("<div id=\"bar").reference(ctx.get(["cid"], false),ctx,"h").write("\" class=\"bar\"><div class=\"scale\"></div></div>");}return body_0;})();
 },{"../dust-core.min.js":7}],20:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<div class=\"infoBar\"></div><div id=\"currentBlock\"></div><div id=\"oldBlock\"></div><div id=\"cardCount\"></div>");}return body_0;})();
+(function(){dust.register("block",body_0);function body_0(chk,ctx){return chk.write("<div class=\"block\"></div>");}return body_0;})();
 },{"../dust-core.min.js":7}],21:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("logInstance",body_0);function body_0(chk,ctx){return chk.write("<div id=\"logInstance").reference(ctx.get(["cid"], false),ctx,"h").write("\" class=\"logInstance\"><span class=\"message\">").reference(ctx.get(["message"], false),ctx,"h").write("</span><span class=\"close\">[x]</span></div>");}return body_0;})();
+(function(){dust.register("cardCount",body_0);function body_0(chk,ctx){return chk.write("<div class=\"count\">").reference(ctx.get(["count"], false),ctx,"h").write("</div>");}return body_0;})();
 },{"../dust-core.min.js":7}],22:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("logger",body_0);function body_0(chk,ctx){return chk.write("<div class=\"logArea\"><div>Log</div><div id=\"logInstances\"></div></div>");}return body_0;})();
+(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<div class=\"infoBar\"></div><div id=\"currentBlock\"></div><div id=\"bars\"></div>");}return body_0;})();
 },{"../dust-core.min.js":7}],23:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("room",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1><p>").reference(ctx.get(["status"], false),ctx,"h").write("</p><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><div class=\"joinNew\">Create a new room</div><div class=\"joinExisting\">Join a room</div>");}return body_0;})();
+(function(){dust.register("logInstance",body_0);function body_0(chk,ctx){return chk.write("<div id=\"logInstance").reference(ctx.get(["cid"], false),ctx,"h").write("\" class=\"logInstance\"><span class=\"message\">").reference(ctx.get(["message"], false),ctx,"h").write("</span><span class=\"close\">[x]</span></div>");}return body_0;})();
 },{"../dust-core.min.js":7}],24:[function(require,module,exports){
+var dust = require('../dust-core.min.js');
+(function(){dust.register("logger",body_0);function body_0(chk,ctx){return chk.write("<div class=\"logArea\"><div>Log</div><div id=\"logInstances\"></div></div>");}return body_0;})();
+},{"../dust-core.min.js":7}],25:[function(require,module,exports){
+var dust = require('../dust-core.min.js');
+(function(){dust.register("room",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1><p>").reference(ctx.get(["status"], false),ctx,"h").write("</p><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><div class=\"joinNew\">Create a new room</div><div class=\"joinExisting\">Join a room</div>");}return body_0;})();
+},{"../dust-core.min.js":7}],26:[function(require,module,exports){
+var $ = require('jquery')(window);
+var Backbone = require('backbone');
+var _ = require('underscore');
+Backbone.$ = $;
+
+var tpl = require('../templates/bar.js');
+var dust = require('../dust-core.min.js');
+
+module.exports = Backbone.View.extend({
+
+  el: '#bars',
+
+  initialize: function() {
+    this.listenTo(this.model, 'change:count', this.resize);
+  },
+
+  dom: function() {
+    return this.$el.children('#bar'+this.model.cid);
+  },
+
+  barCount: function(count) {
+    this.dom().css({
+      'margin-left': Math.floor(20/count)+"%",
+      'width': Math.floor(80/count)+"%"
+    });
+  },
+
+  resize: function() {
+    this.dom().children('.scale').height(this.model.get('count') * 15);
+  },
+
+  setColor: function(color) {
+    if (!color) color = this.model.get('color');
+    this.dom().children('.scale').css('background-color', '#'+color);
+  },
+
+  render: function() {
+    var self = this;
+    dust.render('bar', _.extend({cid: self.model.cid}, self.model.attributes), function(err, out) {
+      if (err) console.log(err);
+      self.$el.append(out);
+      self.setColor();
+    });
+  }
+});
+
+},{"../dust-core.min.js":7,"../templates/bar.js":19,"backbone":1,"jquery":3,"underscore":5}],27:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16401,7 +16496,7 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":7,"../templates/block.js":18,"backbone":1,"jquery":3}],25:[function(require,module,exports){
+},{"../dust-core.min.js":7,"../templates/block.js":20,"backbone":1,"jquery":3}],28:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16425,7 +16520,7 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":7,"../templates/cardCount.js":19,"backbone":1,"jquery":3}],26:[function(require,module,exports){
+},{"../dust-core.min.js":7,"../templates/cardCount.js":21,"backbone":1,"jquery":3}],29:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16465,7 +16560,7 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":7,"../templates/display.js":20,"backbone":1,"jquery":3}],27:[function(require,module,exports){
+},{"../dust-core.min.js":7,"../templates/display.js":22,"backbone":1,"jquery":3}],30:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var _ = require('underscore');
@@ -16507,7 +16602,7 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":7,"../templates/logInstance.js":21,"backbone":1,"jquery":3,"underscore":5}],28:[function(require,module,exports){
+},{"../dust-core.min.js":7,"../templates/logInstance.js":23,"backbone":1,"jquery":3,"underscore":5}],31:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16537,7 +16632,7 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":7,"../templates/logger.js":22,"backbone":1,"jquery":3}],29:[function(require,module,exports){
+},{"../dust-core.min.js":7,"../templates/logger.js":24,"backbone":1,"jquery":3}],32:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16579,7 +16674,7 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":7,"../templates/room.js":23,"backbone":1,"jquery":3}],30:[function(require,module,exports){
+},{"../dust-core.min.js":7,"../templates/room.js":25,"backbone":1,"jquery":3}],33:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;

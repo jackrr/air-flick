@@ -1,2 +1,2 @@
 var dust = require('../dust-core.min.js');
-(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<div class=\"infoBar\"></div><div id=\"currentBlock\"></div><div id=\"oldBlock\"></div><div id=\"cardCount\"></div>");}return body_0;})();
+(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<div class=\"infoBar\"></div><div id=\"currentBlock\"></div><div id=\"bars\"></div>");}return body_0;})();

@@ -1,9 +1,12 @@
 var Sound = require('../models/soundModel.js');
 var Block = require('../models/blockModel.js');
+var Bar = require('../models/barModel.js');
 
 var Manager = function() {
   this.blockCount = 0;
   this.blocks = {};
+  this.bars = {};
+  this.barCount = 0;
   this.largest = '';
   this.smallSound = new Sound({type: 'short'});
   this.longSound = new Sound({type: 'long'});
@@ -11,8 +14,15 @@ var Manager = function() {
 
 Manager.prototype.addBlock = function(block) {
   var color = block.color;
-  if (!this.blocks[color]) this.blocks[color] = [];
+  if (!this.blocks[color]) {
+    this.blocks[color] = [];
+    this.bars[color] = new Bar({color: color, count: 0});
+    this.barCount++;
+
+    for (var key in this.bars) this.bars[key].barCount(this.barCount);
+  }
   this.blocks[color].push(block);
+  this.bars[color].addBlock(block);
   this.updateLargest();
   
   this.smallSound.set('color', color);
@@ -40,7 +50,10 @@ Manager.prototype.updateLargest = function() {
 Manager.prototype.removeBlock = function() {
   if (!this.current) return {};
 
-  var block = this.blocks[this.current.get('color')].pop();
+  var color = this.current.get('color');
+  var block = this.blocks[color].pop();
+  this.bars[color].popBlock();
+
   this.updateLargest();
 
   var large = this.blocks[this.largest];
