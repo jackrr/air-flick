@@ -25,10 +25,11 @@
 		C817BE9718FB17940088750F /* NAColorSelectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C817BE9518FB17940088750F /* NAColorSelectorViewController.m */; };
 		C817BE9818FB17940088750F /* NAColorSelectorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C817BE9618FB17940088750F /* NAColorSelectorViewController.xib */; };
 		C817BE9B18FB8BC50088750F /* UIColor+Expanded.m in Sources */ = {isa = PBXBuildFile; fileRef = C817BE9A18FB8BC50088750F /* UIColor+Expanded.m */; };
-		C82BE44518FC609F009FB7AC /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C82BE44418FC609F009FB7AC /* AudioToolbox.framework */; };
 		C87EFB0818F33DB100913968 /* NARoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C87EFB0618F33DB100913968 /* NARoomViewController.m */; };
 		C87EFB0918F33DB100913968 /* NARoomViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C87EFB0718F33DB100913968 /* NARoomViewController.xib */; };
 		C8A0B6C818ECBD7300639917 /* NACard.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A0B6C718ECBD7300639917 /* NACard.m */; };
+		C8A4402C19167AD1000E5CF4 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8A4402B19167AD1000E5CF4 /* QuartzCore.framework */; settings = {ATTRIBUTES = (Required, ); }; };
+		C8C5A04F1914972100B182E5 /* NARoomView.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C5A04E1914972100B182E5 /* NARoomView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,6 +75,9 @@
 		C87EFB0718F33DB100913968 /* NARoomViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NARoomViewController.xib; sourceTree = "<group>"; };
 		C8A0B6C618ECBD7300639917 /* NACard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NACard.h; sourceTree = "<group>"; };
 		C8A0B6C718ECBD7300639917 /* NACard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NACard.m; sourceTree = "<group>"; };
+		C8A4402B19167AD1000E5CF4 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		C8C5A04D1914972100B182E5 /* NARoomView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NARoomView.h; sourceTree = "<group>"; };
+		C8C5A04E1914972100B182E5 /* NARoomView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NARoomView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,7 +85,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C82BE44518FC609F009FB7AC /* AudioToolbox.framework in Frameworks */,
+				C8A4402C19167AD1000E5CF4 /* QuartzCore.framework in Frameworks */,
 				C8080C3118E60A00002E9447 /* CoreGraphics.framework in Frameworks */,
 				C8080C3318E60A00002E9447 /* UIKit.framework in Frameworks */,
 				C8080C2F18E60A00002E9447 /* Foundation.framework in Frameworks */,
@@ -123,6 +127,7 @@
 		C8080C2D18E60A00002E9447 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C8A4402B19167AD1000E5CF4 /* QuartzCore.framework */,
 				C82BE44418FC609F009FB7AC /* AudioToolbox.framework */,
 				C8080C2E18E60A00002E9447 /* Foundation.framework */,
 				C8080C3018E60A00002E9447 /* CoreGraphics.framework */,
@@ -151,6 +156,8 @@
 				C817BE9218FB0ABE0088750F /* NAColorsClass.m */,
 				C87EFB0518F33DB100913968 /* NARoomViewController.h */,
 				C87EFB0618F33DB100913968 /* NARoomViewController.m */,
+				C8C5A04D1914972100B182E5 /* NARoomView.h */,
+				C8C5A04E1914972100B182E5 /* NARoomView.m */,
 				C87EFB0718F33DB100913968 /* NARoomViewController.xib */,
 				C817BE9918FB8BC50088750F /* UIColor+Expanded.h */,
 				C817BE9A18FB8BC50088750F /* UIColor+Expanded.m */,
@@ -235,6 +242,9 @@
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "Nonstop Akubara LLC";
 				TargetAttributes = {
+					C8080C2A18E60A00002E9447 = {
+						DevelopmentTeam = 9F42XBADME;
+					};
 					C8080C4518E60A01002E9447 = {
 						TestTargetID = C8080C2A18E60A00002E9447;
 					};
@@ -286,6 +296,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8C5A04F1914972100B182E5 /* NARoomView.m in Sources */,
 				C817BE9318FB0ABE0088750F /* NAColorsClass.m in Sources */,
 				C8A0B6C818ECBD7300639917 /* NACard.m in Sources */,
 				C8080C3B18E60A00002E9447 /* main.m in Sources */,
@@ -410,9 +421,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "airflick/airflick-Prefix.pch";
 				INFOPLIST_FILE = "airflick/airflick-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -423,9 +436,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "airflick/airflick-Prefix.pch";
 				INFOPLIST_FILE = "airflick/airflick-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
