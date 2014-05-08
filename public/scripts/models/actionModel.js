@@ -18,6 +18,7 @@ var Action = Backbone.Model.extend({
 
 var VolumeModel = Action.extend({
   initialize: function() {
+    this.set('type', 'volume');
     if (this.get('default')) {
       this.execute = function() {
         var sound = this.get('parent').sound;
@@ -25,7 +26,6 @@ var VolumeModel = Action.extend({
       }
     }
   },
-  type: 'volume',
   execute: function() {
     var sound = this.get('parent').sound;
     sound.setVolume(this.get('value'), this.get('duration'));
@@ -38,6 +38,7 @@ var VolumeModel = Action.extend({
 
 var ChordModel = Action.extend({
   initialize: function() {
+    this.set('type', 'chord');
     if (this.get('default')) {
       this.execute = function() {
         var sound = this.get('parent').sound;
@@ -45,7 +46,6 @@ var ChordModel = Action.extend({
       }
     }
   },
-  type: 'chord',
   execute: function() {
     sound.setChord(this.get('value'), this.get('duration'));
     Action.prototype.execute.apply(this);
@@ -57,6 +57,7 @@ var ChordModel = Action.extend({
 
 var PitchModel = Action.extend({
   initialize: function() {
+    this.set('type', 'pitch');
     if (this.get('default')) {
       this.execute = function() {
         var sound = this.get('parent').sound;

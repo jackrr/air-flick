@@ -2,6 +2,7 @@ var Queue = require('./queue.js');
 var Sound = require('../models/soundModel.js');
 var Actions = require('../models/actionModel.js');
 var SineView = require('../views/sineView.js');
+var ActionView = require('../views/actionView.js');
 var Volume = Actions.Volume;
 var Chord = Actions.Chord;
 var Pitch = Actions.Pitch;
@@ -22,6 +23,12 @@ var Manager = function() {
   this.volSine = new SineView({model: this.defaults.vol, el: '#vol'});
   this.chordSine = new SineView({model: this.defaults.chord, el: '#chord'});
   this.pitchSine = new SineView({model: this.defaults.pitch, el: '#pitch'});
+
+  this.views = {
+    vol: new ActionView({el: '#vol .action', model: this.defaults.vol}),
+    pitch: new ActionView({el: '#pitch .action', model: this.defaults.pitch}),
+    chord: new ActionView({el: '#chord .action', model: this.defaults.chord})
+  }
 
   this.startPlaying();
 };
@@ -91,16 +98,19 @@ Manager.prototype.stopPlaying = function() {
 
 Manager.prototype.executeVol = function(vol) {
   this.current.vol = vol;
+  this.views.vol.setModel(vol);
   vol.execute();
   this.volSine.model = vol;
 };
 Manager.prototype.executePitch = function(p) {
   this.current.pitch = p;
+  this.views.pitch.setModel(p);
   p.execute();
   this.pitchSine.model = p;
 };
 Manager.prototype.executeChord = function(c) {
   this.current.chord = c;
+  this.views.chord.setModel(c);
   c.execute();
   this.chordSine.model = c;
 };

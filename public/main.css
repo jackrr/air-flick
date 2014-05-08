@@ -10,6 +10,11 @@ body {
   background-color: #ffffff;
 }
 
+.action {
+  position: absolute;
+  left: -25px;
+}
+
 .waveArea {
   width: 100%;
 }
@@ -22,6 +27,8 @@ body {
 }
 
 canvas.sine {
+  position: absolute;
+  top: 0;
 }
 
 #bars {

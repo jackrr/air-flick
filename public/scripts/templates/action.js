@@ -1,0 +1,2 @@
+var dust = require('../dust-core.min.js');
+(function(){dust.register("action",body_0);function body_0(chk,ctx){return chk.write("<div class=\"shape\"><span class=\"text\">").reference(ctx.get(["displayText"], false),ctx,"h").write("</span><canvas class=\"shape\" height=\"100\" width=\"100\"></canvas></div><div class=\"spoutContainer\"><canvas class=\"spout\" height=\"400\" width=\"25\"></canvas></div>");}return body_0;})();
