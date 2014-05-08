@@ -16,9 +16,8 @@ module.exports = function(app) {
   app.post('/device/room/:roomID', function(req, res) {
     var body = req.body;
     var room = rooms.getRoom(req.params.roomID);
-    room.sendTo(body.displayID, body.block, body.deviceID);
-    var matches = room.displaysMatching();
-    res.json({display: room.displays[body.displayID].toJSON(), matches: matches});
+    room.sendTo(body.displayID, body.action, body.deviceID);
+    res.json({display: room.displays[body.displayID].toJSON(), matches: 0});
   });
 
   // this is used to ask the server for an unpositioned display

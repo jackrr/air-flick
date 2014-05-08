@@ -1,0 +1,2 @@
+var dust = require('../dust-core.min.js');
+(function(){dust.register("sine",body_0);function body_0(chk,ctx){return chk.write("<div class=\"sineContainer\"><canvas class=\"sine\" height=\"400\" width=\"344\"></canvas></div>");}return body_0;})();

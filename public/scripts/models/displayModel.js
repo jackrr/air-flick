@@ -1,9 +1,7 @@
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var DisplayView = require("../views/displayView.js");
-var CardCounter = require("../models/cardCounterModel.js");
-var Block = require("./blockModel.js");
-var Manager = require("../modules/blockManager.js");
+var ActionManager = require("../modules/actionManager.js");
 
 Backbone.$ = $;
 
@@ -11,28 +9,15 @@ module.exports = Backbone.Model.extend({
 
   initialize: function() {
     var self = this;
-    this.set('cardCount', 1);
 
     this.view = new DisplayView({model: this});
     this.view.render();
 
-    this.cardCounter = new CardCounter();
-
-    this.blocks = new Manager();
 
     var socket = this.get('socket');
 
-    socket.on('display:sendBlock', function(data) {
-      self.addBlock(data.block, data.device);
-    });
-
-    socket.on('display:removeBlock', function() {
-      var data = self.removeBlock();
-
-      socket.emit('rooms:blockRemoved', {
-        removedBlock: data.removedBlock.forServer(),
-        currentBlock: data.currentBlock.forServer()
-      });
+    socket.on('display:sendAction', function(data) {
+      self.addAction(data.action, data.device);
     });
 
     socket.on('display:positioningStart', function() {
@@ -49,15 +34,20 @@ module.exports = Backbone.Model.extend({
 
     socket.on('display:allPositioningDone', function() {
       self.view.allPositioned();
+      self.actions = new ActionManager();
     });
   },
 
-  addBlock: function(block, sender) {
-    this.blocks.addBlock(block)
-  },
-
-  removeBlock: function() {
-    if (this.blocks.blockCount == 0) return {};
-    return this.blocks.removeBlock();
+  addAction: function(action, sender) {
+    switch (action.type) {
+      case 'start':
+        self.actions.startPlaying();
+        break;
+      case 'stop':
+        self.actions.stopPlaying();
+        break;
+      default:
+        self.actions.addAction(action);
+    }
   }
 });

@@ -2,9 +2,69 @@ body {
   margin: 0;
 }
 
-.block {
+#display {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+  background-color: #ffffff;
 }
 
+.waveArea {
+  width: 100%;
+}
+
+.waveArea > div {
+  position: relative;
+  display: inline-block;
+  width:25%;
+  padding-top:100px;
+}
+
+canvas.sine {
+}
+
+#bars {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.bar {
+  float: left;
+  position: relative;
+  height: 100%;
+}
+
+.scale {
+  position: absolute;
+  bottom: 100px;
+  width: 100%;
+}
+
+#attn {
+  font-size: 30px;
+  margin-top: 30px;
+  text-align: center;
+}
+
+#dev {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 170px;
+  background-color: #000000;
+  height: 110px;
+  padding: 2px;
+  color: #ffffff;
+  z-index: 10;
+}
+
+#clearrooms {
+  color: #ffff00;
+}
+/*
 #currentBlock {
   position: fixed;
   height: 100%;
@@ -46,7 +106,7 @@ body {
   line-height: 100px;
   z-index: 1;
 }
-
+*/
 /*
 .infoBar {
   position: absolute;
@@ -57,52 +117,3 @@ body {
   background-color: #ffffff;
 }
 */
-
-#display {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  padding: 4px;
-  background-color: #ffffff;
-}
-
-#bars {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-}
-
-.bar {
-  float: left;
-  position: relative;
-  height: 100%;
-}
-
-.scale {
-  position: absolute;
-  bottom: 100px;
-  width: 100%;
-}
-
-#attn {
-  font-size: 30px;
-  margin-top: 30px;
-  text-align: center;
-}
-
-#dev {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  width: 170px;
-  background-color: #000000;
-  height: 110px;
-  padding: 2px;
-  color: #ffffff;
-  z-index: 10;
-}
-
-#clearRooms {
-  color: #ffff00;
-}

@@ -23,6 +23,7 @@ Display.prototype.position = function() {
 }
 
 Display.prototype.allPostioningDone = function() {
+  this.hasPosition = undefined;
   this.socket.emit('display:allPositioningDone');
 }
 
@@ -42,9 +43,9 @@ Display.prototype.send = function(event, data) {
   this.socket.emit(event, data);
 }
 
-Display.prototype.sendBlock = function(data) {
-  this.currentBlock = data.block;
-  this.socket.emit('display:sendBlock', data);
+Display.prototype.sendAction = function(data) {
+  this.currentBlock = data.action;
+  this.socket.emit('display:sendAction', data);
 };
 
 Display.prototype.removeBlock = function(callback) {

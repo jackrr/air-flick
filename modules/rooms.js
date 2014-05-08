@@ -24,28 +24,8 @@ function Room(id) {
     return display;
   }
 
-  this.sendTo = function(displayID, block, controllerID) {
-    this.displays[displayID].sendBlock({device: this.controllers[controllerID], block: block});
-  }
-
-  this.displaysMatching = function() {
-    var colors = {};
-    for (var key in this.displays) {
-      var display = self.displays[key];
-      var color = display.currentColor();
-      if (colors[color]) {
-        colors[color] += 1;
-      } else {
-        colors[color] = 1;
-      }
-    }
-
-    var max = 0;
-    for (var key in colors) {
-      if (colors[key] > max) max = colors[key];
-    }
-      
-    return colors[key];
+  this.sendTo = function(displayID, action, controllerID) {
+    this.displays[displayID].sendAction({device: this.controllers[controllerID], action: action});
   }
 
   this.addController = function(id) {

@@ -1,3 +1,7 @@
 <div class="infoBar"></div>
-<div id="currentBlock"></div>
-<div id="bars"></div>
+<div class="waveArea">
+  <div id="plain"></div>
+  <div id="pitch"></div>
+  <div id="vol"></div>
+  <div id="chord"></div>
+</div>

@@ -1,38 +1,54 @@
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var SoundView = require('../views/soundView.js');
-var url = "media/";
 
 Backbone.$ = $;
 
 module.exports = Backbone.Model.extend({
 
-
   initialize: function() {
-    this.on('change:color', this.setNote);
     this.view = new SoundView({model: this});
   },
 
-  setNote: function() {
-    var cnotes = {
-      'FF00FF': 'C4',
-      '00FFFF': 'E4',
-      'FFFF00': 'G4'
+  setPitch: function(pitch, duration, def) {
+    var pitches = {
+      A: 440,
+      B: 494,
+      C: 523,
+      D: 587,
+      E: 659,
+      F: 698,
+      G: 784
     };
-    var note = cnotes[this.get('color')];
-    if (!note) console.log("ERROR: No musical note for color");
-    this.set('note', cnotes[this.get('color')]);
+    if (def) {
+      this.set('freq', pitches.C);
+      return;
+    }
+    var freq = pitches[pitch];
+    if (!freq) {
+      console.log('ERROR: Invalid pitch', pitch);
+      return;
+    }
+    this.set('freq', freq);
   },
 
-  playOnce: function(duration) {
-    this.view.playFor(duration);
+  setVolume: function(value, duration, def) {
+    if (def) {
+      this.set('magnitude', .5);
+    } else {
+      this.set('magnitude', this.get('magnitude')*value);
+    }
+  },
+
+  setChord: function(name, duration, def) {
+    // this shit is harder
   },
 
   play: function() {
-    this.view.play();
+    this.set('playing', true);
   },
 
   stop: function() {
-    this.view.stop();
+    this.set('playing', false);
   }
 });

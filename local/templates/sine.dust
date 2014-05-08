@@ -1,0 +1,3 @@
+<div class="sineContainer">
+  <canvas class="sine" height="400" width="344"></canvas>
+</div>

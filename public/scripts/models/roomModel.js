@@ -14,7 +14,6 @@ module.exports = Backbone.Model.extend({
     this.connect();
     this.view = new RoomView({model: this});
     this.view.render();
-
   },
 
   connect: function() {

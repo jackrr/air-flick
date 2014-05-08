@@ -15969,118 +15969,95 @@ $(function(){
   router.newRoom();
 });
 
-},{"./routes/index.js":18,"backbone":1,"jquery":3}],9:[function(require,module,exports){
+},{"./routes/index.js":17,"backbone":1,"jquery":3}],9:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
-var BarView = require('../views/barView.js');
+var SineView = require('../views/sineView.js');
 
 Backbone.$ = $;
 
-module.exports = Backbone.Model.extend({
+var Action = Backbone.Model.extend({
 
-  initialize: function() {
-    this.blocks = [];
-    this.view = new BarView({model: this});
-    this.view.render();
+  execute: function() {
+    setTimeout(this.done, this.get('duration'));
   },
 
-  addBlock: function(block) {
-    this.blocks.push(block);
-    this.set('count', this.blocks.length);
-  },
-
-  barCount: function(count) {
-    this.view.barCount(count);
-  },
-
-  popBlock: function() {
-    if (this.blocks.length == 0) return {};
-    var block = this.blocks.pop();
-    this.view.render();
-    return block;
+  done: function() {
+    this.get('parent').nextAction(this.type);
   }
+
 });
 
-},{"../views/barView.js":26,"backbone":1,"jquery":3}],10:[function(require,module,exports){
-var $ = require('jquery')(window);
-var Backbone = require('backbone');
-
-var BlockView = require('../views/blockView.js');
-var Sound = require('./soundModel.js');
-
-Backbone.$ = $;
-
-module.exports = Backbone.Model.extend({
+var VolumeModel = Action.extend({
   initialize: function() {
-    //this.sound = new Sound({color: this.get('color')});
-    this.view = new BlockView({model: this});
-    this.view.render();
-  },
-
-  playSound: function(time) {
-    if (time) {
-      this.sound.playOnce(time);
-    } else {
-      this.sound.play();
+    if (this.get('default')) {
+      this.execute = function() {
+        var sound = this.get('parent').sound;
+        sound.setVolume(-1, -1, 'default');
+      }
     }
   },
-
-  stopSound: function() {
-    this.sound.stop();
+  type: 'volume',
+  execute: function() {
+    var sound = this.get('parent').sound;
+    sound.setVolume(this.get('value'), this.get('duration'));
+    Action.prototype.execute.apply(this);
   },
-
-  sendBack: function() {
-    this.stopSound();
-    this.view.makeOld();
-  },
-
-  makePrimary: function() {
-    this.playSound();
-    this.view.makePrimary();
-  },
-
-  remove: function() {
-    this.view.makeOld();
-  },
-
-  forServer: function() {
-    return this.attributes;
+  done: function() {
+    Action.prototype.done.apply(this);
   }
 });
 
-},{"../views/blockView.js":27,"./soundModel.js":16,"backbone":1,"jquery":3}],11:[function(require,module,exports){
-var $ = require('jquery')(window);
-var Backbone = require('backbone');
-var CardCountView = require("../views/cardCountView.js");
-var Block = require("./blockModel.js");
-
-Backbone.$ = $;
-
-module.exports = Backbone.Model.extend({
-
+var ChordModel = Action.extend({
   initialize: function() {
-    this.set('count', 0);
-
-    this.view = new CardCountView({model: this});
-    this.view.render();
+    if (this.get('default')) {
+      this.execute = function() {
+        var sound = this.get('parent').sound;
+        sound.setChord(-1, -1, 'default');
+      }
+    }
   },
-
-  inc: function() {
-    this.set('count', this.get('count') + 1);
+  type: 'chord',
+  execute: function() {
+    sound.setChord(this.get('value'), this.get('duration'));
+    Action.prototype.execute.apply(this);
   },
-
-  dec: function() {
-    this.set('count', this.get('count') - 1);
+  done: function() {
+    Action.prototype.done.apply(this);
   }
 });
 
-},{"../views/cardCountView.js":28,"./blockModel.js":10,"backbone":1,"jquery":3}],12:[function(require,module,exports){
+var PitchModel = Action.extend({
+  initialize: function() {
+    if (this.get('default')) {
+      this.execute = function() {
+        var sound = this.get('parent').sound;
+        sound.setPitch(-1, -1, 'default');
+      }
+    }
+  },
+  type: 'pitch',
+  execute: function() {
+    sound.setPitch(this.get('value'), this.get('duration'));
+    Action.prototype.execute.apply(this);
+  },
+  done: function() {
+    Action.prototype.done.apply(this);
+  }
+
+});
+
+module.exports = {
+  Volume: VolumeModel,
+  Chord: ChordModel,
+  Pitch: PitchModel
+};
+
+},{"../views/sineView.js":27,"backbone":1,"jquery":3}],10:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var DisplayView = require("../views/displayView.js");
-var CardCounter = require("../models/cardCounterModel.js");
-var Block = require("./blockModel.js");
-var Manager = require("../modules/blockManager.js");
+var ActionManager = require("../modules/actionManager.js");
 
 Backbone.$ = $;
 
@@ -16088,28 +16065,15 @@ module.exports = Backbone.Model.extend({
 
   initialize: function() {
     var self = this;
-    this.set('cardCount', 1);
 
     this.view = new DisplayView({model: this});
     this.view.render();
 
-    this.cardCounter = new CardCounter();
-
-    this.blocks = new Manager();
 
     var socket = this.get('socket');
 
-    socket.on('display:sendBlock', function(data) {
-      self.addBlock(data.block, data.device);
-    });
-
-    socket.on('display:removeBlock', function() {
-      var data = self.removeBlock();
-
-      socket.emit('rooms:blockRemoved', {
-        removedBlock: data.removedBlock.forServer(),
-        currentBlock: data.currentBlock.forServer()
-      });
+    socket.on('display:sendAction', function(data) {
+      self.addAction(data.action, data.device);
     });
 
     socket.on('display:positioningStart', function() {
@@ -16126,20 +16090,25 @@ module.exports = Backbone.Model.extend({
 
     socket.on('display:allPositioningDone', function() {
       self.view.allPositioned();
+      self.actions = new ActionManager();
     });
   },
 
-  addBlock: function(block, sender) {
-    this.blocks.addBlock(block)
-  },
-
-  removeBlock: function() {
-    if (this.blocks.blockCount == 0) return {};
-    return this.blocks.removeBlock();
+  addAction: function(action, sender) {
+    switch (action.type) {
+      case 'start':
+        self.actions.startPlaying();
+        break;
+      case 'stop':
+        self.actions.stopPlaying();
+        break;
+      default:
+        self.actions.addAction(action);
+    }
   }
 });
 
-},{"../models/cardCounterModel.js":11,"../modules/blockManager.js":17,"../views/displayView.js":29,"./blockModel.js":10,"backbone":1,"jquery":3}],13:[function(require,module,exports){
+},{"../modules/actionManager.js":15,"../views/displayView.js":23,"backbone":1,"jquery":3}],11:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 
@@ -16158,7 +16127,7 @@ module.exports = Backbone.Model.extend({
   }
 });
 
-},{"../views/logInstanceView.js":30,"backbone":1,"jquery":3}],14:[function(require,module,exports){
+},{"../views/logInstanceView.js":24,"backbone":1,"jquery":3}],12:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 
@@ -16193,7 +16162,7 @@ module.exports = Backbone.Model.extend({
 
 });
 
-},{"../views/loggerView.js":31,"./logInstance.js":13,"backbone":1,"jquery":3}],15:[function(require,module,exports){
+},{"../views/loggerView.js":25,"./logInstance.js":11,"backbone":1,"jquery":3}],13:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var Display = require('./displayModel.js');
@@ -16210,7 +16179,6 @@ module.exports = Backbone.Model.extend({
     this.connect();
     this.view = new RoomView({model: this});
     this.view.render();
-
   },
 
   connect: function() {
@@ -16245,121 +16213,177 @@ module.exports = Backbone.Model.extend({
   }
 });
 
-},{"../views/roomView.js":32,"./displayModel.js":12,"./logger.js":14,"backbone":1,"jquery":3,"socket.io-client":4}],16:[function(require,module,exports){
+},{"../views/roomView.js":26,"./displayModel.js":10,"./logger.js":12,"backbone":1,"jquery":3,"socket.io-client":4}],14:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var SoundView = require('../views/soundView.js');
-var url = "media/";
 
 Backbone.$ = $;
 
 module.exports = Backbone.Model.extend({
 
-
   initialize: function() {
-    this.on('change:color', this.setNote);
     this.view = new SoundView({model: this});
   },
 
-  setNote: function() {
-    var cnotes = {
-      'FF00FF': 'C4',
-      '00FFFF': 'E4',
-      'FFFF00': 'G4'
+  setPitch: function(pitch, duration, def) {
+    var pitches = {
+      A: 440,
+      B: 494,
+      C: 523,
+      D: 587,
+      E: 659,
+      F: 698,
+      G: 784
     };
-    var note = cnotes[this.get('color')];
-    if (!note) console.log("ERROR: No musical note for color");
-    this.set('note', cnotes[this.get('color')]);
+    if (def) {
+      this.set('freq', pitches.C);
+      return;
+    }
+    var freq = pitches[pitch];
+    if (!freq) {
+      console.log('ERROR: Invalid pitch', pitch);
+      return;
+    }
+    this.set('freq', freq);
   },
 
-  playOnce: function(duration) {
-    this.view.playFor(duration);
+  setVolume: function(value, duration, def) {
+    if (def) {
+      this.set('magnitude', .5);
+    } else {
+      this.set('magnitude', this.get('magnitude')*value);
+    }
+  },
+
+  setChord: function(name, duration, def) {
+    // this shit is harder
   },
 
   play: function() {
-    this.view.play();
+    this.set('playing', true);
   },
 
   stop: function() {
-    this.view.stop();
+    this.set('playing', false);
   }
 });
 
-},{"../views/soundView.js":33,"backbone":1,"jquery":3}],17:[function(require,module,exports){
+},{"../views/soundView.js":28,"backbone":1,"jquery":3}],15:[function(require,module,exports){
+var Queue = require('./queue.js');
 var Sound = require('../models/soundModel.js');
-var Block = require('../models/blockModel.js');
-var Bar = require('../models/barModel.js');
+var Actions = require('../models/actionModel.js');
+var SineView = require('../views/sineView.js');
+var Volume = Actions.Volume;
+var Chord = Actions.Chord;
+var Pitch = Actions.Pitch;
 
 var Manager = function() {
-  this.blockCount = 0;
-  this.blocks = {};
-  this.bars = {};
-  this.barCount = 0;
-  this.largest = '';
-  this.smallSound = new Sound({type: 'short'});
-  this.longSound = new Sound({type: 'long'});
-};
-
-Manager.prototype.addBlock = function(block) {
-  var color = block.color;
-  if (!this.blocks[color]) {
-    this.blocks[color] = [];
-    this.bars[color] = new Bar({color: color, count: 0});
-    this.barCount++;
-
-    for (var key in this.bars) this.bars[key].barCount(this.barCount);
-  }
-  this.blocks[color].push(block);
-  this.bars[color].addBlock(block);
-  this.updateLargest();
-  
-  this.smallSound.set('color', color);
-
-  if (this.largest == color) {
-    if (this.current) this.current.remove();
-    var block = new Block({color: color});
-    this.longSound.set('color', color);
-    this.current = block;
-  }
-
-  this.blockCount++;
-};
-
-Manager.prototype.updateLargest = function() {
-  var max = -1;
-  for (var key in this.blocks) {
-    if (this.blocks[key].length > max) {
-      max = this.blocks[key].length;
-      this.largest = key;
-    }
-  }
-};
-
-Manager.prototype.removeBlock = function() {
-  if (!this.current) return {};
-
-  var color = this.current.get('color');
-  var block = this.blocks[color].pop();
-  this.bars[color].popBlock();
-
-  this.updateLargest();
-
-  var large = this.blocks[this.largest];
-  this.current = large[large.length-1];
-
-  block.sendBack();
-  this.current.makePrimary();
-
-  this.blockCount--;
-  return {
-    removedBlock: block,
-    currentBlock: this.current
+  this.vols = new Queue();
+  this.pitches = new Queue();
+  this.chords = new Queue();
+  this.sound = new Sound({'freq': 440, 'magnitude': .5});
+  this.current = {};
+  this.defaults = {
+    vol: new Volume({parent: this, default: true}),
+    chord: new Chord({parent: this, default: true}),
+    pitch: new Pitch({parent: this, default: true}),
   };
+
+  this.plainSine = new SineView({el: '#plain'});
+  this.volSine = new SineView({model: this.defaults.vol, el: '#vol'});
+  this.chordSine = new SineView({model: this.defaults.chord, el: '#chord'});
+  this.pitchSine = new SineView({model: this.defaults.pitch, el: '#pitch'});
+
+  this.startPlaying();
+};
+
+Manager.prototype.addAction = function(action) {
+  switch (action.type) {
+    case 'volume':
+      vol = new Volume({parent: this, duration: action.duration, value: action.value});
+      if (this.current.vol) {
+        this.vols.enqueue(vol);
+      } else {
+        this.execute(vol);
+      }
+      break;
+    case 'pitch':
+      pitch = new Pitch({parent: this, duration: action.duration, value: action.value});
+      if (this.current.pitch) {
+        this.pitches.enqueue(pitch);
+      } else {
+        this.execute(pitch);
+      }
+      break;
+    case 'chord':
+      chord = new Chord({parent: this, duration: action.duration, value: action.value});
+      if (this.current.chord) {
+        this.chords.enqueue(chord);
+      } else {
+        this.execute(chord);
+      }
+      break;
+  }
+};
+
+Manager.prototype.nextAction = function(type) {
+  switch (type) {
+    case 'volume':
+      if (this.vols.isEmpty()) {
+        this.executeVol(this.defaults.vol);
+      } else {
+        this.executeVol(this.vols.dequeue());
+      }
+      break;
+    case 'pitch':
+      if (this.pitches.isEmpty()) {
+        this.executePitch(this.defaults.pitch);
+      } else {
+        this.executePitch(this.pitches.dequeue());
+      }
+      break;
+    case 'chord':
+      if (this.chords.isEmpty()) {
+        this.executeChord(this.defaults.chord);
+      } else {
+        this.executeChord(this.chords.dequeue());
+      }
+      break;
+  }
+};
+
+Manager.prototype.startPlaying = function() {
+  this.sound.play();
+};
+
+Manager.prototype.stopPlaying = function() {
+  this.sound.stop();
+};
+
+Manager.prototype.executeVol = function(vol) {
+  this.current.vol = vol;
+  vol.execute();
+  this.volSine.model = vol;
+};
+Manager.prototype.executePitch = function(p) {
+  this.current.pitch = p;
+  p.execute();
+  this.pitchSine.model = p;
+};
+Manager.prototype.executeChord = function(c) {
+  this.current.chord = c;
+  c.execute();
+  this.chordSine.model = c;
 };
 
 module.exports = Manager;
 
-},{"../models/barModel.js":9,"../models/blockModel.js":10,"../models/soundModel.js":16}],18:[function(require,module,exports){
+},{"../models/actionModel.js":9,"../models/soundModel.js":14,"../views/sineView.js":27,"./queue.js":16}],16:[function(require,module,exports){
+//code.stephenmorley.org
+module.exports=function(){var a=[],b=0;this.getLength=function(){return a.length-b};this.isEmpty=function(){return 0==a.length};this.enqueue=function(b){a.push(b)};this.dequeue=function(){if(0!=a.length){var c=a[b];2*++b>=a.length&&(a=a.slice(b),b=0);return c}};this.peek=function(){return 0<a.length?a[b]:void 0}};
+
+},{}],17:[function(require,module,exports){
 var Room = require('../models/roomModel.js');
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
@@ -16385,142 +16409,22 @@ module.exports = Backbone.Router.extend({
   }
 });
 
-},{"../models/roomModel.js":15,"backbone":1,"jquery":3}],19:[function(require,module,exports){
+},{"../models/roomModel.js":13,"backbone":1,"jquery":3}],18:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("bar",body_0);function body_0(chk,ctx){return chk.write("<div id=\"bar").reference(ctx.get(["cid"], false),ctx,"h").write("\" class=\"bar\"><div class=\"scale\"></div></div>");}return body_0;})();
-},{"../dust-core.min.js":7}],20:[function(require,module,exports){
-var dust = require('../dust-core.min.js');
-(function(){dust.register("block",body_0);function body_0(chk,ctx){return chk.write("<div class=\"block\"></div>");}return body_0;})();
-},{"../dust-core.min.js":7}],21:[function(require,module,exports){
-var dust = require('../dust-core.min.js');
-(function(){dust.register("cardCount",body_0);function body_0(chk,ctx){return chk.write("<div class=\"count\">").reference(ctx.get(["count"], false),ctx,"h").write("</div>");}return body_0;})();
-},{"../dust-core.min.js":7}],22:[function(require,module,exports){
-var dust = require('../dust-core.min.js');
-(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<div class=\"infoBar\"></div><div id=\"currentBlock\"></div><div id=\"bars\"></div>");}return body_0;})();
-},{"../dust-core.min.js":7}],23:[function(require,module,exports){
+(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<div class=\"infoBar\"></div><div class=\"waveArea\"><div id=\"plain\"></div><div id=\"pitch\"></div><div id=\"vol\"></div><div id=\"chord\"></div></div>");}return body_0;})();
+},{"../dust-core.min.js":7}],19:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
 (function(){dust.register("logInstance",body_0);function body_0(chk,ctx){return chk.write("<div id=\"logInstance").reference(ctx.get(["cid"], false),ctx,"h").write("\" class=\"logInstance\"><span class=\"message\">").reference(ctx.get(["message"], false),ctx,"h").write("</span><span class=\"close\">[x]</span></div>");}return body_0;})();
-},{"../dust-core.min.js":7}],24:[function(require,module,exports){
+},{"../dust-core.min.js":7}],20:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
 (function(){dust.register("logger",body_0);function body_0(chk,ctx){return chk.write("<div class=\"logArea\"><div>Log</div><div id=\"logInstances\"></div></div>");}return body_0;})();
-},{"../dust-core.min.js":7}],25:[function(require,module,exports){
+},{"../dust-core.min.js":7}],21:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
 (function(){dust.register("room",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1><p>").reference(ctx.get(["status"], false),ctx,"h").write("</p><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><div class=\"joinNew\">Create a new room</div><div class=\"joinExisting\">Join a room</div>");}return body_0;})();
-},{"../dust-core.min.js":7}],26:[function(require,module,exports){
-var $ = require('jquery')(window);
-var Backbone = require('backbone');
-var _ = require('underscore');
-Backbone.$ = $;
-
-var tpl = require('../templates/bar.js');
+},{"../dust-core.min.js":7}],22:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-
-module.exports = Backbone.View.extend({
-
-  el: '#bars',
-
-  initialize: function() {
-    this.listenTo(this.model, 'change:count', this.resize);
-  },
-
-  dom: function() {
-    return this.$el.children('#bar'+this.model.cid);
-  },
-
-  barCount: function(count) {
-    this.dom().css({
-      'margin-left': Math.floor(20/count)+"%",
-      'width': Math.floor(80/count)+"%"
-    });
-  },
-
-  resize: function() {
-    this.dom().children('.scale').height(this.model.get('count') * 15);
-  },
-
-  setColor: function(color) {
-    if (!color) color = this.model.get('color');
-    this.dom().children('.scale').css('background-color', '#'+color);
-  },
-
-  render: function() {
-    var self = this;
-    dust.render('bar', _.extend({cid: self.model.cid}, self.model.attributes), function(err, out) {
-      if (err) console.log(err);
-      self.$el.append(out);
-      self.setColor();
-    });
-  }
-});
-
-},{"../dust-core.min.js":7,"../templates/bar.js":19,"backbone":1,"jquery":3,"underscore":5}],27:[function(require,module,exports){
-var $ = require('jquery')(window);
-var Backbone = require('backbone');
-Backbone.$ = $;
-
-var tpl = require('../templates/block.js');
-var dust = require('../dust-core.min.js');
-
-module.exports = Backbone.View.extend({
-  events: {
-  },
-
-  el: '#currentBlock',
-
-  initialize: function() {
-    this.listenTo(this.model, 'change', this.render);
-  },
-
-  render: function() {
-    var self = this;
-    dust.render('block', self.model.attributes, function(err, out) {
-      if (err) console.log(err);
-      self.$el.html(out);
-      self.setColor();
-    });
-  },
-
-  setColor: function(color) {
-    if (!color) color = this.model.get('color');
-    this.$el.find('.block').css('background-color', '#'+color);
-  },
-
-  makeOld: function() {
-    this.setElement(Backbone.$('#oldBlock'));
-    this.render();
-  },
-
-  makePrimary: function() {
-    this.setElement(Backbone.$('#currentBlock'));
-    this.render();
-  }
-});
-
-},{"../dust-core.min.js":7,"../templates/block.js":20,"backbone":1,"jquery":3}],28:[function(require,module,exports){
-var $ = require('jquery')(window);
-var Backbone = require('backbone');
-Backbone.$ = $;
-
-var dust = require('../dust-core.min.js');
-var tpl = require('../templates/cardCount.js');
-
-module.exports = Backbone.View.extend({
-  el: '#cardCount',
-
-  initialize: function() {
-    this.listenTo(this.model, 'change', this.render);
-  },
-
-  render: function() {
-    var self = this;
-    dust.render('cardCount', self.model.attributes, function(err, out) {
-      if (err) console.log(err);
-      self.$el.html(out);
-    });
-  }
-});
-
-},{"../dust-core.min.js":7,"../templates/cardCount.js":21,"backbone":1,"jquery":3}],29:[function(require,module,exports){
+(function(){dust.register("sine",body_0);function body_0(chk,ctx){return chk.write("<div class=\"sineContainer\"><canvas class=\"sine\" height=\"400\" width=\"344\"></canvas></div>");}return body_0;})();
+},{"../dust-core.min.js":7}],23:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16560,7 +16464,7 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":7,"../templates/display.js":22,"backbone":1,"jquery":3}],30:[function(require,module,exports){
+},{"../dust-core.min.js":7,"../templates/display.js":18,"backbone":1,"jquery":3}],24:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var _ = require('underscore');
@@ -16602,7 +16506,7 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":7,"../templates/logInstance.js":23,"backbone":1,"jquery":3,"underscore":5}],31:[function(require,module,exports){
+},{"../dust-core.min.js":7,"../templates/logInstance.js":19,"backbone":1,"jquery":3,"underscore":5}],25:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16632,7 +16536,7 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":7,"../templates/logger.js":24,"backbone":1,"jquery":3}],32:[function(require,module,exports){
+},{"../dust-core.min.js":7,"../templates/logger.js":20,"backbone":1,"jquery":3}],26:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16674,7 +16578,78 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":7,"../templates/room.js":25,"backbone":1,"jquery":3}],33:[function(require,module,exports){
+},{"../dust-core.min.js":7,"../templates/room.js":21,"backbone":1,"jquery":3}],27:[function(require,module,exports){
+var $ = require('jquery')(window);
+var Backbone = require('backbone');
+Backbone.$ = $;
+
+var tpl = require('../templates/sine.js');
+var dust = require('../dust-core.min.js');
+
+module.exports = Backbone.View.extend({
+  initialize: function() {
+    if (this.model) this.listenTo(this.model, 'change', this.modified);
+    this.render();
+  },
+
+  render: function() {
+    var self = this;
+    dust.render('sine', {}, function(err, out) {
+      if (err) console.log(err);
+      self.$el.html(out);
+      self.modified();
+    });
+  },
+
+  modified: function() {
+    var $canvas = this.$el.find(".sine");
+    var canvas = $canvas[0];
+    var context = canvas.getContext('2d');
+    context.strokeStyle = "#000000";
+    context.lineJoin = 'round';
+    context.lineWidth = 2;
+
+    context.stash = {};
+    context.save();
+    context.stash.height = $canvas.height();
+    context.stash.width = $canvas.width();
+    context.stash.xAxis = context.stash.height/2;
+    context.stash.yAxis = 0;
+    this.context = context;
+    this.animate();
+  },
+
+  animate: function() {
+    var context = this.context;
+    var config = context.stash;
+
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
+
+    function drawWave(t) {
+      context.clearRect(0,0, config.width, config.height);
+
+      var x = t;
+      var y = Math.sin(x) * config.xAxis;
+      context.beginPath();
+      context.moveTo(config.yAxis, y + config.xAxis);
+
+      for (var i = config.yAxis; i <= config.width; i += 10) {
+        x = t + (i/100);
+        y = Math.sin(x) * config.xAxis;
+        context.lineTo(i, y+config.xAxis);
+      }
+
+      context.stroke();
+
+      this.timeout = setTimeout(function() {drawWave(t+.2)}, 130);
+    }
+    drawWave(0);
+  }
+});
+
+},{"../dust-core.min.js":7,"../templates/sine.js":22,"backbone":1,"jquery":3}],28:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16685,52 +16660,16 @@ module.exports = Backbone.View.extend({
   el: '#sounds',
 
   initialize: function() {
-    if (this.model.get('type') == 'short') {
-      this.listenTo(this.model, 'change', this.renderShort);
+    this.listenTo(this.model, 'change', this.render);
+  },
+
+  render: function() {
+    if (this.model.get('playing')) {
+      this.audio = timbre("sin", {freq: this.model.get('freq'), mul: this.model.get('magnitude')});
+      this.audio.play();
     } else {
-      this.listenTo(this.model, 'change', this.renderLong);
+      this.audio.pause();
     }
-  },
-
-  notes: {
-    'C4': 261,
-    'E4': 329,
-    'G4': 392,
-    'Bb4': 466
-  },
-
-  renderShort: function() {
-    var audio = timbre("sin", {freq: this.notes[this.model.get('note')], mul: 0.8});
-    audio.play();
-    setTimeout(function() {
-      audio.pause();
-    }, 1000);
-  },
-
-  renderLong: function() {
-    if (this.audio) this.audio.pause();
-    this.audio = timbre("sin", {freq: this.notes[this.model.get('note')], mul: 0.3});
-    this.audio.set('freq', this.notes[this.model.get('note')]);
-    this.audio.play();
-  },
-
-  playFor: function(duration) {
-    var audio = timbre("sin", {freq: this.notes[this.model.get('note')], mul: 0.8});
-    audio.play();
-
-    setTimeout(function() {
-      audio.pause();
-    }, duration * 1000);
-  },
-
-  play: function() {
-    this.audio = timbre("sin", {freq: this.notes[this.model.get('note')], mul: 0.3});
-    this.audio.play();
-  },
-
-  stop: function() {
-    this.audio.pause();
-    delete this.audio;
   }
 });
 
