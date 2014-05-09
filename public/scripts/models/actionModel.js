@@ -7,11 +7,12 @@ Backbone.$ = $;
 var Action = Backbone.Model.extend({
 
   execute: function() {
-    setTimeout(this.done, this.get('duration'));
+    var self = this;
+    setTimeout(function() { self.done(); }, this.get('duration'));
   },
 
   done: function() {
-    this.get('parent').nextAction(this.type);
+    this.get('parent').nextAction(this.get('type'));
   }
 
 });
@@ -30,9 +31,6 @@ var VolumeModel = Action.extend({
     var sound = this.get('parent').sound;
     sound.setVolume(this.get('value'), this.get('duration'));
     Action.prototype.execute.apply(this);
-  },
-  done: function() {
-    Action.prototype.done.apply(this);
   }
 });
 
@@ -47,11 +45,9 @@ var ChordModel = Action.extend({
     }
   },
   execute: function() {
+    var sound = this.get('parent').sound;
     sound.setChord(this.get('value'), this.get('duration'));
     Action.prototype.execute.apply(this);
-  },
-  done: function() {
-    Action.prototype.done.apply(this);
   }
 });
 
@@ -65,15 +61,11 @@ var PitchModel = Action.extend({
       }
     }
   },
-  type: 'pitch',
   execute: function() {
+    var sound = this.get('parent').sound;
     sound.setPitch(this.get('value'), this.get('duration'));
     Action.prototype.execute.apply(this);
-  },
-  done: function() {
-    Action.prototype.done.apply(this);
   }
-
 });
 
 module.exports = {

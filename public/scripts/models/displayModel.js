@@ -16,6 +16,15 @@ module.exports = Backbone.Model.extend({
 
     var socket = this.get('socket');
 
+    // *** comment out for production:
+    console.log('starting run in 3 seconds');
+    setTimeout(function() {
+      self.view.allPositioned();
+      self.actions = new ActionManager();
+    }, 3000);
+
+
+
     socket.on('display:sendAction', function(data) {
       self.addAction(data.action, data.device);
     });

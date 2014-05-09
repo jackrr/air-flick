@@ -36,12 +36,12 @@ module.exports = Backbone.Model.extend({
     if (def) {
       this.set('magnitude', .5);
     } else {
-      this.set('magnitude', this.get('magnitude')*value);
+      this.set('magnitude', value * .5);
     }
   },
 
   setChord: function(name, duration, def) {
-    // this shit is harder
+    // this stuff is harder
   },
 
   play: function() {
