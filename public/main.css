@@ -10,9 +10,28 @@ body {
   background-color: #ffffff;
 }
 
-.action {
+.action .text {
   position: absolute;
-  left: -25px;
+  top: 186px;
+  left: -50px;
+  font-size: 20px;
+  background-color: #000000;
+  color: #ffffff;
+  padding: 1px 6px;
+  z-index: 15;
+}
+
+.action .shape {
+  position: absolute;
+  left: -50px;
+  top: 150px;
+  z-index: 10;
+}
+
+.action .spout {
+  position: absolute;
+  top: 0px;
+  left: -50px;
 }
 
 .waveArea {
@@ -29,6 +48,7 @@ body {
 canvas.sine {
   position: absolute;
   top: 0;
+  left: 50px;
 }
 
 #bars {

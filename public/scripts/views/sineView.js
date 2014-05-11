@@ -7,7 +7,6 @@ var dust = require('../dust-core.min.js');
 
 module.exports = Backbone.View.extend({
   initialize: function() {
-    if (this.model) this.listenTo(this.model, 'change', this.modified);
     this.render();
   },
 
@@ -20,8 +19,13 @@ module.exports = Backbone.View.extend({
     });
   },
 
+  changeWave: function(options) {
+    this.animate(options);
+  },
+
   modified: function() {
     var $canvas = this.$el.find(".sine");
+    $canvas.attr('width', this.$el.width() - 100);
     var canvas = $canvas[0];
     var context = canvas.getContext('2d');
     context.strokeStyle = "#000000";
@@ -38,31 +42,35 @@ module.exports = Backbone.View.extend({
     this.animate();
   },
 
-  animate: function() {
+  animate: function(options) {
+    options = options || {};
+    if (!options.color) options.color = "#000000";
+    if (!options.freq) options.freq = 523;
+    if (!options.mag) options.mag = 0.5;
+
     var context = this.context;
     var config = context.stash;
+    var self = this;
+    clearTimeout(this.timeout);
 
-    if (this.timeout) {
-      clearTimeout(this.timeout);
-    }
-
+    context.strokeStyle = options.color;
     function drawWave(t) {
       context.clearRect(0,0, config.width, config.height);
 
       var x = t;
-      var y = Math.sin(x) * config.xAxis;
+      var y = options.mag * (Math.sin(4*x) * config.xAxis);
       context.beginPath();
-      context.moveTo(config.yAxis, y + config.xAxis);
+      context.moveTo(config.yAxis+2, y + config.xAxis);
 
-      for (var i = config.yAxis; i <= config.width; i += 10) {
-        x = t + (i/100);
-        y = Math.sin(x) * config.xAxis;
+      for (var i = config.yAxis+2; i <= config.width; i += 4) {
+        x = (options.freq/523) * (t + (i/100));
+        y = options.mag * (Math.sin(4*x) * config.xAxis);
         context.lineTo(i, y+config.xAxis);
       }
 
       context.stroke();
 
-      this.timeout = setTimeout(function() {drawWave(t+.2)}, 130);
+      self.timeout = setTimeout(function() {drawWave(t+.4)}, 30);
     }
     drawWave(0);
   }

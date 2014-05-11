@@ -3,6 +3,7 @@ var Sound = require('../models/soundModel.js');
 var Actions = require('../models/actionModel.js');
 var SineView = require('../views/sineView.js');
 var ActionView = require('../views/actionView.js');
+// var testModule = require('./testModule.js'); // comment out for production
 var Volume = Actions.Volume;
 var Chord = Actions.Chord;
 var Pitch = Actions.Pitch;
@@ -20,9 +21,9 @@ var Manager = function() {
   };
 
   this.plainSine = new SineView({el: '#plain'});
-  this.volSine = new SineView({model: this.defaults.vol, el: '#vol'});
-  this.chordSine = new SineView({model: this.defaults.chord, el: '#chord'});
-  this.pitchSine = new SineView({model: this.defaults.pitch, el: '#pitch'});
+  this.volSine = new SineView({el: '#vol'});
+  this.chordSine = new SineView({el: '#chord'});
+  this.pitchSine = new SineView({el: '#pitch'});
 
   this.views = {
     vol: new ActionView({el: '#vol .action', model: this.defaults.vol}),
@@ -31,6 +32,8 @@ var Manager = function() {
   }
 
   this.startPlaying();
+
+  // testModule.runTests(this); // comment out for production
 };
 
 Manager.prototype.addAction = function(action) {
@@ -40,7 +43,7 @@ Manager.prototype.addAction = function(action) {
       if (this.current.vol) {
         this.vols.enqueue(vol);
       } else {
-        this.execute(vol);
+        this.executeVol(vol);
       }
       break;
     case 'pitch':
@@ -48,7 +51,7 @@ Manager.prototype.addAction = function(action) {
       if (this.current.pitch) {
         this.pitches.enqueue(pitch);
       } else {
-        this.execute(pitch);
+        this.executePitch(pitch);
       }
       break;
     case 'chord':
@@ -56,7 +59,7 @@ Manager.prototype.addAction = function(action) {
       if (this.current.chord) {
         this.chords.enqueue(chord);
       } else {
-        this.execute(chord);
+        this.executeChord(chord);
       }
       break;
   }
@@ -66,21 +69,21 @@ Manager.prototype.nextAction = function(type) {
   switch (type) {
     case 'volume':
       if (this.vols.isEmpty()) {
-        this.executeVol(this.defaults.vol);
+        this.executeVol(this.defaults.vol, true);
       } else {
         this.executeVol(this.vols.dequeue());
       }
       break;
     case 'pitch':
       if (this.pitches.isEmpty()) {
-        this.executePitch(this.defaults.pitch);
+        this.executePitch(this.defaults.pitch, true);
       } else {
         this.executePitch(this.pitches.dequeue());
       }
       break;
     case 'chord':
       if (this.chords.isEmpty()) {
-        this.executeChord(this.defaults.chord);
+        this.executeChord(this.defaults.chord, true);
       } else {
         this.executeChord(this.chords.dequeue());
       }
@@ -96,23 +99,59 @@ Manager.prototype.stopPlaying = function() {
   this.sound.stop();
 };
 
-Manager.prototype.executeVol = function(vol) {
-  this.current.vol = vol;
-  this.views.vol.setModel(vol);
-  vol.execute();
-  this.volSine.model = vol;
-};
-Manager.prototype.executePitch = function(p) {
-  this.current.pitch = p;
-  this.views.pitch.setModel(p);
-  p.execute();
-  this.pitchSine.model = p;
-};
-Manager.prototype.executeChord = function(c) {
-  this.current.chord = c;
+Manager.prototype.executeChord = function(c, def) {
   this.views.chord.setModel(c);
   c.execute();
-  this.chordSine.model = c;
+  if (def) {
+    delete this.current.chord;
+    this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude')});
+  } else {
+    this.current.chord = c;
+    // this is going to be complex
+    this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude'), color: "#00FF00"});
+  }
+  this.chordSine.setModel(c);
+};
+
+Manager.prototype.executeVol = function(vol, def) {
+  vol.execute();
+  if (def) {
+    delete this.current.vol;
+    this.volSine.animate({freq: this.sound.get('freq')});
+  } else {
+    this.current.vol = vol;
+    this.volSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude'), color: "#0000FF"});
+  }
+  if (this.current.chord) {
+    // this is going to be complex
+    this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude'), color: "#00FF00"});
+  } else {
+    this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude')});
+  }
+  this.views.vol.setModel(vol);
+};
+
+Manager.prototype.executePitch = function(p, def) {
+  p.execute();
+  if (def) {
+    delete this.current.pitch;
+    this.pitchSine.animate();
+  } else {
+    this.current.pitch = p;
+    this.pitchSine.animate({freq: this.sound.get('freq'), color: "#FF00FF"});
+  }
+  if (this.current.vol) {
+    this.volSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude'), color: "#0000FF"});
+  } else {
+    this.volSine.animate({freq: this.sound.get('freq')});
+  }
+  if (this.current.chord) {
+    // this is going to be complex
+    this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude'), color: "#00FF00"});
+  } else {
+    this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude')});
+  }
+  this.views.pitch.setModel(p);
 };
 
 module.exports = Manager;

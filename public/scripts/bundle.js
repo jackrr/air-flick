@@ -15979,11 +15979,12 @@ Backbone.$ = $;
 var Action = Backbone.Model.extend({
 
   execute: function() {
-    setTimeout(this.done, this.get('duration'));
+    var self = this;
+    setTimeout(function() { self.done(); }, this.get('duration'));
   },
 
   done: function() {
-    this.get('parent').nextAction(this.type);
+    this.get('parent').nextAction(this.get('type'));
   }
 
 });
@@ -15992,19 +15993,19 @@ var VolumeModel = Action.extend({
   initialize: function() {
     this.set('type', 'volume');
     if (this.get('default')) {
+      this.set('displayText', 'x1');
       this.execute = function() {
         var sound = this.get('parent').sound;
         sound.setVolume(-1, -1, 'default');
       }
+    } else {
+      this.set('displayText', 'x'+this.get('value'));
     }
   },
   execute: function() {
     var sound = this.get('parent').sound;
     sound.setVolume(this.get('value'), this.get('duration'));
     Action.prototype.execute.apply(this);
-  },
-  done: function() {
-    Action.prototype.done.apply(this);
   }
 });
 
@@ -16012,18 +16013,19 @@ var ChordModel = Action.extend({
   initialize: function() {
     this.set('type', 'chord');
     if (this.get('default')) {
+      this.set('displayText', 'Root');
       this.execute = function() {
         var sound = this.get('parent').sound;
         sound.setChord(-1, -1, 'default');
       }
+    } else {
+      this.set('displayText', this.get('value'));
     }
   },
   execute: function() {
+    var sound = this.get('parent').sound;
     sound.setChord(this.get('value'), this.get('duration'));
     Action.prototype.execute.apply(this);
-  },
-  done: function() {
-    Action.prototype.done.apply(this);
   }
 });
 
@@ -16031,21 +16033,20 @@ var PitchModel = Action.extend({
   initialize: function() {
     this.set('type', 'pitch');
     if (this.get('default')) {
+      this.set('displayText', 'C');
       this.execute = function() {
         var sound = this.get('parent').sound;
         sound.setPitch(-1, -1, 'default');
       }
+    } else {
+      this.set('displayText', this.get('value'));
     }
   },
-  type: 'pitch',
   execute: function() {
+    var sound = this.get('parent').sound;
     sound.setPitch(this.get('value'), this.get('duration'));
     Action.prototype.execute.apply(this);
-  },
-  done: function() {
-    Action.prototype.done.apply(this);
   }
-
 });
 
 module.exports = {
@@ -16072,6 +16073,15 @@ module.exports = Backbone.Model.extend({
 
 
     var socket = this.get('socket');
+
+    // *** comment out for production:
+    // console.log('starting run in 3 seconds');
+    // setTimeout(function() {
+      // self.view.allPositioned();
+      // self.actions = new ActionManager();
+    // }, 3000);
+
+
 
     socket.on('display:sendAction', function(data) {
       self.addAction(data.action, data.device);
@@ -16192,7 +16202,9 @@ module.exports = Backbone.Model.extend({
         socket: socket
       });
 
+
       self.logger = new Logger({socket: socket});
+      // self.joinRoom('test'); // *** comment out for production
     });
   },
 
@@ -16253,12 +16265,12 @@ module.exports = Backbone.Model.extend({
     if (def) {
       this.set('magnitude', .5);
     } else {
-      this.set('magnitude', this.get('magnitude')*value);
+      this.set('magnitude', value * .5);
     }
   },
 
   setChord: function(name, duration, def) {
-    // this shit is harder
+    // this stuff is harder
   },
 
   play: function() {
@@ -16276,6 +16288,7 @@ var Sound = require('../models/soundModel.js');
 var Actions = require('../models/actionModel.js');
 var SineView = require('../views/sineView.js');
 var ActionView = require('../views/actionView.js');
+// var testModule = require('./testModule.js'); // comment out for production
 var Volume = Actions.Volume;
 var Chord = Actions.Chord;
 var Pitch = Actions.Pitch;
@@ -16293,9 +16306,9 @@ var Manager = function() {
   };
 
   this.plainSine = new SineView({el: '#plain'});
-  this.volSine = new SineView({model: this.defaults.vol, el: '#vol'});
-  this.chordSine = new SineView({model: this.defaults.chord, el: '#chord'});
-  this.pitchSine = new SineView({model: this.defaults.pitch, el: '#pitch'});
+  this.volSine = new SineView({el: '#vol'});
+  this.chordSine = new SineView({el: '#chord'});
+  this.pitchSine = new SineView({el: '#pitch'});
 
   this.views = {
     vol: new ActionView({el: '#vol .action', model: this.defaults.vol}),
@@ -16304,6 +16317,8 @@ var Manager = function() {
   }
 
   this.startPlaying();
+
+  // testModule.runTests(this); // comment out for production
 };
 
 Manager.prototype.addAction = function(action) {
@@ -16313,7 +16328,7 @@ Manager.prototype.addAction = function(action) {
       if (this.current.vol) {
         this.vols.enqueue(vol);
       } else {
-        this.execute(vol);
+        this.executeVol(vol);
       }
       break;
     case 'pitch':
@@ -16321,7 +16336,7 @@ Manager.prototype.addAction = function(action) {
       if (this.current.pitch) {
         this.pitches.enqueue(pitch);
       } else {
-        this.execute(pitch);
+        this.executePitch(pitch);
       }
       break;
     case 'chord':
@@ -16329,7 +16344,7 @@ Manager.prototype.addAction = function(action) {
       if (this.current.chord) {
         this.chords.enqueue(chord);
       } else {
-        this.execute(chord);
+        this.executeChord(chord);
       }
       break;
   }
@@ -16339,21 +16354,21 @@ Manager.prototype.nextAction = function(type) {
   switch (type) {
     case 'volume':
       if (this.vols.isEmpty()) {
-        this.executeVol(this.defaults.vol);
+        this.executeVol(this.defaults.vol, true);
       } else {
         this.executeVol(this.vols.dequeue());
       }
       break;
     case 'pitch':
       if (this.pitches.isEmpty()) {
-        this.executePitch(this.defaults.pitch);
+        this.executePitch(this.defaults.pitch, true);
       } else {
         this.executePitch(this.pitches.dequeue());
       }
       break;
     case 'chord':
       if (this.chords.isEmpty()) {
-        this.executeChord(this.defaults.chord);
+        this.executeChord(this.defaults.chord, true);
       } else {
         this.executeChord(this.chords.dequeue());
       }
@@ -16369,23 +16384,59 @@ Manager.prototype.stopPlaying = function() {
   this.sound.stop();
 };
 
-Manager.prototype.executeVol = function(vol) {
-  this.current.vol = vol;
-  this.views.vol.setModel(vol);
-  vol.execute();
-  this.volSine.model = vol;
-};
-Manager.prototype.executePitch = function(p) {
-  this.current.pitch = p;
-  this.views.pitch.setModel(p);
-  p.execute();
-  this.pitchSine.model = p;
-};
-Manager.prototype.executeChord = function(c) {
-  this.current.chord = c;
+Manager.prototype.executeChord = function(c, def) {
   this.views.chord.setModel(c);
   c.execute();
-  this.chordSine.model = c;
+  if (def) {
+    delete this.current.chord;
+    this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude')});
+  } else {
+    this.current.chord = c;
+    // this is going to be complex
+    this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude'), color: "#00FF00"});
+  }
+  this.chordSine.setModel(c);
+};
+
+Manager.prototype.executeVol = function(vol, def) {
+  vol.execute();
+  if (def) {
+    delete this.current.vol;
+    this.volSine.animate({freq: this.sound.get('freq')});
+  } else {
+    this.current.vol = vol;
+    this.volSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude'), color: "#0000FF"});
+  }
+  if (this.current.chord) {
+    // this is going to be complex
+    this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude'), color: "#00FF00"});
+  } else {
+    this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude')});
+  }
+  this.views.vol.setModel(vol);
+};
+
+Manager.prototype.executePitch = function(p, def) {
+  p.execute();
+  if (def) {
+    delete this.current.pitch;
+    this.pitchSine.animate();
+  } else {
+    this.current.pitch = p;
+    this.pitchSine.animate({freq: this.sound.get('freq'), color: "#FF00FF"});
+  }
+  if (this.current.vol) {
+    this.volSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude'), color: "#0000FF"});
+  } else {
+    this.volSine.animate({freq: this.sound.get('freq')});
+  }
+  if (this.current.chord) {
+    // this is going to be complex
+    this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude'), color: "#00FF00"});
+  } else {
+    this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude')});
+  }
+  this.views.pitch.setModel(p);
 };
 
 module.exports = Manager;
@@ -16422,7 +16473,7 @@ module.exports = Backbone.Router.extend({
 
 },{"../models/roomModel.js":13,"backbone":1,"jquery":3}],18:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("action",body_0);function body_0(chk,ctx){return chk.write("<div class=\"shape\"><span class=\"text\">").reference(ctx.get(["displayText"], false),ctx,"h").write("</span><canvas class=\"shape\" height=\"100\" width=\"100\"></canvas></div><div class=\"spoutContainer\"><canvas class=\"spout\" height=\"400\" width=\"25\"></canvas></div>");}return body_0;})();
+(function(){dust.register("action",body_0);function body_0(chk,ctx){return chk.write("<div class=\"shapeContainer\"><span class=\"text\">").reference(ctx.get(["displayText"], false),ctx,"h").write("</span><canvas class=\"shape\" height=\"100\" width=\"100\"></canvas><canvas class=\"spout\" height=\"400\" width=\"100\"></canvas></div>");}return body_0;})();
 },{"../dust-core.min.js":7}],19:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
 (function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<div class=\"infoBar\"></div><div class=\"waveArea\"><div id=\"plain\"></div><div id=\"pitch\"></div><div id=\"vol\"></div><div id=\"chord\"></div></div>");}return body_0;})();
@@ -16437,7 +16488,7 @@ var dust = require('../dust-core.min.js');
 (function(){dust.register("room",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1><p>").reference(ctx.get(["status"], false),ctx,"h").write("</p><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><div class=\"joinNew\">Create a new room</div><div class=\"joinExisting\">Join a room</div>");}return body_0;})();
 },{"../dust-core.min.js":7}],23:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("sine",body_0);function body_0(chk,ctx){return chk.write("<div class=\"sineContainer\"><div class=\"action\"></div><canvas class=\"sine\" height=\"400\" width=\"344\"></canvas></div>");}return body_0;})();
+(function(){dust.register("sine",body_0);function body_0(chk,ctx){return chk.write("<div class=\"sineContainer\"><div class=\"action\"></div><canvas class=\"sine\" height=\"400\" width=\"250\"></canvas></div>");}return body_0;})();
 },{"../dust-core.min.js":7}],24:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
@@ -16470,10 +16521,31 @@ module.exports = Backbone.View.extend({
 
   drawSpout: function() {
     var $canvas = this.$el.find(".spout");
+    var width = $canvas.width();
+    var height = $canvas.height();
     var canvas = $canvas[0];
     var context = canvas.getContext('2d');
 
-    // draw the background stuff
+    context.clearRect(0,0,width,height);
+    context.fillStyle = "#000000";
+    // left triangle
+    context.beginPath();
+    context.moveTo(0,0);
+    context.lineTo(width/2, height/2);
+    context.lineTo(0, height);
+    context.fill();
+
+    // right triangle
+    context.beginPath();
+    context.moveTo(width,0);
+    context.lineTo(width/2, height/2);
+    context.lineTo(width, height);
+    context.fill();
+  },
+
+  setModel: function(model) {
+    this.model = model;
+    this.render();
   },
 
   drawShape: function() {
@@ -16497,40 +16569,48 @@ module.exports = Backbone.View.extend({
     if (time) {
       var inc = time;
       function draw() {
-        func.apply(self,[inc/time]);
+        if (inc > 15000) {
+          func.apply(self,[1]); // just sit at max size until small enough to start shrinking
+        } else {
+          func.apply(self,[inc/15000]);
+        }
         inc = inc-100;
-        if (inc > 0) setTimeout(draw, 100);
+        if (inc > 0) self.timeout = setTimeout(draw, 100);
       }
+      draw();
     } else {
-      func.apply(self,[-1]);
+      clearTimeout(this.timeout);
+      func.apply(this,[-1]);
     }
   },
 
   drawCircle: function(ratio) {
-    console.log('drawing circle', ratio);
+    this.context.clearRect(0,0,this.context.stash.width,this.context.stash.height);
     this.context.fillStyle = "#0000FF";
     if (ratio == -1) {
       this.context.fillStyle = "#BBBBBB";
       ratio = 1;
     }
-    this.context.arc(this.context.stash.width/2, this.context.stash.height/2, ratio*this.context.stash.height/2, 0, 2*Math.PI, false);
+    this.context.beginPath();
+    this.context.arc(this.context.stash.width/2, this.context.stash.height/2, ratio*this.context.stash.height/2, 0, 2*Math.PI);
     this.context.fill();
   },
 
   drawSquare: function(ratio) {
-    console.log('drawing square', ratio);
+    this.context.clearRect(0,0,this.context.stash.width,this.context.stash.height);
     this.context.fillStyle = "#00FF00";
     if (ratio == -1) {
       this.context.fillStyle = "#BBBBBB";
       ratio = 1;
     }
+    this.context.beginPath();
     var hMiddle = this.context.stash.width/2;
     var vMiddle = this.context.stash.height/2;
     this.context.fillRect(hMiddle - (ratio*hMiddle), vMiddle - (ratio*vMiddle), ratio * 2 * hMiddle, ratio * 2 * vMiddle);
   },
 
   drawDiamond: function(ratio) {
-    console.log('drawing diamond', ratio);
+    this.context.clearRect(0,0,this.context.stash.width,this.context.stash.height);
     this.context.fillStyle = "#FF00FF";
     if (ratio == -1) {
       this.context.fillStyle = "#BBBBBB";
@@ -16712,7 +16792,6 @@ var dust = require('../dust-core.min.js');
 
 module.exports = Backbone.View.extend({
   initialize: function() {
-    if (this.model) this.listenTo(this.model, 'change', this.modified);
     this.render();
   },
 
@@ -16725,8 +16804,13 @@ module.exports = Backbone.View.extend({
     });
   },
 
+  changeWave: function(options) {
+    this.animate(options);
+  },
+
   modified: function() {
     var $canvas = this.$el.find(".sine");
+    $canvas.attr('width', this.$el.width() - 100);
     var canvas = $canvas[0];
     var context = canvas.getContext('2d');
     context.strokeStyle = "#000000";
@@ -16743,31 +16827,35 @@ module.exports = Backbone.View.extend({
     this.animate();
   },
 
-  animate: function() {
+  animate: function(options) {
+    options = options || {};
+    if (!options.color) options.color = "#000000";
+    if (!options.freq) options.freq = 523;
+    if (!options.mag) options.mag = 0.5;
+
     var context = this.context;
     var config = context.stash;
+    var self = this;
+    clearTimeout(this.timeout);
 
-    if (this.timeout) {
-      clearTimeout(this.timeout);
-    }
-
+    context.strokeStyle = options.color;
     function drawWave(t) {
       context.clearRect(0,0, config.width, config.height);
 
       var x = t;
-      var y = Math.sin(x) * config.xAxis;
+      var y = options.mag * (Math.sin(4*x) * config.xAxis);
       context.beginPath();
-      context.moveTo(config.yAxis, y + config.xAxis);
+      context.moveTo(config.yAxis+2, y + config.xAxis);
 
-      for (var i = config.yAxis; i <= config.width; i += 10) {
-        x = t + (i/100);
-        y = Math.sin(x) * config.xAxis;
+      for (var i = config.yAxis+2; i <= config.width; i += 4) {
+        x = (options.freq/523) * (t + (i/100));
+        y = options.mag * (Math.sin(4*x) * config.xAxis);
         context.lineTo(i, y+config.xAxis);
       }
 
       context.stroke();
 
-      this.timeout = setTimeout(function() {drawWave(t+.2)}, 130);
+      self.timeout = setTimeout(function() {drawWave(t+.4)}, 30);
     }
     drawWave(0);
   }
@@ -16785,11 +16873,14 @@ module.exports = Backbone.View.extend({
 
   initialize: function() {
     this.listenTo(this.model, 'change', this.render);
+    this.audio = timbre("sin", {freq: 440, mul: 0.5});
   },
 
   render: function() {
+    // switch the comments below to toggle sound
+    this.audio.set({mul: this.model.get('magnitude'), freq: this.model.get('freq')});
+    //this.audio.set({mul: 0.0, freq: this.model.get('freq')}); 
     if (this.model.get('playing')) {
-      this.audio = timbre("sin", {freq: this.model.get('freq'), mul: this.model.get('magnitude')});
       this.audio.play();
     } else {
       this.audio.pause();

@@ -21,10 +21,13 @@ var VolumeModel = Action.extend({
   initialize: function() {
     this.set('type', 'volume');
     if (this.get('default')) {
+      this.set('displayText', 'x1');
       this.execute = function() {
         var sound = this.get('parent').sound;
         sound.setVolume(-1, -1, 'default');
       }
+    } else {
+      this.set('displayText', 'x'+this.get('value'));
     }
   },
   execute: function() {
@@ -38,10 +41,13 @@ var ChordModel = Action.extend({
   initialize: function() {
     this.set('type', 'chord');
     if (this.get('default')) {
+      this.set('displayText', 'Root');
       this.execute = function() {
         var sound = this.get('parent').sound;
         sound.setChord(-1, -1, 'default');
       }
+    } else {
+      this.set('displayText', this.get('value'));
     }
   },
   execute: function() {
@@ -55,10 +61,13 @@ var PitchModel = Action.extend({
   initialize: function() {
     this.set('type', 'pitch');
     if (this.get('default')) {
+      this.set('displayText', 'C');
       this.execute = function() {
         var sound = this.get('parent').sound;
         sound.setPitch(-1, -1, 'default');
       }
+    } else {
+      this.set('displayText', this.get('value'));
     }
   },
   execute: function() {

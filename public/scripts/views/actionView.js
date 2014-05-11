@@ -29,10 +29,31 @@ module.exports = Backbone.View.extend({
 
   drawSpout: function() {
     var $canvas = this.$el.find(".spout");
+    var width = $canvas.width();
+    var height = $canvas.height();
     var canvas = $canvas[0];
     var context = canvas.getContext('2d');
 
-    // draw the background stuff
+    context.clearRect(0,0,width,height);
+    context.fillStyle = "#000000";
+    // left triangle
+    context.beginPath();
+    context.moveTo(0,0);
+    context.lineTo(width/2, height/2);
+    context.lineTo(0, height);
+    context.fill();
+
+    // right triangle
+    context.beginPath();
+    context.moveTo(width,0);
+    context.lineTo(width/2, height/2);
+    context.lineTo(width, height);
+    context.fill();
+  },
+
+  setModel: function(model) {
+    this.model = model;
+    this.render();
   },
 
   drawShape: function() {
@@ -56,40 +77,48 @@ module.exports = Backbone.View.extend({
     if (time) {
       var inc = time;
       function draw() {
-        func.apply(self,[inc/time]);
+        if (inc > 15000) {
+          func.apply(self,[1]); // just sit at max size until small enough to start shrinking
+        } else {
+          func.apply(self,[inc/15000]);
+        }
         inc = inc-100;
-        if (inc > 0) setTimeout(draw, 100);
+        if (inc > 0) self.timeout = setTimeout(draw, 100);
       }
+      draw();
     } else {
-      func.apply(self,[-1]);
+      clearTimeout(this.timeout);
+      func.apply(this,[-1]);
     }
   },
 
   drawCircle: function(ratio) {
-    console.log('drawing circle', ratio);
+    this.context.clearRect(0,0,this.context.stash.width,this.context.stash.height);
     this.context.fillStyle = "#0000FF";
     if (ratio == -1) {
       this.context.fillStyle = "#BBBBBB";
       ratio = 1;
     }
-    this.context.arc(this.context.stash.width/2, this.context.stash.height/2, ratio*this.context.stash.height/2, 0, 2*Math.PI, false);
+    this.context.beginPath();
+    this.context.arc(this.context.stash.width/2, this.context.stash.height/2, ratio*this.context.stash.height/2, 0, 2*Math.PI);
     this.context.fill();
   },
 
   drawSquare: function(ratio) {
-    console.log('drawing square', ratio);
+    this.context.clearRect(0,0,this.context.stash.width,this.context.stash.height);
     this.context.fillStyle = "#00FF00";
     if (ratio == -1) {
       this.context.fillStyle = "#BBBBBB";
       ratio = 1;
     }
+    this.context.beginPath();
     var hMiddle = this.context.stash.width/2;
     var vMiddle = this.context.stash.height/2;
     this.context.fillRect(hMiddle - (ratio*hMiddle), vMiddle - (ratio*vMiddle), ratio * 2 * hMiddle, ratio * 2 * vMiddle);
   },
 
   drawDiamond: function(ratio) {
-    console.log('drawing diamond', ratio);
+    this.context.clearRect(0,0,this.context.stash.width,this.context.stash.height);
     this.context.fillStyle = "#FF00FF";
     if (ratio == -1) {
       this.context.fillStyle = "#BBBBBB";

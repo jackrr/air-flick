@@ -9,11 +9,14 @@ module.exports = Backbone.View.extend({
 
   initialize: function() {
     this.listenTo(this.model, 'change', this.render);
+    this.audio = timbre("sin", {freq: 440, mul: 0.5});
   },
 
   render: function() {
+    // switch the comments below to toggle sound
+    this.audio.set({mul: this.model.get('magnitude'), freq: this.model.get('freq')});
+    //this.audio.set({mul: 0.0, freq: this.model.get('freq')}); 
     if (this.model.get('playing')) {
-      this.audio = timbre("sin", {freq: this.model.get('freq'), mul: this.model.get('magnitude')});
       this.audio.play();
     } else {
       this.audio.pause();
