@@ -15969,7 +15969,7 @@ $(function(){
   router.newRoom();
 });
 
-},{"./routes/index.js":17,"backbone":1,"jquery":3}],9:[function(require,module,exports){
+},{"./routes/index.js":18,"backbone":1,"jquery":3}],9:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var SineView = require('../views/sineView.js');
@@ -16055,7 +16055,7 @@ module.exports = {
   Pitch: PitchModel
 };
 
-},{"../views/sineView.js":29,"backbone":1,"jquery":3}],10:[function(require,module,exports){
+},{"../views/sineView.js":30,"backbone":1,"jquery":3}],10:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var DisplayView = require("../views/displayView.js");
@@ -16075,11 +16075,11 @@ module.exports = Backbone.Model.extend({
     var socket = this.get('socket');
 
     // *** comment out for production:
-    // console.log('starting run in 3 seconds');
-    // setTimeout(function() {
-      // self.view.allPositioned();
-      // self.actions = new ActionManager();
-    // }, 3000);
+    console.log('starting run in 3 seconds');
+    setTimeout(function() {
+      self.view.allPositioned();
+      self.actions = new ActionManager();
+    }, 3000);
 
 
 
@@ -16119,7 +16119,7 @@ module.exports = Backbone.Model.extend({
   }
 });
 
-},{"../modules/actionManager.js":15,"../views/displayView.js":25,"backbone":1,"jquery":3}],11:[function(require,module,exports){
+},{"../modules/actionManager.js":15,"../views/displayView.js":26,"backbone":1,"jquery":3}],11:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 
@@ -16138,7 +16138,7 @@ module.exports = Backbone.Model.extend({
   }
 });
 
-},{"../views/logInstanceView.js":26,"backbone":1,"jquery":3}],12:[function(require,module,exports){
+},{"../views/logInstanceView.js":27,"backbone":1,"jquery":3}],12:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 
@@ -16173,7 +16173,7 @@ module.exports = Backbone.Model.extend({
 
 });
 
-},{"../views/loggerView.js":27,"./logInstance.js":11,"backbone":1,"jquery":3}],13:[function(require,module,exports){
+},{"../views/loggerView.js":28,"./logInstance.js":11,"backbone":1,"jquery":3}],13:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var Display = require('./displayModel.js');
@@ -16194,8 +16194,8 @@ module.exports = Backbone.Model.extend({
 
   connect: function() {
     var self = this;
-    var socket = io.connect("http://photoplace.cs.oberlin.edu");
-    // var socket = io.connect("http://localhost:3000");
+    // var socket = io.connect("http://photoplace.cs.oberlin.edu");
+    var socket = io.connect("http://localhost:3000");
     socket.on('connectSuccess', function(data) {
       self.set({
         status: 'connected',
@@ -16204,7 +16204,7 @@ module.exports = Backbone.Model.extend({
 
 
       self.logger = new Logger({socket: socket});
-      // self.joinRoom('test'); // *** comment out for production
+      self.joinRoom('test'); // *** comment out for production
     });
   },
 
@@ -16226,7 +16226,7 @@ module.exports = Backbone.Model.extend({
   }
 });
 
-},{"../views/roomView.js":28,"./displayModel.js":10,"./logger.js":12,"backbone":1,"jquery":3,"socket.io-client":4}],14:[function(require,module,exports){
+},{"../views/roomView.js":29,"./displayModel.js":10,"./logger.js":12,"backbone":1,"jquery":3,"socket.io-client":4}],14:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var SoundView = require('../views/soundView.js');
@@ -16237,6 +16237,53 @@ module.exports = Backbone.Model.extend({
 
   initialize: function() {
     this.view = new SoundView({model: this});
+    var mul = Math.pow(2, 1/12);
+    this.intervals = {
+      3: {major: Math.pow(mul,4), minor: Math.pow(mul,3)},
+      5: {major: Math.pow(mul,7), dim: Math.pow(mul,6)},
+      7: {major: Math.pow(mul,11), minor: Math.pow(mul,10)}
+    }
+  },
+
+  setTones: function() {
+    var name = this.get('chord');
+    var root = this.get('freq');
+    var freqs = [];
+    // the root
+    freqs.push(root);
+
+    // the third
+    if (name == 'maj' || name == '7' || name == 'maj7') {
+      freqs.push(this.intervals[3].major * root);
+    } else {
+      freqs.push(this.intervals[3].minor * root);
+    }
+
+    // 5th is always the same
+    freqs.push(this.intervals[5].major * root);
+
+    // the 7th, not always present
+    if (name == 'min' || name == 'maj') {
+      freqs.push(-1);
+    } else if (name == '7' || 'min7') {
+      freqs.push(this.intervals[7].minor * root);
+    } else { // maj7
+      freqs.push(this.intervals[7].major * root);
+    }
+    this.set('freqs', freqs);
+  },
+
+  setChord: function(name, duration, def) {
+    var names = ['maj', 'maj7', 'min', '7', 'min7'];
+    if (def) {
+      console.log('unsetting chord');
+      this.unset('chord'); 
+    } else if (names.indexOf(name) > -1) {
+      this.set('chord', name);
+      this.setTones();
+    } else {
+      console.log('ERROR: bad chord name ', name);
+    }
   },
 
   setPitch: function(pitch, duration, def) {
@@ -16251,6 +16298,7 @@ module.exports = Backbone.Model.extend({
     };
     if (def) {
       this.set('freq', pitches.C);
+      if (this.get('chord')) this.setTones();
       return;
     }
     var freq = pitches[pitch];
@@ -16259,6 +16307,7 @@ module.exports = Backbone.Model.extend({
       return;
     }
     this.set('freq', freq);
+    if (this.get('chord')) this.setTones();
   },
 
   setVolume: function(value, duration, def) {
@@ -16269,9 +16318,6 @@ module.exports = Backbone.Model.extend({
     }
   },
 
-  setChord: function(name, duration, def) {
-    // this stuff is harder
-  },
 
   play: function() {
     this.set('playing', true);
@@ -16282,13 +16328,13 @@ module.exports = Backbone.Model.extend({
   }
 });
 
-},{"../views/soundView.js":30,"backbone":1,"jquery":3}],15:[function(require,module,exports){
+},{"../views/soundView.js":31,"backbone":1,"jquery":3}],15:[function(require,module,exports){
 var Queue = require('./queue.js');
 var Sound = require('../models/soundModel.js');
 var Actions = require('../models/actionModel.js');
 var SineView = require('../views/sineView.js');
 var ActionView = require('../views/actionView.js');
-// var testModule = require('./testModule.js'); // comment out for production
+var testModule = require('./testModule.js'); // comment out for production
 var Volume = Actions.Volume;
 var Chord = Actions.Chord;
 var Pitch = Actions.Pitch;
@@ -16318,7 +16364,7 @@ var Manager = function() {
 
   this.startPlaying();
 
-  // testModule.runTests(this); // comment out for production
+  testModule.runTests(this); // comment out for production
 };
 
 Manager.prototype.addAction = function(action) {
@@ -16385,7 +16431,6 @@ Manager.prototype.stopPlaying = function() {
 };
 
 Manager.prototype.executeChord = function(c, def) {
-  this.views.chord.setModel(c);
   c.execute();
   if (def) {
     delete this.current.chord;
@@ -16395,7 +16440,7 @@ Manager.prototype.executeChord = function(c, def) {
     // this is going to be complex
     this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude'), color: "#00FF00"});
   }
-  this.chordSine.setModel(c);
+  this.views.chord.setModel(c);
 };
 
 Manager.prototype.executeVol = function(vol, def) {
@@ -16441,11 +16486,78 @@ Manager.prototype.executePitch = function(p, def) {
 
 module.exports = Manager;
 
-},{"../models/actionModel.js":9,"../models/soundModel.js":14,"../views/actionView.js":24,"../views/sineView.js":29,"./queue.js":16}],16:[function(require,module,exports){
+},{"../models/actionModel.js":9,"../models/soundModel.js":14,"../views/actionView.js":25,"../views/sineView.js":30,"./queue.js":16,"./testModule.js":17}],16:[function(require,module,exports){
 //code.stephenmorley.org
 module.exports=function(){var a=[],b=0;this.getLength=function(){return a.length-b};this.isEmpty=function(){return 0==a.length};this.enqueue=function(b){a.push(b)};this.dequeue=function(){if(0!=a.length){var c=a[b];2*++b>=a.length&&(a=a.slice(b),b=0);return c}};this.peek=function(){return 0<a.length?a[b]:void 0}};
 
 },{}],17:[function(require,module,exports){
+
+
+
+var actions = [{
+    type: 'volume',
+    duration: '15000',
+    value: '1.8'
+  }, {
+    type: 'chord',
+    duration: '10000',
+    value: 'maj'
+  }, {
+    type: 'pitch',
+    duration: '10000',
+    value: 'D'
+  }, {
+    type: 'volume',
+    duration: '10000',
+    value: '0.1'
+  }, {
+    type: 'pitch',
+    duration: '10000',
+    value: 'F'
+  }, {
+    type: 'chord',
+    duration: '10000',
+    value: 'min'
+  }, {
+    type: 'chord',
+    duration: '10000',
+    value: 'maj7'
+  }, {
+    type: 'chord',
+    duration: '10000',
+    value: 'min7'
+  }, {
+    type: 'chord',
+    duration: '10000',
+    value: '7'
+  }, {
+    type: 'pitch',
+    duration: '20000',
+    value: 'A'
+  }
+];
+
+function sendActions(index, manager) {
+  if (!actions[index]) return;
+  console.log('sending action', actions[index]);
+
+  manager.addAction(actions[index]);
+
+  setTimeout(function() { sendActions(index+1,manager)}, 5000);
+}
+
+
+var start = function(manager) {
+  setTimeout(function() {
+    sendActions(0,manager);
+  }, 2000);
+};
+
+module.exports = {
+  runTests: start
+}
+
+},{}],18:[function(require,module,exports){
 var Room = require('../models/roomModel.js');
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
@@ -16471,25 +16583,25 @@ module.exports = Backbone.Router.extend({
   }
 });
 
-},{"../models/roomModel.js":13,"backbone":1,"jquery":3}],18:[function(require,module,exports){
+},{"../models/roomModel.js":13,"backbone":1,"jquery":3}],19:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
 (function(){dust.register("action",body_0);function body_0(chk,ctx){return chk.write("<div class=\"shapeContainer\"><span class=\"text\">").reference(ctx.get(["displayText"], false),ctx,"h").write("</span><canvas class=\"shape\" height=\"100\" width=\"100\"></canvas><canvas class=\"spout\" height=\"400\" width=\"100\"></canvas></div>");}return body_0;})();
-},{"../dust-core.min.js":7}],19:[function(require,module,exports){
-var dust = require('../dust-core.min.js');
-(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<div class=\"infoBar\"></div><div class=\"waveArea\"><div id=\"plain\"></div><div id=\"pitch\"></div><div id=\"vol\"></div><div id=\"chord\"></div></div>");}return body_0;})();
 },{"../dust-core.min.js":7}],20:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("logInstance",body_0);function body_0(chk,ctx){return chk.write("<div id=\"logInstance").reference(ctx.get(["cid"], false),ctx,"h").write("\" class=\"logInstance\"><span class=\"message\">").reference(ctx.get(["message"], false),ctx,"h").write("</span><span class=\"close\">[x]</span></div>");}return body_0;})();
+(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<div class=\"infoBar\"></div><div class=\"waveArea\"><div id=\"plain\"></div><div id=\"pitch\"></div><div id=\"vol\"></div><div id=\"chord\"></div></div>");}return body_0;})();
 },{"../dust-core.min.js":7}],21:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("logger",body_0);function body_0(chk,ctx){return chk.write("<div class=\"logArea\"><div>Log</div><div id=\"logInstances\"></div></div>");}return body_0;})();
+(function(){dust.register("logInstance",body_0);function body_0(chk,ctx){return chk.write("<div id=\"logInstance").reference(ctx.get(["cid"], false),ctx,"h").write("\" class=\"logInstance\"><span class=\"message\">").reference(ctx.get(["message"], false),ctx,"h").write("</span><span class=\"close\">[x]</span></div>");}return body_0;})();
 },{"../dust-core.min.js":7}],22:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("room",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1><p>").reference(ctx.get(["status"], false),ctx,"h").write("</p><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><div class=\"joinNew\">Create a new room</div><div class=\"joinExisting\">Join a room</div>");}return body_0;})();
+(function(){dust.register("logger",body_0);function body_0(chk,ctx){return chk.write("<div class=\"logArea\"><div>Log</div><div id=\"logInstances\"></div></div>");}return body_0;})();
 },{"../dust-core.min.js":7}],23:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("sine",body_0);function body_0(chk,ctx){return chk.write("<div class=\"sineContainer\"><div class=\"action\"></div><canvas class=\"sine\" height=\"400\" width=\"250\"></canvas></div>");}return body_0;})();
+(function(){dust.register("room",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1><p>").reference(ctx.get(["status"], false),ctx,"h").write("</p><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><div class=\"joinNew\">Create a new room</div><div class=\"joinExisting\">Join a room</div>");}return body_0;})();
 },{"../dust-core.min.js":7}],24:[function(require,module,exports){
+var dust = require('../dust-core.min.js');
+(function(){dust.register("sine",body_0);function body_0(chk,ctx){return chk.write("<div class=\"sineContainer\"><div class=\"action\"></div><canvas class=\"sine\" height=\"400\" width=\"250\"></canvas></div>");}return body_0;})();
+},{"../dust-core.min.js":7}],25:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16628,7 +16740,7 @@ module.exports = Backbone.View.extend({
 
 });
 
-},{"../dust-core.min.js":7,"../templates/action.js":18,"backbone":1,"jquery":3}],25:[function(require,module,exports){
+},{"../dust-core.min.js":7,"../templates/action.js":19,"backbone":1,"jquery":3}],26:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16668,7 +16780,7 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":7,"../templates/display.js":19,"backbone":1,"jquery":3}],26:[function(require,module,exports){
+},{"../dust-core.min.js":7,"../templates/display.js":20,"backbone":1,"jquery":3}],27:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 var _ = require('underscore');
@@ -16710,7 +16822,7 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":7,"../templates/logInstance.js":20,"backbone":1,"jquery":3,"underscore":5}],27:[function(require,module,exports){
+},{"../dust-core.min.js":7,"../templates/logInstance.js":21,"backbone":1,"jquery":3,"underscore":5}],28:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16740,7 +16852,7 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":7,"../templates/logger.js":21,"backbone":1,"jquery":3}],28:[function(require,module,exports){
+},{"../dust-core.min.js":7,"../templates/logger.js":22,"backbone":1,"jquery":3}],29:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16782,7 +16894,7 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":7,"../templates/room.js":22,"backbone":1,"jquery":3}],29:[function(require,module,exports){
+},{"../dust-core.min.js":7,"../templates/room.js":23,"backbone":1,"jquery":3}],30:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16861,7 +16973,7 @@ module.exports = Backbone.View.extend({
   }
 });
 
-},{"../dust-core.min.js":7,"../templates/sine.js":23,"backbone":1,"jquery":3}],30:[function(require,module,exports){
+},{"../dust-core.min.js":7,"../templates/sine.js":24,"backbone":1,"jquery":3}],31:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
 Backbone.$ = $;
@@ -16872,18 +16984,46 @@ module.exports = Backbone.View.extend({
   el: '#sounds',
 
   initialize: function() {
-    this.listenTo(this.model, 'change', this.render);
-    this.audio = timbre("sin", {freq: 440, mul: 0.5});
+    this.listenTo(this.model, 'change:freqs change:freq change:magnitude', this.render);
+    this.audios = [timbre("sin", {freq: 440, mul: 0.5})];
   },
 
   render: function() {
-    // switch the comments below to toggle sound
-    this.audio.set({mul: this.model.get('magnitude'), freq: this.model.get('freq')});
-    //this.audio.set({mul: 0.0, freq: this.model.get('freq')}); 
-    if (this.model.get('playing')) {
-      this.audio.play();
+    if (this.model.get('chord')) {
+      console.log('render sound with chord');
+      this.wasChord = true;
+      var tones = this.model.get('freqs');
+
+      for (var i = 0; i < tones.length; i++) {
+        if (tones[i] == -1) {
+          if (this.audios[i]) this.audios[i].pause();
+          continue;
+        }
+        if (!this.audios[i]) {
+          this.audios[i] = timbre("sin", {freq: tones[i], mul: this.model.get('magnitude')});
+        } else {
+          this.audios[i].set({mul: this.model.get('magnitude'), freq: tones[i]});
+        }
+        if (this.model.get('playing')) {
+          this.audios[i].play();
+        } else {
+          this.audios[i].pause();
+        }
+      }
     } else {
-      this.audio.pause();
+      console.log('render sound without chord');
+      if (this.wasChord) {
+        for (var i = 1; i < this.audios.length; i++) this.audios[i].pause();
+        this.wasChord = undefined;
+      }
+      // switch the comments below to toggle sound
+      this.audios[0].set({mul: this.model.get('magnitude'), freq: this.model.get('freq')});
+      //this.audio.set({mul: 0.0, freq: this.model.get('freq')}); 
+      if (this.model.get('playing')) {
+        this.audios[0].play();
+      } else {
+        this.audios[0].pause();
+      }
     }
   }
 });

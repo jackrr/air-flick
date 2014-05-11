@@ -3,7 +3,7 @@ var Sound = require('../models/soundModel.js');
 var Actions = require('../models/actionModel.js');
 var SineView = require('../views/sineView.js');
 var ActionView = require('../views/actionView.js');
-// var testModule = require('./testModule.js'); // comment out for production
+var testModule = require('./testModule.js'); // comment out for production
 var Volume = Actions.Volume;
 var Chord = Actions.Chord;
 var Pitch = Actions.Pitch;
@@ -33,7 +33,7 @@ var Manager = function() {
 
   this.startPlaying();
 
-  // testModule.runTests(this); // comment out for production
+  testModule.runTests(this); // comment out for production
 };
 
 Manager.prototype.addAction = function(action) {
@@ -100,7 +100,6 @@ Manager.prototype.stopPlaying = function() {
 };
 
 Manager.prototype.executeChord = function(c, def) {
-  this.views.chord.setModel(c);
   c.execute();
   if (def) {
     delete this.current.chord;
@@ -110,7 +109,7 @@ Manager.prototype.executeChord = function(c, def) {
     // this is going to be complex
     this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude'), color: "#00FF00"});
   }
-  this.chordSine.setModel(c);
+  this.views.chord.setModel(c);
 };
 
 Manager.prototype.executeVol = function(vol, def) {

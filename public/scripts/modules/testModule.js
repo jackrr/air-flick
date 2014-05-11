@@ -6,6 +6,10 @@ var actions = [{
     duration: '15000',
     value: '1.8'
   }, {
+    type: 'chord',
+    duration: '10000',
+    value: 'maj'
+  }, {
     type: 'pitch',
     duration: '10000',
     value: 'D'
@@ -17,6 +21,22 @@ var actions = [{
     type: 'pitch',
     duration: '10000',
     value: 'F'
+  }, {
+    type: 'chord',
+    duration: '10000',
+    value: 'min'
+  }, {
+    type: 'chord',
+    duration: '10000',
+    value: 'maj7'
+  }, {
+    type: 'chord',
+    duration: '10000',
+    value: 'min7'
+  }, {
+    type: 'chord',
+    duration: '10000',
+    value: '7'
   }, {
     type: 'pitch',
     duration: '20000',
