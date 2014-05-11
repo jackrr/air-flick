@@ -7,6 +7,7 @@ var dust = require('../dust-core.min.js');
 
 module.exports = Backbone.View.extend({
   initialize: function() {
+    this.stopped = true;
     this.render();
   },
 
@@ -17,6 +18,16 @@ module.exports = Backbone.View.extend({
       self.$el.html(out);
       self.modified();
     });
+  },
+
+  stop: function() {
+    this.stopped = true;
+    this.modified();
+  },
+
+  start: function() {
+    this.stopped = false;
+    this.modified();
   },
 
   changeWave: function(options) {
@@ -39,7 +50,21 @@ module.exports = Backbone.View.extend({
     context.stash.xAxis = context.stash.height/2;
     context.stash.yAxis = 0;
     this.context = context;
-    this.animate();
+    if (this.stopped) {
+      this.flatLine();
+    } else {
+      this.animate();
+    }
+  },
+
+  flatLine: function() {
+    var context = this.context;
+    var config = context.stash;
+    context.clearRect(0,0, config.width, config.height);
+    context.beginPath();
+    context.moveTo(config.yAxis, config.xAxis);
+    context.lineTo(config.width, config.xAxis);
+    context.stroke();
   },
 
   animate: function(options) {
