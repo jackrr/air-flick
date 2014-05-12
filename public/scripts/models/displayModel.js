@@ -17,11 +17,11 @@ module.exports = Backbone.Model.extend({
     var socket = this.get('socket');
 
     // *** comment out for production:
-    console.log('starting run in 3 seconds');
-    setTimeout(function() {
-      self.view.allPositioned();
-      self.actions = new ActionManager();
-    }, 3000);
+    // console.log('starting run in 3 seconds');
+    // setTimeout(function() {
+      // self.view.allPositioned();
+      // self.actions = new ActionManager();
+    // }, 3000);
 
 
 

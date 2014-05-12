@@ -3,7 +3,7 @@ var Sound = require('../models/soundModel.js');
 var Actions = require('../models/actionModel.js');
 var SineView = require('../views/sineView.js');
 var ActionView = require('../views/actionView.js');
-var testModule = require('./testModule.js'); // comment out for production
+// var testModule = require('./testModule.js'); // comment out for production
 var Volume = Actions.Volume;
 var Chord = Actions.Chord;
 var Pitch = Actions.Pitch;
@@ -33,7 +33,7 @@ var Manager = function() {
 
   this.startPlaying();
 
-  testModule.runTests(this); // comment out for production
+  // testModule.runTests(this); // comment out for production
 };
 
 Manager.prototype.addAction = function(action) {
@@ -92,6 +92,11 @@ Manager.prototype.nextAction = function(type) {
 };
 
 Manager.prototype.startPlaying = function() {
+  this.plainSine.start();
+  this.volSine.start();
+  this.chordSine.start();
+  this.pitchSine.start();
+
   this.sound.play();
 };
 
@@ -106,8 +111,7 @@ Manager.prototype.executeChord = function(c, def) {
     this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude')});
   } else {
     this.current.chord = c;
-    // this is going to be complex
-    this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude'), color: "#00FF00"});
+    this.chordSine.animateChord({freqs: this.sound.get('freqs'), mag: this.sound.get('magnitude'), color: "#00FF00"});
   }
   this.views.chord.setModel(c);
 };
@@ -122,8 +126,7 @@ Manager.prototype.executeVol = function(vol, def) {
     this.volSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude'), color: "#0000FF"});
   }
   if (this.current.chord) {
-    // this is going to be complex
-    this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude'), color: "#00FF00"});
+    this.chordSine.animateChord({freqs: this.sound.get('freqs'), mag: this.sound.get('magnitude'), color: "#00FF00"});
   } else {
     this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude')});
   }
@@ -145,8 +148,7 @@ Manager.prototype.executePitch = function(p, def) {
     this.volSine.animate({freq: this.sound.get('freq')});
   }
   if (this.current.chord) {
-    // this is going to be complex
-    this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude'), color: "#00FF00"});
+    this.chordSine.animateChord({freqs: this.sound.get('freqs'), mag: this.sound.get('magnitude'), color: "#00FF00"});
   } else {
     this.chordSine.animate({freq: this.sound.get('freq'), mag: this.sound.get('magnitude')});
   }

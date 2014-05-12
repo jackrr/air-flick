@@ -22,12 +22,11 @@ module.exports = Backbone.View.extend({
 
   stop: function() {
     this.stopped = true;
-    this.modified();
   },
 
   start: function() {
     this.stopped = false;
-    this.modified();
+    this.animate();
   },
 
   changeWave: function(options) {
@@ -65,6 +64,47 @@ module.exports = Backbone.View.extend({
     context.moveTo(config.yAxis, config.xAxis);
     context.lineTo(config.width, config.xAxis);
     context.stroke();
+  },
+
+  animateChord: function(options) {
+    var context = this.context;
+    var config = context.stash;
+    var self = this;
+    clearTimeout(this.timeout);
+
+    context.strokeStyle = options.color;
+
+    var freqs = [];
+    for (var index = 0; index < options.freqs.length; index++) {
+      if (options.freqs[index] != -1) freqs.push(options.freqs[index]);
+    }
+    console.log(freqs, length);
+    var length = freqs.length;
+    var height = config.height/length;
+
+    function drawWaves(t) {
+      context.clearRect(0,0, config.width, config.height);
+
+      for (var index = 0; index < length; index++) {
+        var freq = freqs[index];
+        if (freq == -1) continue;
+        var xaxis = (index+0.5) * height;
+        var x = t;
+        var y = options.mag * (Math.sin(4*x) * config.xAxis / length);
+        context.beginPath();
+        context.moveTo(config.yAxis+2, y + xaxis);
+
+        for (var i = config.yAxis+2; i <= config.width; i += 4) {
+          x = (freq/440) * (t + (i/100));
+          y = options.mag * (Math.sin(4*x) * config.xAxis / length);
+          context.lineTo(i, y+xaxis);
+        }
+        context.stroke();
+      }
+
+      self.timeout = setTimeout(function() {drawWaves(t+.4)}, 30);
+    }
+    drawWaves(0);
   },
 
   animate: function(options) {

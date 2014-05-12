@@ -8,7 +8,7 @@ module.exports = Backbone.View.extend({
   el: '#sounds',
 
   initialize: function() {
-    this.listenTo(this.model, 'change:freqs change:freq change:magnitude', this.render);
+    this.listenTo(this.model, 'change:playing change:freqs change:freq change:magnitude', this.render);
     this.audios = [timbre("sin", {freq: 440, mul: 0.5})];
   },
 
