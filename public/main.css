@@ -12,12 +12,20 @@ body {
 
 .action .text {
   position: absolute;
-  top: 186px;
+  top: 138px;
   left: -50px;
+  width: 100px;
+  height: 120px;
   font-size: 20px;
-  background-color: #000000;
+  text-align: center;
+}
+
+.action .textContent {
+  position: relative;
   color: #ffffff;
-  padding: 1px 6px;
+  padding: 1px 4px;
+  display: block;
+  background-color: #000000;
   z-index: 15;
 }
 
