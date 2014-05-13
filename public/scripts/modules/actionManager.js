@@ -3,7 +3,7 @@ var Actions = require('../models/actionModel.js');
 var ActionQueue = require('../models/actionQueueModel.js');
 var SineView = require('../views/sineView.js');
 var ActionView = require('../views/actionView.js');
-var testModule = require('./testModule.js'); // comment out for production
+// var testModule = require('./testModule.js'); // comment out for production
 var Volume = Actions.Volume;
 var Chord = Actions.Chord;
 var Pitch = Actions.Pitch;
@@ -34,7 +34,7 @@ var Manager = function() {
 
   this.startPlaying();
 
-  testModule.runTests(this); // comment out for production
+  // testModule.runTests(this); // comment out for production
 };
 
 Manager.prototype.addAction = function(action) {
