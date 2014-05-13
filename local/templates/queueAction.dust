@@ -1,0 +1,9 @@
+<div id="queueAction_{cid}" class="queueAction">
+  <div class="text">
+    <span class="textContent">{displayText}</span>
+  </div>
+  <div class="time">
+    <span class="timeContent">{time}</span>
+  </div>
+  <canvas class="shape" height="25" width="25"></canvas>
+</div>

@@ -1,6 +1,6 @@
-var Queue = require('./queue.js');
 var Sound = require('../models/soundModel.js');
 var Actions = require('../models/actionModel.js');
+var ActionQueue = require('../models/actionQueueModel.js');
 var SineView = require('../views/sineView.js');
 var ActionView = require('../views/actionView.js');
 var testModule = require('./testModule.js'); // comment out for production
@@ -9,9 +9,10 @@ var Chord = Actions.Chord;
 var Pitch = Actions.Pitch;
 
 var Manager = function() {
-  this.vols = new Queue();
-  this.pitches = new Queue();
-  this.chords = new Queue();
+  this.vols = new ActionQueue({type: 'volume'});
+  this.pitches = new ActionQueue({type: 'pitch'});
+  this.chords = new ActionQueue({type: 'chord'});
+
   this.sound = new Sound({'freq': 440, 'magnitude': .5});
   this.current = {};
   this.defaults = {

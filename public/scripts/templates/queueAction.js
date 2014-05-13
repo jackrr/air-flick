@@ -1,0 +1,2 @@
+var dust = require('../dust-core.min.js');
+(function(){dust.register("queueAction",body_0);function body_0(chk,ctx){return chk.write("<div id=\"queueAction_").reference(ctx.get(["cid"], false),ctx,"h").write("\" class=\"queueAction\"><div class=\"text\"><span class=\"textContent\">").reference(ctx.get(["displayText"], false),ctx,"h").write("</span></div><div class=\"time\"><span class=\"timeContent\">").reference(ctx.get(["time"], false),ctx,"h").write("</span></div><canvas class=\"shape\" height=\"25\" width=\"25\"></canvas></div>");}return body_0;})();

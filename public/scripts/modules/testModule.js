@@ -14,13 +14,29 @@ var actions = [{
     duration: '10000',
     value: 'D'
   }, {
-    type: 'volume',
+    type: 'pitch',
     duration: '10000',
-    value: '0.1'
+    value: 'E'
   }, {
     type: 'pitch',
     duration: '10000',
     value: 'F'
+  }, {
+    type: 'volume',
+    duration: '10000',
+    value: '0.2'
+  }, {
+    type: 'volume',
+    duration: '10000',
+    value: '0.7'
+  }, {
+    type: 'volume',
+    duration: '10000',
+    value: '1.6'
+  }, {
+    type: 'pitch',
+    duration: '10000',
+    value: 'D'
   }, {
     type: 'chord',
     duration: '10000',
@@ -50,14 +66,14 @@ function sendActions(index, manager) {
 
   manager.addAction(actions[index]);
 
-  setTimeout(function() { sendActions(index+1,manager)}, 5000);
+  setTimeout(function() { sendActions(index+1,manager)}, 3000);
 }
 
 
 var start = function(manager) {
   setTimeout(function() {
     sendActions(0,manager);
-  }, 2000);
+  }, 1000);
 };
 
 module.exports = {
