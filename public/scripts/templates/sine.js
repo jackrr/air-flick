@@ -1,2 +1,2 @@
 var dust = require('../dust-core.min.js');
-(function(){dust.register("sine",body_0);function body_0(chk,ctx){return chk.write("<div class=\"sineContainer\"><div class=\"action\"></div><canvas class=\"sine\" height=\"400\" width=\"250\"></canvas></div>");}return body_0;})();
+(function(){dust.register("sine",body_0);function body_0(chk,ctx){return chk.write("<div class=\"sineContainer\"><div class=\"action\"></div><canvas class=\"sine\" height=\"400\" width=\"250\"></canvas><div class=\"actionQueue\"></div></div>");}return body_0;})();

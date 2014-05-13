@@ -59,6 +59,45 @@ canvas.sine {
   left: 50px;
 }
 
+.actionQueue {
+  position: absolute;
+  width: 100px;
+  left: -50px;
+  top: 450px;
+}
+
+.queueAction {
+  position: relative;
+  width: 75px;
+  height: 75px;
+  margin: 2px auto;
+}
+
+.queueAction .text {
+  position: absolute;
+  top: 20px;
+  text-align: center;
+  width: 100%;
+}
+
+.queueAction .text span {
+  background-color: #ffffff;
+  padding:2px;
+}
+.queueAction .time {
+  position: absolute;
+  top: 40px;
+  text-align: center;
+  width: 100%;
+}
+.queueAction .time span {
+  background-color: #ffffff;
+  padding:2px;
+}
+
+
+/*
+
 #bars {
   position: fixed;
   width: 100%;
@@ -77,6 +116,7 @@ canvas.sine {
   bottom: 100px;
   width: 100%;
 }
+*/
 
 #attn {
   font-size: 30px;

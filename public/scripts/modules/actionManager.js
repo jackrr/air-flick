@@ -9,7 +9,7 @@ var Chord = Actions.Chord;
 var Pitch = Actions.Pitch;
 
 var Manager = function() {
-  this.vols = new ActionQueue({type: 'volume'});
+  this.vols = new ActionQueue({type: 'vol'});
   this.pitches = new ActionQueue({type: 'pitch'});
   this.chords = new ActionQueue({type: 'chord'});
 

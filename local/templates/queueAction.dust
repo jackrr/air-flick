@@ -5,5 +5,5 @@
   <div class="time">
     <span class="timeContent">{time}</span>
   </div>
-  <canvas class="shape" height="25" width="25"></canvas>
+  <canvas class="shape" height="75" width="75"></canvas>
 </div>

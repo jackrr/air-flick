@@ -16078,7 +16078,7 @@ module.exports = Backbone.Model.extend({
   },
 
   enqueue: function(action) {
-    this.views.enqueue(new View({model: action, type: this.get('type'), el: '#' + this.get('type') + '_queue'}));
+    this.views.enqueue(new View({model: action, type: this.get('type'), el: '#' + this.get('type') + ' .actionQueue'}));
     return this.queue.enqueue(action);
   },
 
@@ -16382,7 +16382,7 @@ var Chord = Actions.Chord;
 var Pitch = Actions.Pitch;
 
 var Manager = function() {
-  this.vols = new ActionQueue({type: 'volume'});
+  this.vols = new ActionQueue({type: 'vol'});
   this.pitches = new ActionQueue({type: 'pitch'});
   this.chords = new ActionQueue({type: 'chord'});
 
@@ -16541,8 +16541,16 @@ module.exports=function(){var a=[],b=0;this.getLength=function(){return a.length
 
 var actions = [{
     type: 'volume',
-    duration: '15000',
+    duration: '10000',
     value: '1.8'
+  }, {
+    type: 'volume',
+    duration: '10000',
+    value: '1.2'
+  }, {
+    type: 'volume',
+    duration: '10000',
+    value: '0.2'
   }, {
     type: 'chord',
     duration: '10000',
@@ -16604,7 +16612,7 @@ function sendActions(index, manager) {
 
   manager.addAction(actions[index]);
 
-  setTimeout(function() { sendActions(index+1,manager)}, 3000);
+  setTimeout(function() { sendActions(index+1,manager)}, 1000);
 }
 
 
@@ -16649,7 +16657,7 @@ var dust = require('../dust-core.min.js');
 (function(){dust.register("action",body_0);function body_0(chk,ctx){return chk.write("<div class=\"shapeContainer\"><div class=\"text\"><span class=\"textContent\">").reference(ctx.get(["displayText"], false),ctx,"h").write("</span></div><canvas class=\"shape\" height=\"100\" width=\"100\"></canvas><canvas class=\"spout\" height=\"400\" width=\"100\"></canvas></div>");}return body_0;})();
 },{"../dust-core.min.js":7}],21:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<div class=\"infoBar\"></div><div class=\"waveArea\"><div id=\"plain\"></div><div id=\"pitch\"></div><div id=\"vol\"></div><div id=\"chord\"></div></div><div class=\"queues\"><div id=\"volume_queue\"></div><div id=\"pitch_queue\"></div><div id=\"chord_queue\"></div></div>");}return body_0;})();
+(function(){dust.register("display",body_0);function body_0(chk,ctx){return chk.write("<div class=\"infoBar\"></div><div class=\"waveArea\"><div id=\"plain\"></div><div id=\"pitch\"></div><div id=\"vol\"></div><div id=\"chord\"></div></div>");}return body_0;})();
 },{"../dust-core.min.js":7}],22:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
 (function(){dust.register("logInstance",body_0);function body_0(chk,ctx){return chk.write("<div id=\"logInstance").reference(ctx.get(["cid"], false),ctx,"h").write("\" class=\"logInstance\"><span class=\"message\">").reference(ctx.get(["message"], false),ctx,"h").write("</span><span class=\"close\">[x]</span></div>");}return body_0;})();
@@ -16658,13 +16666,13 @@ var dust = require('../dust-core.min.js');
 (function(){dust.register("logger",body_0);function body_0(chk,ctx){return chk.write("<div class=\"logArea\"><div>Log</div><div id=\"logInstances\"></div></div>");}return body_0;})();
 },{"../dust-core.min.js":7}],24:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("queueAction",body_0);function body_0(chk,ctx){return chk.write("<div id=\"queueAction_").reference(ctx.get(["cid"], false),ctx,"h").write("\" class=\"queueAction\"><div class=\"text\"><span class=\"textContent\">").reference(ctx.get(["displayText"], false),ctx,"h").write("</span></div><div class=\"time\"><span class=\"timeContent\">").reference(ctx.get(["time"], false),ctx,"h").write("</span></div><canvas class=\"shape\" height=\"25\" width=\"25\"></canvas></div>");}return body_0;})();
+(function(){dust.register("queueAction",body_0);function body_0(chk,ctx){return chk.write("<div id=\"queueAction_").reference(ctx.get(["cid"], false),ctx,"h").write("\" class=\"queueAction\"><div class=\"text\"><span class=\"textContent\">").reference(ctx.get(["displayText"], false),ctx,"h").write("</span></div><div class=\"time\"><span class=\"timeContent\">").reference(ctx.get(["time"], false),ctx,"h").write("</span></div><canvas class=\"shape\" height=\"75\" width=\"75\"></canvas></div>");}return body_0;})();
 },{"../dust-core.min.js":7}],25:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
 (function(){dust.register("room",body_0);function body_0(chk,ctx){return chk.write("<h1>ROOM VIEW</h1><p>").reference(ctx.get(["status"], false),ctx,"h").write("</p><p>").reference(ctx.get(["id"], false),ctx,"h").write("</p><div class=\"joinNew\">Create a new room</div><div class=\"joinExisting\">Join a room</div>");}return body_0;})();
 },{"../dust-core.min.js":7}],26:[function(require,module,exports){
 var dust = require('../dust-core.min.js');
-(function(){dust.register("sine",body_0);function body_0(chk,ctx){return chk.write("<div class=\"sineContainer\"><div class=\"action\"></div><canvas class=\"sine\" height=\"400\" width=\"250\"></canvas></div>");}return body_0;})();
+(function(){dust.register("sine",body_0);function body_0(chk,ctx){return chk.write("<div class=\"sineContainer\"><div class=\"action\"></div><canvas class=\"sine\" height=\"400\" width=\"250\"></canvas><div class=\"actionQueue\"></div></div>");}return body_0;})();
 },{"../dust-core.min.js":7}],27:[function(require,module,exports){
 var $ = require('jquery')(window);
 var Backbone = require('backbone');
@@ -16697,7 +16705,6 @@ module.exports = Backbone.View.extend({
   },
 
   drawSpout: function() {
-    console.log('drawing spout');
     var $canvas = this.$el.find(".spout");
     var width = $canvas.width();
     var height = $canvas.height();
@@ -16967,9 +16974,10 @@ module.exports = Backbone.View.extend({
     var self = this;
     dust.render('queueAction', _.extend({cid: this.model.cid}, this.model.attributes), function(err, out) {
       if (err) console.log(err);
-      self.$el.prepend(out);
+      self.$el.append(out);
       var $canvas = self.$el.children('#queueAction_'+self.model.cid).find("canvas");
       var canvas = $canvas[0];
+      if (!canvas) return;
       self.context = canvas.getContext('2d');
       self.context.stash = {};
       self.context.stash.height = $canvas.height();
@@ -16979,7 +16987,19 @@ module.exports = Backbone.View.extend({
   },
 
   remove: function() {
-    this.$el.children('#queueAction_'+this.model.cid).remove();
+    //this.clearShape();
+    this.slideRemove();
+  },
+
+  clearShape: function() {
+    this.context.clearRect(0,0,this.context.stash.width,this.context.stash.height);
+  },
+
+  slideRemove: function() {
+    var $self = this.$el.children('#queueAction_'+this.model.cid) ;
+    $self.animate({top: -220}, 2000, function() {
+      $self.remove();
+    });
   },
 
   drawCircle: function() {

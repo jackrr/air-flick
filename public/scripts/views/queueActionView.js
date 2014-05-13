@@ -28,9 +28,10 @@ module.exports = Backbone.View.extend({
     var self = this;
     dust.render('queueAction', _.extend({cid: this.model.cid}, this.model.attributes), function(err, out) {
       if (err) console.log(err);
-      self.$el.prepend(out);
+      self.$el.append(out);
       var $canvas = self.$el.children('#queueAction_'+self.model.cid).find("canvas");
       var canvas = $canvas[0];
+      if (!canvas) return;
       self.context = canvas.getContext('2d');
       self.context.stash = {};
       self.context.stash.height = $canvas.height();
@@ -40,7 +41,19 @@ module.exports = Backbone.View.extend({
   },
 
   remove: function() {
-    this.$el.children('#queueAction_'+this.model.cid).remove();
+    //this.clearShape();
+    this.slideRemove();
+  },
+
+  clearShape: function() {
+    this.context.clearRect(0,0,this.context.stash.width,this.context.stash.height);
+  },
+
+  slideRemove: function() {
+    var $self = this.$el.children('#queueAction_'+this.model.cid) ;
+    $self.animate({top: -220}, 2000, function() {
+      $self.remove();
+    });
   },
 
   drawCircle: function() {

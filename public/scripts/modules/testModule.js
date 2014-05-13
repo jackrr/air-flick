@@ -3,8 +3,16 @@
 
 var actions = [{
     type: 'volume',
-    duration: '15000',
+    duration: '10000',
     value: '1.8'
+  }, {
+    type: 'volume',
+    duration: '10000',
+    value: '1.2'
+  }, {
+    type: 'volume',
+    duration: '10000',
+    value: '0.2'
   }, {
     type: 'chord',
     duration: '10000',
@@ -66,7 +74,7 @@ function sendActions(index, manager) {
 
   manager.addAction(actions[index]);
 
-  setTimeout(function() { sendActions(index+1,manager)}, 3000);
+  setTimeout(function() { sendActions(index+1,manager)}, 1000);
 }
 
 

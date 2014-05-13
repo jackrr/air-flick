@@ -13,7 +13,7 @@ module.exports = Backbone.Model.extend({
   },
 
   enqueue: function(action) {
-    this.views.enqueue(new View({model: action, type: this.get('type'), el: '#' + this.get('type') + '_queue'}));
+    this.views.enqueue(new View({model: action, type: this.get('type'), el: '#' + this.get('type') + ' .actionQueue'}));
     return this.queue.enqueue(action);
   },
 

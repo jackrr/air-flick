@@ -29,7 +29,6 @@ module.exports = Backbone.View.extend({
   },
 
   drawSpout: function() {
-    console.log('drawing spout');
     var $canvas = this.$el.find(".spout");
     var width = $canvas.width();
     var height = $canvas.height();

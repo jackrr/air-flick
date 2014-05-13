@@ -1,4 +1,6 @@
 <div class="sineContainer">
   <div class="action"></div>
   <canvas class="sine" height="400" width="250"></canvas>
+  <div class="actionQueue">
+  </div>
 </div>

@@ -5,8 +5,3 @@
   <div id="vol"></div>
   <div id="chord"></div>
 </div>
-<div class="queues">
-  <div id="volume_queue"></div>
-  <div id="pitch_queue"></div>
-  <div id="chord_queue"></div>
-</div>
