@@ -78,7 +78,6 @@ module.exports = Backbone.View.extend({
     for (var index = 0; index < options.freqs.length; index++) {
       if (options.freqs[index] != -1) freqs.push(options.freqs[index]);
     }
-    console.log(freqs, length);
     var length = freqs.length;
     var height = config.height/length;
 
@@ -102,7 +101,7 @@ module.exports = Backbone.View.extend({
         context.stroke();
       }
 
-      self.timeout = setTimeout(function() {drawWaves(t+.4)}, 30);
+      self.timeout = setTimeout(function() {drawWaves(t+.2)}, 25);
     }
     drawWaves(0);
   },
@@ -135,7 +134,7 @@ module.exports = Backbone.View.extend({
 
       context.stroke();
 
-      self.timeout = setTimeout(function() {drawWave(t+.4)}, 30);
+      self.timeout = setTimeout(function() {drawWave(t+.2)}, 25);
     }
     drawWave(0);
   }

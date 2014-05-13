@@ -14,7 +14,6 @@ module.exports = Backbone.View.extend({
 
   render: function() {
     if (this.model.get('chord')) {
-      console.log('render sound with chord');
       this.wasChord = true;
       var tones = this.model.get('freqs');
 
@@ -35,7 +34,6 @@ module.exports = Backbone.View.extend({
         }
       }
     } else {
-      console.log('render sound without chord');
       if (this.wasChord) {
         for (var i = 1; i < this.audios.length; i++) this.audios[i].pause();
         this.wasChord = undefined;

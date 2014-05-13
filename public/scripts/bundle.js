@@ -15984,7 +15984,7 @@ var Action = Backbone.Model.extend({
 
   execute: function() {
     var self = this;
-    setTimeout(function() { self.done(); }, this.get('duration'));
+    setTimeout(function() { self.done(); }, this.get('duration') - 2000);
   },
 
   done: function() {
@@ -16440,26 +16440,30 @@ Manager.prototype.addAction = function(action) {
 };
 
 Manager.prototype.nextAction = function(type) {
+  var self = this;
   switch (type) {
     case 'volume':
       if (this.vols.isEmpty()) {
-        this.executeVol(this.defaults.vol, true);
+        setTimeout(function() {self.executeVol(self.defaults.vol, true);}, 2000);
       } else {
-        this.executeVol(this.vols.dequeue());
+        var next = this.vols.dequeue();
+        setTimeout(function() {self.executeVol(next);}, 2000);
       }
       break;
     case 'pitch':
       if (this.pitches.isEmpty()) {
-        this.executePitch(this.defaults.pitch, true);
+        setTimeout(function() {self.executePitch(self.defaults.pitch, true);}, 2000);
       } else {
-        this.executePitch(this.pitches.dequeue());
+        var next = this.pitches.dequeue();
+        setTimeout(function() {self.executePitch(next);}, 2000);
       }
       break;
     case 'chord':
       if (this.chords.isEmpty()) {
-        this.executeChord(this.defaults.chord, true);
+        setTimeout(function() {self.executeChord(self.defaults.chord, true);}, 2000);
       } else {
-        this.executeChord(this.chords.dequeue());
+        var next = this.chords.dequeue();
+        setTimeout(function() {self.executeChord(next);}, 2000);
       }
       break;
   }
@@ -17159,7 +17163,6 @@ module.exports = Backbone.View.extend({
     for (var index = 0; index < options.freqs.length; index++) {
       if (options.freqs[index] != -1) freqs.push(options.freqs[index]);
     }
-    console.log(freqs, length);
     var length = freqs.length;
     var height = config.height/length;
 
@@ -17183,7 +17186,7 @@ module.exports = Backbone.View.extend({
         context.stroke();
       }
 
-      self.timeout = setTimeout(function() {drawWaves(t+.4)}, 30);
+      self.timeout = setTimeout(function() {drawWaves(t+.2)}, 25);
     }
     drawWaves(0);
   },
@@ -17216,7 +17219,7 @@ module.exports = Backbone.View.extend({
 
       context.stroke();
 
-      self.timeout = setTimeout(function() {drawWave(t+.4)}, 30);
+      self.timeout = setTimeout(function() {drawWave(t+.2)}, 25);
     }
     drawWave(0);
   }
@@ -17239,7 +17242,6 @@ module.exports = Backbone.View.extend({
 
   render: function() {
     if (this.model.get('chord')) {
-      console.log('render sound with chord');
       this.wasChord = true;
       var tones = this.model.get('freqs');
 
@@ -17260,7 +17262,6 @@ module.exports = Backbone.View.extend({
         }
       }
     } else {
-      console.log('render sound without chord');
       if (this.wasChord) {
         for (var i = 1; i < this.audios.length; i++) this.audios[i].pause();
         this.wasChord = undefined;

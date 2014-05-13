@@ -67,26 +67,30 @@ Manager.prototype.addAction = function(action) {
 };
 
 Manager.prototype.nextAction = function(type) {
+  var self = this;
   switch (type) {
     case 'volume':
       if (this.vols.isEmpty()) {
-        this.executeVol(this.defaults.vol, true);
+        setTimeout(function() {self.executeVol(self.defaults.vol, true);}, 2000);
       } else {
-        this.executeVol(this.vols.dequeue());
+        var next = this.vols.dequeue();
+        setTimeout(function() {self.executeVol(next);}, 2000);
       }
       break;
     case 'pitch':
       if (this.pitches.isEmpty()) {
-        this.executePitch(this.defaults.pitch, true);
+        setTimeout(function() {self.executePitch(self.defaults.pitch, true);}, 2000);
       } else {
-        this.executePitch(this.pitches.dequeue());
+        var next = this.pitches.dequeue();
+        setTimeout(function() {self.executePitch(next);}, 2000);
       }
       break;
     case 'chord':
       if (this.chords.isEmpty()) {
-        this.executeChord(this.defaults.chord, true);
+        setTimeout(function() {self.executeChord(self.defaults.chord, true);}, 2000);
       } else {
-        this.executeChord(this.chords.dequeue());
+        var next = this.chords.dequeue();
+        setTimeout(function() {self.executeChord(next);}, 2000);
       }
       break;
   }

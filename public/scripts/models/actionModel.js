@@ -12,7 +12,7 @@ var Action = Backbone.Model.extend({
 
   execute: function() {
     var self = this;
-    setTimeout(function() { self.done(); }, this.get('duration'));
+    setTimeout(function() { self.done(); }, this.get('duration') - 2000);
   },
 
   done: function() {
