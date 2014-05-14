@@ -24,7 +24,7 @@ module.exports = Backbone.Model.extend({
     freqs.push(root);
 
     // the third
-    if (name == 'maj' || name == '7' || name == 'maj7') {
+    if (name == 'maj' || name == 'dom7' || name == 'maj7') {
       freqs.push(this.intervals[3].major * root);
     } else {
       freqs.push(this.intervals[3].minor * root);
@@ -36,7 +36,7 @@ module.exports = Backbone.Model.extend({
     // the 7th, not always present
     if (name == 'min' || name == 'maj') {
       freqs.push(-1);
-    } else if (name == '7' || 'min7') {
+    } else if (name == 'dom7' || 'min7') {
       freqs.push(this.intervals[7].minor * root);
     } else { // maj7
       freqs.push(this.intervals[7].major * root);
@@ -45,7 +45,7 @@ module.exports = Backbone.Model.extend({
   },
 
   setChord: function(name, duration, def) {
-    var names = ['maj', 'maj7', 'min', '7', 'min7'];
+    var names = ['maj', 'maj7', 'min', 'dom7', 'min7'];
     if (def) {
       console.log('unsetting chord');
       this.unset('chord'); 
