@@ -16,8 +16,6 @@ module.exports = Backbone.Model.extend({
 
     var socket = this.get('socket');
 
-    this.actions = new ActionManager();
-
     // *** comment out for production:
     // console.log('starting run in 3 seconds');
     // setTimeout(function() {
