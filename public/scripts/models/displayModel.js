@@ -52,13 +52,13 @@ module.exports = Backbone.Model.extend({
   addAction: function(action, sender) {
     switch (action.type) {
       case 'start':
-        self.actions.startPlaying();
+        this.actions.startPlaying();
         break;
       case 'stop':
-        self.actions.stopPlaying();
+        this.actions.stopPlaying();
         break;
       default:
-        self.actions.addAction(action);
+        this.actions.addAction(action);
     }
   }
 });
