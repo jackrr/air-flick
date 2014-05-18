@@ -47,8 +47,8 @@ module.exports = Backbone.Model.extend({
   setChord: function(name, duration, def) {
     var names = ['maj', 'maj7', 'min', 'dom7', 'min7'];
     if (def) {
-      console.log('unsetting chord');
-      this.unset('chord'); 
+      this.unset('chord'); // no event listener bc of broken render on first call
+      this.view.render();
     } else if (names.indexOf(name) > -1) {
       this.set('chord', name);
       this.setTones();
