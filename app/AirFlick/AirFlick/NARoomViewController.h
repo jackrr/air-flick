@@ -13,4 +13,7 @@
     NSMutableData *_responseData;
 }
 
+- (void)sendShapeToScreen:(NSDictionary *)shapeAsDict :(NSDictionary *)screen;
+- (NSDictionary *)closestScreenToPoint:(CGPoint)point;
+
 @end

@@ -25,6 +25,7 @@
 		C817BE9718FB17940088750F /* NAColorSelectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C817BE9518FB17940088750F /* NAColorSelectorViewController.m */; };
 		C817BE9818FB17940088750F /* NAColorSelectorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C817BE9618FB17940088750F /* NAColorSelectorViewController.xib */; };
 		C817BE9B18FB8BC50088750F /* UIColor+Expanded.m in Sources */ = {isa = PBXBuildFile; fileRef = C817BE9A18FB8BC50088750F /* UIColor+Expanded.m */; };
+		C843677819194E7500A4DB8B /* NASineShape.m in Sources */ = {isa = PBXBuildFile; fileRef = C843677719194E7500A4DB8B /* NASineShape.m */; };
 		C87EFB0818F33DB100913968 /* NARoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C87EFB0618F33DB100913968 /* NARoomViewController.m */; };
 		C87EFB0918F33DB100913968 /* NARoomViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C87EFB0718F33DB100913968 /* NARoomViewController.xib */; };
 		C8A0B6C818ECBD7300639917 /* NACard.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A0B6C718ECBD7300639917 /* NACard.m */; };
@@ -70,6 +71,8 @@
 		C817BE9918FB8BC50088750F /* UIColor+Expanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Expanded.h"; sourceTree = "<group>"; };
 		C817BE9A18FB8BC50088750F /* UIColor+Expanded.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Expanded.m"; sourceTree = "<group>"; };
 		C82BE44418FC609F009FB7AC /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		C843677619194E7500A4DB8B /* NASineShape.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NASineShape.h; path = ../NASineShape.h; sourceTree = "<group>"; };
+		C843677719194E7500A4DB8B /* NASineShape.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NASineShape.m; path = ../NASineShape.m; sourceTree = "<group>"; };
 		C87EFB0518F33DB100913968 /* NARoomViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NARoomViewController.h; sourceTree = "<group>"; };
 		C87EFB0618F33DB100913968 /* NARoomViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NARoomViewController.m; sourceTree = "<group>"; };
 		C87EFB0718F33DB100913968 /* NARoomViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NARoomViewController.xib; sourceTree = "<group>"; };
@@ -140,25 +143,27 @@
 		C8080C3418E60A00002E9447 /* airflick */ = {
 			isa = PBXGroup;
 			children = (
+				C8080C4018E60A01002E9447 /* Images.xcassets */,
 				C8080C3D18E60A00002E9447 /* NAAppDelegate.h */,
 				C8080C3E18E60A01002E9447 /* NAAppDelegate.m */,
-				C8080C4018E60A01002E9447 /* Images.xcassets */,
-				C8080C3518E60A00002E9447 /* Supporting Files */,
-				C8080C6018E60EB6002E9447 /* NAMainViewController.h */,
-				C8080C6118E60EB6002E9447 /* NAMainViewController.m */,
-				C8080C6218E60EB6002E9447 /* NAMainViewController.xib */,
-				C817BE9418FB17940088750F /* NAColorSelectorViewController.h */,
-				C817BE9518FB17940088750F /* NAColorSelectorViewController.m */,
-				C817BE9618FB17940088750F /* NAColorSelectorViewController.xib */,
 				C8A0B6C618ECBD7300639917 /* NACard.h */,
 				C8A0B6C718ECBD7300639917 /* NACard.m */,
 				C817BE9118FB0ABE0088750F /* NAColorsClass.h */,
 				C817BE9218FB0ABE0088750F /* NAColorsClass.m */,
-				C87EFB0518F33DB100913968 /* NARoomViewController.h */,
-				C87EFB0618F33DB100913968 /* NARoomViewController.m */,
+				C817BE9418FB17940088750F /* NAColorSelectorViewController.h */,
+				C817BE9518FB17940088750F /* NAColorSelectorViewController.m */,
+				C817BE9618FB17940088750F /* NAColorSelectorViewController.xib */,
+				C8080C6018E60EB6002E9447 /* NAMainViewController.h */,
+				C8080C6118E60EB6002E9447 /* NAMainViewController.m */,
+				C8080C6218E60EB6002E9447 /* NAMainViewController.xib */,
 				C8C5A04D1914972100B182E5 /* NARoomView.h */,
 				C8C5A04E1914972100B182E5 /* NARoomView.m */,
+				C87EFB0518F33DB100913968 /* NARoomViewController.h */,
+				C87EFB0618F33DB100913968 /* NARoomViewController.m */,
 				C87EFB0718F33DB100913968 /* NARoomViewController.xib */,
+				C843677619194E7500A4DB8B /* NASineShape.h */,
+				C843677719194E7500A4DB8B /* NASineShape.m */,
+				C8080C3518E60A00002E9447 /* Supporting Files */,
 				C817BE9918FB8BC50088750F /* UIColor+Expanded.h */,
 				C817BE9A18FB8BC50088750F /* UIColor+Expanded.m */,
 			);
@@ -305,6 +310,7 @@
 				C817BE9718FB17940088750F /* NAColorSelectorViewController.m in Sources */,
 				C817BE9B18FB8BC50088750F /* UIColor+Expanded.m in Sources */,
 				C8080C6318E60EB6002E9447 /* NAMainViewController.m in Sources */,
+				C843677819194E7500A4DB8B /* NASineShape.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

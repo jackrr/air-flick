@@ -7,9 +7,9 @@
 //
 
 #import "NARoomViewController.h"
-#import "NAColorsClass.h"
 #import "UIColor+Expanded.h"
 #import "NARoomView.h"
+#import "NASineShape.h"
 #import <QuartzCore/QuartzCore.h>
 
 @interface NARoomViewController () <NSURLConnectionDelegate>
@@ -21,15 +21,23 @@
 @property NSMutableArray *screens;
 //@property NSMutableArray *screenColors;
 
-@property NAColorsClass *obj;
-@property (nonatomic) UIView *colorCircle;
-
-@property int mode; // -1=initial, 0=setup, 1=send/get
+//@property int mode; // -1=initial, 0=setup, 1=send/get
 @property int swipeType; // 0=send, 1=get
 @property int moveCircle; // 0=no, 1=yes
 
-@property CGPoint touchStartsAt;
-@property NSDate *timeTouchBegan;
+//@property CGPoint touchStartsAt;
+//@property NSDate *timeTouchBegan;
+
+@property CGPoint touchStart;
+@property CGPoint touchEnd;
+
+@property float lastScale;
+
+@property NSArray *sineShapes;
+@property NASineShape *currentShape;
+@property int sineIndex;
+
+
 
 @end
 
@@ -40,28 +48,54 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        _obj = [NAColorsClass getInstance];
         
         [self.view setNeedsDisplay];
         
         self.screens = [NSMutableArray new];
-        
-//        self.screenColors = [[NSMutableArray alloc]
-//                             initWithObjects:_obj.color1,_obj.color2,_obj.color3,nil];
-//
-//        NSLog(@"%@",self.screenColors);
         
         self.serverURL = [[NSURL alloc] initWithString:@"http://photoplace.cs.oberlin.edu"];
         
         // get and set the device ID
         self.deviceID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
         
+        UISwipeGestureRecognizer *swipeRight = [[UISwipeGestureRecognizer alloc]
+                                                initWithTarget:self
+                                                action:@selector(horizontalSwipeRight:)];
+        swipeRight.direction = UISwipeGestureRecognizerDirectionRight;
+        swipeRight.cancelsTouchesInView = NO;
+        [self.view addGestureRecognizer:swipeRight];
+        
+        UISwipeGestureRecognizer *swipeLeft = [[UISwipeGestureRecognizer alloc]
+                                               initWithTarget:self
+                                               action:@selector(horizontalSwipeLeft:)];
+        swipeLeft.direction = UISwipeGestureRecognizerDirectionLeft;
+        swipeLeft.cancelsTouchesInView = NO;
+        [self.view addGestureRecognizer:swipeLeft];
+        
+        UIPinchGestureRecognizer *pinchRecognizer = [[UIPinchGestureRecognizer alloc]
+                                                     initWithTarget:self
+                                                     action:@selector(scaleShape:)];
+        [self.view addGestureRecognizer:pinchRecognizer];
+        
+        UISwipeGestureRecognizer *swipeUp = [[UISwipeGestureRecognizer alloc]
+                                             initWithTarget:self
+                                             action:@selector(verticalSwipeUp:)];
+        swipeUp.direction = UISwipeGestureRecognizerDirectionUp;
+        [self.view addGestureRecognizer:swipeUp];
+        
+        UISwipeGestureRecognizer *swipeDown = [[UISwipeGestureRecognizer alloc]
+                                               initWithTarget:self
+                                               action:@selector(verticalSwipeDown:)];
+        swipeDown.direction = UISwipeGestureRecognizerDirectionDown;
+        [self.view addGestureRecognizer:swipeDown];
+        
+        
         UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
                                        initWithTitle:@"Exit"
                                        style:UIBarButtonItemStyleBordered
                                        target:self
                                        action:@selector(back)];
-
+        
         self.navigationItem.leftBarButtonItem = backButton;
         
         UIBarButtonItem *setupButton = [[UIBarButtonItem alloc]
@@ -72,7 +106,26 @@
         
         self.view.backgroundColor = [UIColor whiteColor]; //[_obj getColor];
         
-        self.mode = -1; // start/waiting mode
+//        self.mode = -1; // start/waiting mode
+        
+        self.sineShapes = @[[[NASineShape alloc] initWithShape:@"diamond"],
+                            [[NASineShape alloc] initWithShape:@"circle"],
+                            [[NASineShape alloc] initWithShape:@"square"]];
+        
+        for (NASineShape *s in self.sineShapes){
+            s.parentClass = self;
+        }
+        self.sineIndex = 0;
+        
+        for (UIGestureRecognizer *gr in self.view.gestureRecognizers){
+            gr.enabled = NO;
+        }
+        
+        UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc]
+                                              initWithTarget:self
+                                              action:@selector(panHandler:)];
+        [self.view addGestureRecognizer:panRecognizer];
+        NSLog(@"pan recognizer enabled: %hhd",panRecognizer.isEnabled);
         
         [self connectToRoom];
     }
@@ -89,7 +142,68 @@
     self.view = backgroundView;
 }
 
+- (void)scaleShape:(UIPinchGestureRecognizer *)pr
+{
+    if (pr.state == UIGestureRecognizerStateBegan){
+        self.lastScale = pr.scale;
+    }
+    
+    if (pr.state == UIGestureRecognizerStateEnded) {
+        float wtf = self.currentShape.frame.size.height/10*1000;
+        NSLog(@"wtf: %f",wtf);
+        [self.currentShape updateDuration:wtf];
+        NSLog(@"duration: %@",self.currentShape.duration);
+    }
+    
+    self.currentShape.transform = CGAffineTransformScale(self.currentShape.transform,
+                                                         pr.scale, pr.scale);
+    pr.scale = 1;
+}
 
+- (void)verticalSwipeUp:(UISwipeGestureRecognizer *)sr
+{
+    NSLog(@"swipe up detected");
+    [self.currentShape changeValue:sr.direction];
+}
+
+- (void)verticalSwipeDown:(UISwipeGestureRecognizer *)sr
+{
+    NSLog(@"swipe down direction");
+    [self.currentShape changeValue:sr.direction];
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    self.touchStart = [[touches anyObject] locationInView:self.view];
+}
+
+- (void)horizontalSwipeRight:(UISwipeGestureRecognizer *)sr
+{
+    NSLog(@"swipe right detected");
+    
+    if (!CGRectContainsPoint(self.currentShape.frame, self.touchStart)){
+        self.sineIndex = (self.sineIndex+1) % self.sineShapes.count;
+        CGPoint oldCenter = self.currentShape.center;
+        [self.currentShape removeFromSuperview];
+        self.currentShape = self.sineShapes[self.sineIndex];
+        [self.view addSubview:self.currentShape];
+        self.currentShape.center = oldCenter;
+    }
+}
+
+- (void)horizontalSwipeLeft:(UISwipeGestureRecognizer *)sr
+{
+    NSLog(@"swipe left detected");
+    
+    if (!CGRectContainsPoint(self.currentShape.frame, self.touchStart)){
+        self.sineIndex = (self.sineIndex-1+self.sineShapes.count) % self.sineShapes.count;
+        CGPoint oldCenter = self.currentShape.center;
+        [self.currentShape removeFromSuperview];
+        self.currentShape = self.sineShapes[self.sineIndex];
+        [self.view addSubview:self.currentShape];
+        self.currentShape.center = oldCenter;
+    }
+}
 
 - (void)back {
     [self dismissViewControllerAnimated:NO completion:nil];
@@ -138,7 +252,7 @@
     }
 }
 
-/* 
+/*
  * URLCONNECTION FUNCTIONS
  */
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
@@ -161,11 +275,23 @@
     
     NSLog(@"received: %@",resJSON);
     
-    if (self.mode == 0){
-        // adding screens mode
-        
-    }
+}
+
+- (void)sendShapeToScreen:(NSDictionary *)shapeAsDict :(NSDictionary *)screen
+{
+    NSLog(@"beginning of sendShapeToScreen");
     
+    if (screen)
+        NSLog(@"screen is still not nil");
+    if (shapeAsDict)
+        NSLog(@"shape as dictionary is not nil");
+    
+    NSLog(@"(this could be a problem) screen: %@",screen);
+    
+    [self sendJSONtoPath:[NSString stringWithFormat:@"/device/room/%@",self.roomID]
+                        :@{ @"action":shapeAsDict,
+                            @"deviceID":self.deviceID,
+                            @"displayID":screen[@"displayID"] }];
 }
 
 - (void)sendJSONtoPath:(NSString *)urlPath :(NSDictionary *)dictWithJSONObject {
@@ -194,11 +320,58 @@
 }
 
 - (void)startScreenSetup {
-    self.mode = 0;
+//    self.mode = 0;
+    self.navigationItem.rightBarButtonItem.enabled = NO;
     [self positionDisplay];
 }
 
-- (void)positionDisplay {
+- (void)panHandler:(UIPanGestureRecognizer *)pr
+{
+    if (self.navigationItem.rightBarButtonItem.isEnabled){
+        return;
+    }
+    
+    NSLog(@"PAN HANDLER CALLED");
+    if (pr.state == UIGestureRecognizerStateBegan){
+        self.touchStart = [pr locationInView:self.view];
+    }
+    else if (pr.state == UIGestureRecognizerStateEnded){
+        if ([self distFormula:self.touchStart
+                             :CGPointMake(self.view.bounds.size.width/2.0,
+                                          self.view.bounds.size.height/2.0+44.0)] > self.view.bounds.size.width/3.0)
+        {
+            [[[UIAlertView alloc] initWithTitle:@"Whoops!"
+                                        message:@"Make sure to start your swipes inside the circle."
+                                       delegate:self
+                              cancelButtonTitle:@"OK"
+                              otherButtonTitles:nil]
+             show];
+            return;
+        }
+        
+        self.touchEnd = [pr locationInView:self.view];
+        
+        float dx = -1*(self.touchStart.x - self.touchEnd.x);
+        float dy = -1*(self.touchStart.y - self.touchEnd.y);
+        
+        float normalize = [self distFormula:self.touchStart :self.touchEnd];
+        float r = 300.0; // height should equal width
+        
+        CGPoint finalPoint = CGPointMake(self.touchStart.x+(r*dx/normalize),
+                                         self.touchStart.y+(r*dy/normalize));
+        NSLog(@"finalPoint: %@",NSStringFromCGPoint(finalPoint));
+        
+        [[self.screens lastObject] setObject:[NSValue valueWithCGPoint:finalPoint]
+                                      forKey:@"point"];
+        
+        NSLog(@"screen updated: %@",[self.screens lastObject]);
+        
+        [self positionDisplay];
+    }
+}
+
+- (void)positionDisplay
+{
     NSURL *url = [self.serverURL
                   URLByAppendingPathComponent:[NSString stringWithFormat:@"/device/room/%@/position_displays",self.roomID]];
     
@@ -222,21 +395,17 @@
         
         if (resJSON[@"next"] == nil){
             NSLog(@"no \"next\" key detected");
-            self.mode = 1;
             
-            // TODO: add draggable sub view
-            CGRect bounds = self.view.bounds;
-            float size = bounds.size.width/4.0;
-            //
-            CGRect frame = CGRectMake(0,0,size,size);
-            self.colorCircle = [[UIView alloc] initWithFrame:frame];
-            self.colorCircle.center = CGPointMake(bounds.origin.x+(bounds.size.width/2.0),
-                                                  bounds.origin.y+bounds.size.height-size);
-            [self setRoundedView:self.colorCircle toDiameter:size];
-            self.colorCircle.layer.borderColor = [UIColor blackColor].CGColor;
-            self.colorCircle.layer.borderWidth = 1.5;
-            self.colorCircle.backgroundColor = [_obj getColor];
-            [self.view addSubview:self.colorCircle];
+            for (UIGestureRecognizer *gr in self.view.gestureRecognizers){
+                gr.enabled = !gr.enabled;
+            }
+            
+            self.currentShape = [self.sineShapes objectAtIndex:self.sineIndex];
+            self.currentShape.center = CGPointMake(self.view.bounds.size.width/2.0,
+                                                   self.view.bounds.size.height/2.0+44.0);
+            
+            NSLog(@"shape center: %@",NSStringFromCGPoint(self.currentShape.center));
+            [self.view addSubview:self.currentShape];
             
         } else {
             NSLog(@"%@",err);
@@ -304,127 +473,8 @@
  * SCREENS METHODS
  */
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
-    CGPoint startPoint = [[touches anyObject] locationInView:self.view];
 
-    CGRect bounds = self.view.bounds;
-    CGPoint center;
-    center.x = bounds.origin.x + bounds.size.width/2.0;
-    center.y = bounds.origin.y + bounds.size.height;
-    
-    if ([self pointInside:startPoint withEvent:nil]){
-        self.timeTouchBegan = [NSDate date];
-        self.touchStartsAt = startPoint;
-        self.moveCircle = 1;
-    } else {
-        self.moveCircle = 0;
-    }
-    
-    CGFloat dist = [self distFormula:startPoint :center];
-    
-    NSLog(@"distance from center: %f",dist);
-    
-    if (dist < (bounds.size.width/2.0)){
-        NSLog(@"within send circle");
-        
-        self.swipeType = 0;
-    } else {
-        NSLog(@"outside send circle");
-
-        self.swipeType = 1;
-    }
-    
-}
-
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event{
-    if (self.moveCircle){
-        UITouch *touch = [touches anyObject];
-        CGPoint location = [touch locationInView:self.view];
-        CGPoint previousLocation = [touch previousLocationInView:self.view];
-        self.colorCircle.frame = CGRectOffset(self.colorCircle.frame,
-                                              (location.x - previousLocation.x),
-                                              (location.y - previousLocation.y));
-    }
-}
-
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
-    NSLog(@"Touch end detected");
-    NSLog(@"mode %i",self.mode);
-    NSLog(@"touches: %@",touches);
-    
-    CGPoint endPoint = [[touches anyObject] locationInView:self.view];
-    
-    if (self.mode == 0 && self.swipeType == 0){
-        // add screens mode, swipe started inside circle: add screen
-        
-        // update point for latest screen
-        [[self.screens lastObject] setObject:[NSValue valueWithCGPoint:endPoint]
-                                      forKey:@"point"];
-        
-        //        [self drawRect:endPoint];
-        
-        // send synchronous get request
-        [self positionDisplay];
-        
-    }
-    else if (self.mode == 0 && self.swipeType == 1){
-        // add screens mode, swipe started outside of circle: alert user to error
-        
-        [[[UIAlertView alloc] initWithTitle:@"Whoops!"
-                                    message:@"Make sure to start your swipes inside the circle."
-                                   delegate:self
-                          cancelButtonTitle:@"OK"
-                          otherButtonTitles:nil]
-         show];
-    }
-    else if (self.mode == 1 && self.swipeType == 0 && self.moveCircle == 1){
-        // data mode, swipe started inside cirle: send data!
-        
-        NSMutableDictionary *closestScreen = [self closestScreenForPoint:endPoint];
-        
-        [self sendJSONtoPath:[NSString stringWithFormat:@"/device/room/%@",self.roomID]
-                            :@{@"block":@{@"color":[self.colorCircle.backgroundColor hexStringValue]},
-                               @"displayID":closestScreen[@"displayID"],
-                               @"deviceID":self.deviceID}];
-        
-        CGFloat dist = [self distFormula:endPoint :self.touchStartsAt];
-        NSLog(@"dist: %f",dist);
-        NSTimeInterval time = [[NSDate date] timeIntervalSinceDate:self.timeTouchBegan];
-        NSLog(@"time: %f",time);
-        float velocity = dist/time;
-        NSLog(@"velocity: %f",velocity);
-
-        float slope = (self.touchStartsAt.y-endPoint.y)/(self.touchStartsAt.x-endPoint.x);
-        float newX = (-endPoint.y/slope)+endPoint.x;
-        
-        // is this actually how I was supposed to be calculating duration? probably...
-        float travelDist = [self distFormula:CGPointMake(newX,0) :endPoint];
-        float dur = travelDist/velocity;
-        NSLog(@"actualDur?: %f",dur);
-        
-        [UIView animateWithDuration:dur
-                              delay:0.0
-                            options:UIViewAnimationOptionCurveEaseOut
-                         animations:^{
-                            // float x = self.view.bounds.size.width/2.0;
-                             float y = 0;
-                             self.colorCircle.center = CGPointMake(newX,y);
-                         }
-                         completion:^(BOOL finished) {
-                             [self resetFrame];
-                         }];
-        
-        //[self resetFrame];
-    }
-    else if (self.mode == 1 && self.swipeType == 1){
-        // data mode, swipe started outside of circle: get data!
-        
-        
-    }
-
-}
-
-- (NSMutableDictionary *)closestScreenForPoint:(CGPoint)point {
+- (NSMutableDictionary *)closestScreenToPoint:(CGPoint)point {
     
     NSMutableDictionary *closestScreen = nil;
     float closestDist = MAXFLOAT;
@@ -433,12 +483,15 @@
         CGPoint scg = [[screen valueForKey:@"point"] CGPointValue];
         
         CGFloat dist = [self distFormula:point :scg];
-
+        
         if (dist < closestDist){
             closestDist = dist;
             closestScreen = screen;
         }
     }
+    
+    if (closestScreen)
+        NSLog(@"closest screen is not nil");
     
     return closestScreen;
 }
@@ -449,32 +502,6 @@
     return sqrt((dx*dx)+(dy*dy));
 }
 
-/*
- * CIRCLE VIEW FUNCTIONS
- */
--(void)setRoundedView:(UIView *)roundedView toDiameter:(float)newSize;
-{
-    CGPoint saveCenter = roundedView.center;
-    CGRect newFrame = CGRectMake(roundedView.frame.origin.x, roundedView.frame.origin.y, newSize, newSize);
-    roundedView.frame = newFrame;
-    roundedView.layer.cornerRadius = newSize / 2.0;
-    roundedView.center = saveCenter;
-}
-
-- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
-{
-    return CGRectContainsPoint(self.colorCircle.frame, point);
-}
-
-- (void)resetFrame {
-    CGRect bounds = self.view.bounds;
-    float size = bounds.size.width/4.0;
-    CGRect frame = CGRectMake(bounds.origin.x+(bounds.size.width/2.0)-(size/2.0),
-                              bounds.origin.y+bounds.size.height-size-20.0,
-                              size, size);
-    [self.colorCircle setFrame:frame];
-    self.colorCircle.backgroundColor = [_obj getColor];
-}
 
 
 @end
