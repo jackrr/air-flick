@@ -31,7 +31,7 @@ var VolumeModel = Action.extend({
         sound.setVolume(-1, -1, 'default');
       }
     } else {
-      this.set('displayText', 'x'+this.get('value'));
+      this.set('displayText', 'x'+Math.floor(this.get('value')));
     }
     Action.prototype.initialize.apply(this);
   },
