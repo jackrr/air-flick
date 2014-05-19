@@ -15979,7 +15979,7 @@ Backbone.$ = $;
 var Action = Backbone.Model.extend({
 
   initialize: function() {
-    this.set('time', this.get('duration')/1000 + "s");
+    this.set('time', Math.floor(this.get('duration')/1000) + "s");
   },
 
   execute: function() {
